@@ -23,7 +23,7 @@ const Header = () => {
         <div className="left-header flex justify-end items-stretch gap-x-4">
           <Search />
           <div
-            className="p-1.5 shadow-md text-gray-500 transition-all border rounded-sm lg:hidden hover:bg-primary/80 hover:text-white cursor-pointer"
+            className="p-1.5 shadow-md text-gray-500 transition-all border rounded-sm xl:hidden hover:bg-primary/80 hover:text-white cursor-pointer"
             onClick={toggleSideBar}
           >
             {isSidebarOpen ? (

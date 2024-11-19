@@ -36,12 +36,12 @@ const sidebarMenuItemsSupport: SidebarMenuItem[] = [
   { id: 2, icon: IoSettingsOutline, label: "Settings", link: "/settings" },
 ];
 
-const Sidebar = () => {
+const LeftSidebar = () => {
   const { isSidebarOpen, sidebarRef } = useLayout();
 
   return (
     <div
-      className={`h-screen p-16 border-r-2 basis-[20%] bg-[#F4F5FC] hidden lg:!block lg:static fixed left-0 ${
+      className={`h-screen p-16 basis-[20%] bg-[#F4F5FC] hidden xl:!block xl:static fixed left-0 ${
         isSidebarOpen ? "!block" : "!hidden"
       }`}
       ref={sidebarRef} // Reference the sidebar to detect clicks outside
@@ -59,7 +59,7 @@ const Sidebar = () => {
                 key={id}
               >
                 <Icon />
-                <span>{label}</span>
+                <span className="whitespace-nowrap">{label}</span>
               </Link>
             ))}
           </div>
@@ -86,4 +86,4 @@ const Sidebar = () => {
   );
 };
 
-export default Sidebar;
+export default LeftSidebar;
