@@ -17,7 +17,7 @@ const Header = () => {
       <div className="flex justify-between items-center p-5 flex-nowrap">
         <div className="right-header">
           <Link href="/">
-            <Image src="/logo.svg" alt="" width={136} height={36} />
+            <Image src="/logo.png" alt="" width={75} height={36} />
           </Link>
         </div>
         <div className="left-header flex justify-end items-stretch gap-x-4">
