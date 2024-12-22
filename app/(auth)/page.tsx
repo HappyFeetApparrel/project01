@@ -42,7 +42,8 @@ export default function LoginPage() {
         setError("Invalid email or password");
       }
     } catch (err) {
-      setError("An error occurred. Please try again.");
+      const errorMessage = err instanceof Error ? err.message : "Unknown error";
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
