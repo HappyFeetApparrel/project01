@@ -63,7 +63,7 @@ export default function SalesOrder() {
             </SelectContent>
           </Select>
         </CardHeader>
-        <CardContent>
+        <CardContent className="w-[90vw]">
           <Table>
             <TableHeader className="bg-muted/50">
               <TableRow>
