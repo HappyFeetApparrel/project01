@@ -43,18 +43,18 @@ const footerLinks: FooterLink[] = [
 
 const Footer = () => {
   return (
-    <footer className="container mx-auto p-5">
-      <div className="top-footer flex flex-col gap-8 py-8 md:flex-row md:items-start">
-        <div className="space-y-5 basis-full md:basis-4/12">
+    <footer className="p-5 bg-white">
+      <div className="top-footer flex flex-col gap-8 py-8 lg:flex-row lg:items-start">
+        <div className="space-y-5 basis-full lg:basis-4/12">
           <Link href="/">
-            <Image src="/logo.svg" alt="" width={136} height={36} />
+            <Image src="/logo.png" alt="" width={136} height={36} />
           </Link>
           <h3>
             Cultivating Efficiency, Tracking Excellence — Your Trusted Inventory
             Management Partner
           </h3>
         </div>
-        <div className="flex flex-col gap-8 basis-full md:basis-8/12 md:flex-col-reverse md:items-end">
+        <div className="flex flex-col gap-8 basis-full lg:basis-8/12 lg:flex-col-reverse lg:items-end">
           <div className="social-media-icons flex gap-4">
             {socialIcons.map(({ id, icon: Icon, name, link }) => (
               <Link
@@ -69,7 +69,7 @@ const Footer = () => {
               </Link>
             ))}
           </div>
-          <div className="flex flex-col gap-2 md:flex-row">
+          <div className="flex flex-col gap-2 lg:flex-row">
             {footerLinks.map(({ id, label, href }) => (
               <Link key={id} href={href}>
                 {label}
@@ -79,7 +79,7 @@ const Footer = () => {
         </div>
       </div>
       <Separator />
-      <div className="copyright flex flex-col gap-4 py-8 md:flex-row md:justify-between">
+      <div className="copyright flex flex-col gap-4 py-8 lg:flex-row lg:justify-between">
         <Link href="/privacy-policy">Privacy Policy</Link>
         <Link href="terms-and-condition">Terms & Conditions</Link>
         <p className="font-semibold text-gray-500">

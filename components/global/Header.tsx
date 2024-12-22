@@ -3,10 +3,9 @@
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Search } from "./Search";
 import { RxHamburgerMenu } from "react-icons/rx";
 import { RiCloseLargeFill } from "react-icons/ri";
-
+import Search from "./Search";
 import { useLayout } from "../context/LayoutProvider";
 
 const Header = () => {

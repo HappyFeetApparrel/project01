@@ -5,7 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const Account = () => {
   return (
-    <div className="flex justify-between  p-8 ">
+    <div className="flex justify-between">
       <div className="flex gap-2 items-center justify-start">
         <Avatar>
           <AvatarImage src="https://github.com/shadcn.png" />

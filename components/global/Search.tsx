@@ -21,7 +21,7 @@ const FormSchema = z.object({
   }),
 });
 
-export function Search() {
+export default function Search() {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -44,7 +44,7 @@ export function Search() {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="w-full space-y-6 hidden sm:block"
+        className="w-full space-y-6  basis-full md:basis-full lg:basis-4/12 block"
       >
         <FormField
           control={form.control}

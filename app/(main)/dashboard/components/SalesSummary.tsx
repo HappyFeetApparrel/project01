@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 
 import { IconType } from "react-icons/lib";
@@ -53,7 +55,7 @@ const SalesSummary = () => {
         {salesSummary.map((item, index) => (
           <div
             key={index}
-            className="flex py-3 px-5 lg:py-6 lg:px-10 bg-white shadow-lg rounded-lg gap-4 items-center"
+            className="flex py-3 px-5 lg:p-5 bg-white shadow-lg rounded-lg gap-4 items-center group hover:shadow-xl transition-all duration-300 hover:bg-primary-foreground cursor-pointer"
           >
             <div
               className={`${item.iconColor} ${item.iconColorBG} p-2.5 rounded-full`}
