@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Montserrat } from "next/font/google";
 import "./globals.css";
 
@@ -11,6 +11,13 @@ export const metadata: Metadata = {
   title: "Happy Feet and Apparel",
   description:
     "A Point of Sale and Inventory Management System of Happy Feet and Apparel.",
+};
+
+export const viewport: Viewport = {
+  initialScale: 1,
+  width: "device-width",
+  maximumScale: 1,
+  viewportFit: "cover",
 };
 
 export default function RootLayout({
