@@ -1,10 +1,42 @@
+"use client";
+
 import React from "react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Plus, Search } from "lucide-react";
+import { ProductTable } from "./components/product-table";
+import { products } from "./data/product";
+
+// right sidebar
+import QuickActions from "../dashboard/components/QuickActions";
+import RecentActivity from "@/components/global/RecentActivity";
 
 const page = () => {
   return (
-    <div className="py-16 px-8 space-y-8">
-      <h3 className="font-semibold">Inventory</h3>
-      <div className="container mx-auto flex gap-4"></div>
+    <div className="py-16 px-8 space-y-8 grid grid-cols-1 xl:grid-cols-3">
+      <div className="p-6 space-y-6 col-span-1 xl:col-span-2">
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-semibold">Inventory</h1>
+          <div className="flex items-center gap-4 flex-1 max-w-xl mx-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input type="search" placeholder="Search" className="pl-8" />
+            </div>
+          </div>
+          <Button className="bg-[#00A3FF] hover:bg-[#00A3FF]/90">
+            <Plus className="mr-2 h-4 w-4" />
+            Add New Product
+          </Button>
+        </div>
+        <div>
+          <h2 className="text-xl font-semibold mb-4">Product List</h2>
+          <ProductTable products={products} />
+        </div>
+      </div>
+      <div className="col-span-1">
+        <QuickActions />
+        <RecentActivity />
+      </div>
     </div>
   );
 };

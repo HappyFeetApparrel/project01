@@ -1,62 +1,77 @@
-"use client";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import Image from "next/image";
 
-import React from "react";
-import { MdOutlineNoteAdd } from "react-icons/md";
-
-import { IconType } from "react-icons/lib";
-
-interface fastMovingItem {
-  icon: IconType;
-  label?: string;
+interface Product {
+  id: number;
+  name: string;
+  image: string;
 }
 
-const fastMovingItems: fastMovingItem[] = [
+const products: Product[] = [
   {
-    icon: MdOutlineNoteAdd,
-    label: "Macbook Pro",
+    id: 1,
+    name: "Macbook Pro",
+    image: "/placeholder.svg?height=40&width=40",
   },
   {
-    icon: MdOutlineNoteAdd,
-    label: "Iphone 14 pro",
+    id: 2,
+    name: "iPhone 14 Pro",
+    image: "/placeholder.svg?height=40&width=40",
   },
   {
-    icon: MdOutlineNoteAdd,
-    label: "Zoom75",
+    id: 3,
+    name: "Zoom75",
+    image: "/placeholder.svg?height=40&width=40",
   },
   {
-    icon: MdOutlineNoteAdd,
-    label: "Airpods Pro",
+    id: 4,
+    name: "Airpods Pro",
+    image: "/placeholder.svg?height=40&width=40",
   },
   {
-    icon: MdOutlineNoteAdd,
-    label: "Samsung Galaxy Fold",
+    id: 5,
+    name: "Samsung Galaxy Fold",
+    image: "/placeholder.svg?height=40&width=40",
   },
   {
-    icon: MdOutlineNoteAdd,
-    label: "Samsung Odyssey",
+    id: 6,
+    name: "Samsung Odyssey",
+    image: "/placeholder.svg?height=40&width=40",
   },
   {
-    icon: MdOutlineNoteAdd,
-    label: "Logitech Superlight",
+    id: 7,
+    name: "Logitech Superlight",
+    image: "/placeholder.svg?height=40&width=40",
   },
 ];
 
-const FastMovingItems = () => {
+export default function FastMovingItems() {
   return (
-    <div className="py-8 px-4 md:px-8 space-y-8 bg-white border">
-      <h3 className="font-semibold">Fast Moving Items</h3>
-      {fastMovingItems.map((item, index) => (
-        <div className="flex flex-row items-center gap-2" key={index}>
-          <Avatar>
-            <AvatarImage src="https://github.com/shadcn.png" />
-            <AvatarFallback>CN</AvatarFallback>
-          </Avatar>
-          <p className="font-semibold">{item.label}</p>
+    <Card className="w-full max-w-sm">
+      <CardHeader>
+        <CardTitle>Fast Moving Items</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-4">
+          {products.map((product) => (
+            <div
+              key={product.id}
+              className="flex items-center gap-3 rounded-lg transition-colors hover:bg-muted/50"
+            >
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg border bg-background p-1">
+                <Image
+                  src={product.image}
+                  alt={product.name}
+                  width={32}
+                  height={32}
+                  className="object-contain"
+                />
+              </div>
+              <span className="text-sm font-medium">{product.name}</span>
+            </div>
+          ))}
         </div>
-      ))}
-    </div>
+      </CardContent>
+    </Card>
   );
-};
-
-export default FastMovingItems;
+}

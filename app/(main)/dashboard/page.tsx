@@ -10,13 +10,13 @@ import FastMovingItems from "./components/FastMovingItems";
 
 const Home = () => {
   return (
-    <div className="flex xl:flex-row flex-col ">
-      <div className="basis-9/12 space-y-8">
+    <div className="grid xl:grid-cols-3 grid-cols-1">
+      <div className="col-span-1 xl:col-span-2 space-y-8">
         <SalesSummary />
         <StockReports />
         <SalesOrder />
       </div>
-      <div className="basis-3/12">
+      <div className="col-span-1">
         <QuickActions />
         <FastMovingItems />
       </div>
