@@ -12,7 +12,7 @@ const page = () => {
       <div className="p-6 space-y-6 col-span-1 xl:col-span-2">
         <Reports />
       </div>
-      <div className="col-span-1">
+      <div className="col-span-1 px-4 mx:px-8">
         <SupplierAnalytics />
       </div>
     </div>

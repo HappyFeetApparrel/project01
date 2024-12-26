@@ -71,7 +71,7 @@ export default function QuickActions() {
   }, [actions]);
 
   return (
-    <Card className="w-full mb-8">
+    <Card className="w-full m-0 xl:my-8 xl:max-w-sm max-w-full">
       <CardHeader>
         <CardTitle>Quick Actions</CardTitle>
       </CardHeader>

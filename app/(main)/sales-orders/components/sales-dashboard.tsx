@@ -90,12 +90,14 @@ export default function SalesDashboard() {
     <div className="w-full space-y-8">
       {/* Sales Orders Section */}
       <div className="space-y-4">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between flex-wrap gap-4">
           <h2 className="text-2xl font-semibold">Sales Orders</h2>
-          <div className="flex items-center gap-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input placeholder="Search" className="w-[300px] pl-9" />
+          <div className="flex gap-4 flex-wrap flex-col w-full sm:flex-row">
+            <div className="flex items-center gap-4 flex-1 max-w-xl flex-nowrap flex-grow">
+              <div className="relative flex-1">
+                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input type="search" placeholder="Search" className="pl-8" />
+              </div>
             </div>
             <Button className="bg-[#00A3FF] hover:bg-[#00A3FF]/90">
               <Plus className="mr-2 h-4 w-4" />

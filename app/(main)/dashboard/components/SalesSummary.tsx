@@ -51,7 +51,7 @@ const SalesSummary = () => {
   return (
     <div className="py-16 px-4 md:px-8 space-y-8">
       <h3 className="font-semibold">Sales Summary</h3>
-      <div className="container mx-auto grid grid-cols-2 gap-4 2xl:grid-cols-4">
+      <div className="container mx-auto grid grid-cols-1 sm:grid-cols-2 gap-4 2xl:grid-cols-4">
         {salesSummary.map((item, index) => (
           <div
             key={index}

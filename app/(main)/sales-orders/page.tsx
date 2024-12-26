@@ -13,7 +13,7 @@ const page = () => {
       <div className="p-6 space-y-6 col-span-1 xl:col-span-2">
         <SalesDashboard />
       </div>
-      <div className="col-span-1">
+      <div className="col-span-1 p-4 mx:p-8 flex xl:block items-start gap-8 flex-col-reverse sm:flex-row">
         <QuickActions />
         <RecentActivity />
       </div>

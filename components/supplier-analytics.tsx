@@ -49,7 +49,7 @@ const renderCustomizedLabel = ({
 
 export default function SupplierAnalytics() {
   return (
-    <div className="w-full max-w-3xl space-y-8">
+    <div className="w-full xl:max-w-sm max-w-full space-y-8">
       {/* Top Suppliers Chart */}
       <Card>
         <CardHeader>

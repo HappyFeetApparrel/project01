@@ -47,7 +47,7 @@ const products: Product[] = [
 
 export default function FastMovingItems() {
   return (
-    <Card className="w-full max-w-sm">
+    <Card className="w-full xl:max-w-sm max-w-full">
       <CardHeader>
         <CardTitle>Fast Moving Items</CardTitle>
       </CardHeader>

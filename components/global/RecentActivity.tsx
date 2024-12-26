@@ -51,7 +51,7 @@ const activities: ActivityItem[] = [
 
 export default function RecentActivity() {
   return (
-    <Card className="w-full max-w-md">
+    <Card className="w-full m-0 xl:my-8 xl:max-w-sm max-w-full">
       <CardHeader>
         <CardTitle className="text-2xl font-bold">Recent Activity</CardTitle>
       </CardHeader>

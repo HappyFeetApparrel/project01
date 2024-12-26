@@ -28,6 +28,9 @@ const SIDEBAR_WIDTH_MOBILE = "22rem";
 const SIDEBAR_WIDTH_ICON = "3rem";
 const SIDEBAR_KEYBOARD_SHORTCUT = "b";
 
+// custom
+import { usePathname } from "next/navigation";
+
 type SidebarContext = {
   state: "expanded" | "collapsed";
   open: boolean;
@@ -265,8 +268,20 @@ const SidebarTrigger = React.forwardRef<
   React.ElementRef<typeof Button>,
   React.ComponentProps<typeof Button>
 >(({ className, onClick, ...props }, ref) => {
-  const { toggleSidebar, open, openMobile } = useSidebar();
-  console.log(open && openMobile);
+  const { toggleSidebar, open, openMobile, setOpenMobile } = useSidebar();
+  const path = usePathname();
+
+  /* @jsxRuntime classic */
+  /* @jsx jsx */
+  /* @jsxFrag React.Fragment */
+  /* @use client */
+  ("use client");
+  React.useEffect(() => {
+    if (openMobile && path) {
+      setOpenMobile(false);
+    }
+  }, [path]);
+
   return (
     <Button
       ref={ref}

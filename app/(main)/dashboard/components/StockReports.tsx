@@ -31,7 +31,7 @@ export default function StockReports() {
   return (
     <div className="py-8 px-4 md:px-8 space-y-8 ">
       <Card className="w-full ">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-7">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-7 flex-wrap">
           <CardTitle className="text-2xl font-bold">Stock Report</CardTitle>
           <div className="flex items-center space-x-4">
             <div className="flex items-center">

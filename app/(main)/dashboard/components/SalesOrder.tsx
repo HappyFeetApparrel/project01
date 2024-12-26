@@ -16,7 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { ChevronDown } from "lucide-react";
+// import { ChevronDown } from "lucide-react";
 
 const data = [
   {
@@ -49,12 +49,12 @@ export default function SalesOrder() {
   return (
     <div className="py-8 px-4 md:px-8 space-y-8 ">
       <Card className="w-full">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-7">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-7 flex-wrap">
           <CardTitle className="text-2xl font-bold">Sales Order</CardTitle>
           <Select defaultValue="7days">
             <SelectTrigger className="w-[180px] text-primary">
               <SelectValue placeholder="Select period" />
-              <ChevronDown className="h-4 w-4 opacity-50" />
+              {/* <ChevronDown className="h-4 w-4 opacity-50" /> */}
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="7days">Last 7 Days</SelectItem>

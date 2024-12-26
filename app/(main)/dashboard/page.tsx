@@ -16,7 +16,7 @@ const Home = () => {
         <StockReports />
         <SalesOrder />
       </div>
-      <div className="col-span-1">
+      <div className="col-span-1 p-4 mx:p-8 flex xl:block items-start gap-8 flex-col-reverse sm:flex-row">
         <QuickActions />
         <FastMovingItems />
       </div>
