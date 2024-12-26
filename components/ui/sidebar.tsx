@@ -275,7 +275,6 @@ const SidebarTrigger = React.forwardRef<
   /* @jsx jsx */
   /* @jsxFrag React.Fragment */
   /* @use client */
-  ("use client");
   React.useEffect(() => {
     if (openMobile && path) {
       setOpenMobile(false);
