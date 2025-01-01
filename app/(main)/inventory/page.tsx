@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Plus, Search } from "lucide-react";
 import { ProductTable } from "./components/product-table";
-import { products } from "./data/product";
+import { products } from "../../../data/product";
 
 // components
 import { AddProductDialog } from "./components/add-product-dialog";
@@ -15,7 +15,7 @@ import { AddProductDialog } from "./components/add-product-dialog";
 import QuickActions from "../dashboard/components/QuickActions";
 import RecentActivity from "@/components/global/RecentActivity";
 
-const Page = () => {
+const InventoryPage = () => {
   "use client";
   const [open, setOpen] = useState<boolean>(false);
 
@@ -54,4 +54,4 @@ const Page = () => {
   );
 };
 
-export default Page;
+export default InventoryPage;

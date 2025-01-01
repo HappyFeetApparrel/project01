@@ -13,7 +13,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import Image from "next/image";
-import { Product } from "../data/product";
+import { Product } from "../../../../data/product";
 
 // components
 import { UpdateProductDialog } from "./update-product-dialog";
