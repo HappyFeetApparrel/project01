@@ -15,13 +15,18 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import Image from "next/image";
 import { Product } from "../data/product";
 
+// components
+import { UpdateProductDialog } from "./update-product-dialog";
+import { ViewProductDialog } from "./view-product-dialog";
+import DeleteProductDialog from "./delete-product-dialog";
+
 interface ProductTableProps {
   products: Product[];
 }
 
 export function ProductTable({ products }: ProductTableProps) {
   const [page, setPage] = React.useState(1);
-  const itemsPerPage = 7;
+  const itemsPerPage = 10; // Update to 10 items per page
   const totalPages = Math.ceil(products.length / itemsPerPage);
 
   const paginatedProducts = products.slice(
@@ -37,25 +42,21 @@ export function ProductTable({ products }: ProductTableProps) {
             <TableHead className="w-12">
               <Checkbox />
             </TableHead>
+            <TableHead>Image</TableHead>
             <TableHead>Name</TableHead>
             <TableHead>Code</TableHead>
             <TableHead>Type</TableHead>
             <TableHead>Price</TableHead>
             <TableHead>Quantity</TableHead>
-            <TableHead>Image</TableHead>
+            <TableHead>Actions</TableHead> {/* Added column for actions */}
           </TableRow>
         </TableHeader>
         <TableBody>
           {paginatedProducts.map((product) => (
-            <TableRow key={product.code}>
+            <TableRow key={product.barcode}>
               <TableCell>
                 <Checkbox />
               </TableCell>
-              <TableCell>{product.name}</TableCell>
-              <TableCell>{product.code}</TableCell>
-              <TableCell>{product.type}</TableCell>
-              <TableCell>${product.price.toLocaleString()}</TableCell>
-              <TableCell>{product.quantity}</TableCell>
               <TableCell>
                 <Image
                   src={product.image}
@@ -64,6 +65,19 @@ export function ProductTable({ products }: ProductTableProps) {
                   height={40}
                   className="object-contain"
                 />
+              </TableCell>
+
+              <TableCell>{product.name}</TableCell>
+              <TableCell>{product.barcode}</TableCell>
+              <TableCell>{product.category}</TableCell>
+              <TableCell>${product.unitPrice.toLocaleString()}</TableCell>
+              <TableCell>{product.quantity}</TableCell>
+              <TableCell>
+                <div className="flex space-x-2">
+                  <ViewProductDialog product={product} />
+                  <UpdateProductDialog product={product} />
+                  <DeleteProductDialog product={product} />
+                </div>
               </TableCell>
             </TableRow>
           ))}

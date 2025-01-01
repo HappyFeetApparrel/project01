@@ -1,17 +1,24 @@
 "use client";
 
 import React from "react";
+import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Plus, Search } from "lucide-react";
 import { ProductTable } from "./components/product-table";
 import { products } from "./data/product";
 
+// components
+import { AddProductDialog } from "./components/add-product-dialog";
+
 // right sidebar
 import QuickActions from "../dashboard/components/QuickActions";
 import RecentActivity from "@/components/global/RecentActivity";
 
-const page = () => {
+const Page = () => {
+  "use client";
+  const [open, setOpen] = useState<boolean>(false);
+
   return (
     <div className="py-16 px-8 space-y-8 grid grid-cols-1 xl:grid-cols-3">
       <div className="p-6 space-y-6 col-span-1 xl:col-span-2">
@@ -24,7 +31,10 @@ const page = () => {
                 <Input type="search" placeholder="Search" className="pl-8" />
               </div>
             </div>
-            <Button className="bg-[#00A3FF] hover:bg-[#00A3FF]/90">
+            <Button
+              className="bg-[#00A3FF] hover:bg-[#00A3FF]/90"
+              onClick={() => setOpen(true)}
+            >
               <Plus className="mr-2 h-4 w-4" />
               Add New Product
             </Button>
@@ -39,8 +49,9 @@ const page = () => {
         <QuickActions />
         <RecentActivity />
       </div>
+      <AddProductDialog open={open} setOpen={setOpen} />
     </div>
   );
 };
 
-export default page;
+export default Page;
