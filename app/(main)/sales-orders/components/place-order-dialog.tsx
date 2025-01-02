@@ -1,9 +1,8 @@
 "use client";
 
-import { useState } from "react";
-import { Plus, Minus, X, Search } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Plus, Minus, X, Search, ShoppingCart } from "lucide-react";
 import Image from "next/image";
-import { products } from "@/data/product";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -12,6 +11,7 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
+  DialogTrigger,
 } from "@/components/ui/dialog";
 import {
   Form,
@@ -34,42 +34,19 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { SuccessPopup } from "./success-popup";
 import { FailPopup } from "./fail-popup";
+import { PrintInvoiceDialog } from "./print-invoice-dialog";
+import { getInventory, updateInventory } from "../utils/inventory";
 
-interface Product {
-  productId: string;
-  name: string;
-  description: string;
-  category: string;
-  sku: string;
-  barcode: string;
-  quantity: number;
-  reorderLevel: number;
-  unitPrice: number;
-  costPrice: number;
-  supplier: string;
-  dateOfEntry: Date;
-  size: string;
-  color: string;
-  material: string;
-  style: string;
-  brand: string;
-  season: string;
-  status: string;
-  location: string;
-  discount: number;
-  image: string;
-}
-
-interface OrderItem {
-  product: Product;
-  quantity: number;
-}
+// import types
+import { Product } from "@/data/product";
+import OrderItem from "../types/order-item";
+import OrderData from "../types/order-data";
 
 const orderSchema = z.object({
-  customerName: z.string().min(1, "Customer name is required"),
   paymentMethod: z.enum(["credit_card", "bank_transfer", "cash"], {
     required_error: "Payment method is required",
   }),
+  amountGiven: z.number().min(0, "Amount must be 0 or greater"),
 });
 
 interface PlaceOrderDialogProps {
@@ -80,18 +57,29 @@ interface PlaceOrderDialogProps {
 export function PlaceOrderDialog({ open, setOpen }: PlaceOrderDialogProps) {
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
   const [showFailPopup, setShowFailPopup] = useState(false);
+  const [showPrintInvoice, setShowPrintInvoice] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
+  const [change, setChange] = useState(0);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [currentOrderData, setCurrentOrderData] = useState<OrderData | null>(
+    null
+  );
+  const [inventory, setInventory] = useState<Product[]>([]);
 
   const form = useForm<z.infer<typeof orderSchema>>({
     resolver: zodResolver(orderSchema),
     defaultValues: {
-      customerName: "",
       paymentMethod: undefined,
+      amountGiven: 0,
     },
   });
 
-  const filteredProducts = products.filter(
+  useEffect(() => {
+    setInventory(getInventory());
+  }, []);
+
+  const filteredProducts = inventory.filter(
     (product) =>
       product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       product.sku.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -103,13 +91,15 @@ export function PlaceOrderDialog({ open, setOpen }: PlaceOrderDialogProps) {
       (item) => item.product.productId === product.productId
     );
     if (existingItem) {
-      setOrderItems(
-        orderItems.map((item) =>
-          item.product.productId === product.productId
-            ? { ...item, quantity: item.quantity + 1 }
-            : item
-        )
-      );
+      if (existingItem.quantity < product.quantity) {
+        setOrderItems(
+          orderItems.map((item) =>
+            item.product.productId === product.productId
+              ? { ...item, quantity: item.quantity + 1 }
+              : item
+          )
+        );
+      }
     } else {
       setOrderItems([...orderItems, { product, quantity: 1 }]);
     }
@@ -122,9 +112,12 @@ export function PlaceOrderDialog({ open, setOpen }: PlaceOrderDialogProps) {
   };
 
   const updateQuantity = (productId: string, newQuantity: number) => {
+    const product = inventory.find((p) => p.productId === productId);
+    if (!product) return;
+
     if (newQuantity < 1) {
       removeFromOrder(productId);
-    } else {
+    } else if (newQuantity <= product.quantity) {
       setOrderItems(
         orderItems.map((item) =>
           item.product.productId === productId
@@ -143,34 +136,75 @@ export function PlaceOrderDialog({ open, setOpen }: PlaceOrderDialogProps) {
     }, 0);
   };
 
+  useEffect(() => {
+    const total = calculateTotal();
+    const amountGiven = form.getValues("amountGiven");
+    setChange(amountGiven - total);
+  }, [orderItems, form.watch("amountGiven")]);
+
   async function onSubmit(values: z.infer<typeof orderSchema>) {
     try {
       if (orderItems.length === 0) {
         throw new Error("No products in order");
       }
 
-      const orderData = {
+      const total = calculateTotal();
+      if (values.amountGiven < total) {
+        throw new Error("Insufficient payment amount");
+      }
+
+      setIsProcessing(true);
+
+      const orderData: OrderData = {
         ...values,
         items: orderItems,
-        totalAmount: calculateTotal(),
+        totalAmount: total,
+        change: values.amountGiven - total,
         orderDate: new Date(),
       };
 
       // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 2000));
       console.log(orderData);
-      setOpen(false);
-      setShowSuccessPopup(true);
-      setOrderItems([]); // Clear the order after successful submission
+
+      // Update inventory
+      updateInventory(
+        orderItems.map((item) => ({
+          productId: item.product.productId,
+          quantity: item.quantity,
+        }))
+      );
+      setInventory(getInventory());
+
+      setCurrentOrderData(orderData);
+      setIsProcessing(false);
+      setShowPrintInvoice(true);
     } catch (error) {
       console.error(error);
+      setIsProcessing(false);
       setShowFailPopup(true);
     }
   }
 
+  const handlePrintInvoiceClose = () => {
+    setShowPrintInvoice(false);
+    setShowSuccessPopup(true);
+    setTimeout(() => {
+      setShowSuccessPopup(false);
+      setOpen(false);
+      setOrderItems([]);
+      form.reset();
+    }, 3000);
+  };
+
   return (
     <>
       <Dialog open={open} onOpenChange={setOpen}>
+        <DialogTrigger asChild>
+          <Button>
+            <ShoppingCart className="mr-2 h-4 w-4" /> Place Order
+          </Button>
+        </DialogTrigger>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Place New Order</DialogTitle>
@@ -179,7 +213,7 @@ export function PlaceOrderDialog({ open, setOpen }: PlaceOrderDialogProps) {
             </DialogDescription>
           </DialogHeader>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-2 gap-6">
             <div className="space-y-6">
               {/* Product Search */}
               <div className="relative">
@@ -220,7 +254,11 @@ export function PlaceOrderDialog({ open, setOpen }: PlaceOrderDialogProps) {
                         Stock: {product.quantity}
                       </p>
                     </div>
-                    <Button size="sm" onClick={() => addToOrder(product)}>
+                    <Button
+                      size="sm"
+                      onClick={() => addToOrder(product)}
+                      disabled={product.quantity === 0}
+                    >
                       <Plus className="h-4 w-4" />
                     </Button>
                   </div>
@@ -266,6 +304,7 @@ export function PlaceOrderDialog({ open, setOpen }: PlaceOrderDialogProps) {
                                 item.quantity + 1
                               )
                             }
+                            disabled={item.quantity >= item.product.quantity}
                           >
                             <Plus className="h-3 w-3" />
                           </Button>
@@ -302,19 +341,6 @@ export function PlaceOrderDialog({ open, setOpen }: PlaceOrderDialogProps) {
                 >
                   <FormField
                     control={form.control}
-                    name="customerName"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Customer Name *</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Enter customer name" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
                     name="paymentMethod"
                     render={({ field }) => (
                       <FormItem>
@@ -342,6 +368,32 @@ export function PlaceOrderDialog({ open, setOpen }: PlaceOrderDialogProps) {
                       </FormItem>
                     )}
                   />
+                  <FormField
+                    control={form.control}
+                    name="amountGiven"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Amount Given *</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            placeholder="Enter amount given"
+                            {...field}
+                            onChange={(e) =>
+                              field.onChange(parseFloat(e.target.value))
+                            }
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <div className="flex justify-between items-center">
+                    <span className="font-medium">Change:</span>
+                    <span className="text-lg font-bold">
+                      ${change.toFixed(2)}
+                    </span>
+                  </div>
                   <div className="flex justify-end space-x-4 pt-4">
                     <Button
                       variant="outline"
@@ -350,8 +402,13 @@ export function PlaceOrderDialog({ open, setOpen }: PlaceOrderDialogProps) {
                     >
                       Cancel
                     </Button>
-                    <Button type="submit" disabled={orderItems.length === 0}>
-                      Place Order
+                    <Button
+                      type="submit"
+                      disabled={
+                        orderItems.length === 0 || change < 0 || isProcessing
+                      }
+                    >
+                      {isProcessing ? "Processing..." : "Place Order"}
                     </Button>
                   </div>
                 </form>
@@ -360,6 +417,13 @@ export function PlaceOrderDialog({ open, setOpen }: PlaceOrderDialogProps) {
           </div>
         </DialogContent>
       </Dialog>
+      {showPrintInvoice && (
+        <PrintInvoiceDialog
+          isOpen={showPrintInvoice}
+          onClose={handlePrintInvoiceClose}
+          orderData={currentOrderData}
+        />
+      )}
       {showSuccessPopup && (
         <SuccessPopup
           message="Order placed successfully!"
