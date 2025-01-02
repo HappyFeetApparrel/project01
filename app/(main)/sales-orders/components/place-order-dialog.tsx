@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Plus, Minus, X, Search, ShoppingCart } from "lucide-react";
+import { Plus, Minus, X, Search } from "lucide-react";
 import Image from "next/image";
 
 import { Button } from "@/components/ui/button";
@@ -11,7 +11,6 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import {
   Form,
@@ -200,11 +199,6 @@ export function PlaceOrderDialog({ open, setOpen }: PlaceOrderDialogProps) {
   return (
     <>
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogTrigger asChild>
-          <Button>
-            <ShoppingCart className="mr-2 h-4 w-4" /> Place Order
-          </Button>
-        </DialogTrigger>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Place New Order</DialogTitle>

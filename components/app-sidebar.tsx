@@ -21,6 +21,7 @@ import { BsBoxSeam } from "react-icons/bs";
 import { LuShoppingCart } from "react-icons/lu";
 import { CiDeliveryTruck } from "react-icons/ci";
 import { AiOutlineStock } from "react-icons/ai";
+import { HiUsers } from "react-icons/hi2";
 
 import { CiCircleInfo } from "react-icons/ci";
 import { IoSettingsOutline } from "react-icons/io5";
@@ -41,6 +42,7 @@ const sidebarMenuItemsGeneral: SidebarMenuItem[] = [
   { id: 3, icon: LuShoppingCart, label: "Sales Orders", link: "/sales-orders" },
   { id: 4, icon: CiDeliveryTruck, label: "Suppliers", link: "/suppliers" },
   { id: 5, icon: AiOutlineStock, label: "Reports", link: "/reports" },
+  { id: 6, icon: HiUsers, label: "Users", link: "/users" },
 ];
 
 const sidebarMenuItemsSupport: SidebarMenuItem[] = [

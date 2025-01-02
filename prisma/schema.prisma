@@ -1,0 +1,150 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  user_id     Int      @id @default(autoincrement())
+  name        String
+  email       String   @unique
+  password    String
+  role        String   // e.g., Admin, Manager, Staff
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  // Relations
+  orders      SalesOrder[]
+  adjustments InventoryAdjustment[]
+  logs        UserActivityLog[]
+}
+
+model Product {
+  product_id     Int      @id @default(autoincrement())
+  name           String
+  description    String?
+  category_id    Int?
+  sku            String   @unique
+  barcode        String?  @unique
+  quantity_in_stock Int
+  reorder_level  Int
+  unit_price     Float
+  cost_price     Float
+  supplier_id    Int?
+  date_of_entry  DateTime @default(now())
+  size           String?  // e.g., S, M, L, XL
+  color          String?
+  material       String?
+  style_design   String?
+  product_image  String?  // URL or path to image
+  dimensions     String?  // JSON-like structure
+  weight         Float?
+  brand          String?
+  season         String?
+  expiration_date DateTime?
+  tags           String[] @default([]) // Array of tags
+  status         String   // e.g., Active, Discontinued, Out of Stock
+  location       String?
+  discount       Float?   // Optional discount percentage
+
+  // Relations
+  category       Category?       @relation(fields: [category_id], references: [category_id])
+  supplier       Supplier?       @relation(fields: [supplier_id], references: [supplier_id])
+  order_items    OrderItem[]
+  adjustments    InventoryAdjustment[]
+}
+
+model Supplier {
+  supplier_id   Int      @id @default(autoincrement())
+  name          String
+  contact_person String?
+  phone_number  String?
+  email_address String?
+  address       String?
+  supplied_products String? // Category or product type
+
+  // Relations
+  products      Product[]
+}
+
+model SalesOrder {
+  order_id      Int      @id @default(autoincrement())
+  order_code    String   @unique
+  user_id       Int
+  payment_method_id Int?
+  amount_given  Float
+  change        Float
+  total_price   Float
+  created_at    DateTime @default(now())
+
+  // Relations
+  user          User      @relation(fields: [user_id], references: [user_id])
+  payment_method PaymentMethod? @relation(fields: [payment_method_id], references: [payment_method_id])
+  order_items   OrderItem[]
+}
+
+model OrderItem {
+  order_item_id Int      @id @default(autoincrement())
+  order_id      Int
+  product_id    Int
+  quantity      Int
+  unit_price    Float
+  total_price   Float
+
+  // Relations
+  order         SalesOrder @relation(fields: [order_id], references: [order_id])
+  product       Product    @relation(fields: [product_id], references: [product_id])
+}
+
+model PaymentMethod {
+  payment_method_id Int    @id @default(autoincrement())
+  name              String
+  description       String?
+
+  // Relations
+  sales_orders      SalesOrder[]
+}
+
+model InventoryAdjustment {
+  adjustment_id     Int      @id @default(autoincrement())
+  product_id        Int
+  quantity_changed  Int
+  reason            String
+  adjusted_by       Int
+  created_at        DateTime @default(now())
+
+  // Relations
+  product           Product @relation(fields: [product_id], references: [product_id])
+  adjusted_by_user  User    @relation(fields: [adjusted_by], references: [user_id])
+}
+
+model Category {
+  category_id Int      @id @default(autoincrement())
+  name        String
+  description String?
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  // Relations
+  products    Product[]
+}
+
+model UserActivityLog {
+  log_id      Int      @id @default(autoincrement())
+  user_id     Int
+  action      String
+  details     String?  // Optional JSON for extra info
+  created_at  DateTime @default(now())
+
+  // Relations
+  user        User @relation(fields: [user_id], references: [user_id])
+}
+
+model Setting {
+  setting_id  Int      @id @default(autoincrement())
+  name        String   @unique
+  value       String   // Store JSON or simple values
+}
