@@ -40,61 +40,49 @@ import {
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { SuccessPopup } from "./success-popup";
-import { FailPopup } from "./fail-popup";
+// import { SuccessPopup } from "./success-popup";
+// import { FailPopup } from "./fail-popup";
 
+// Define the product schema using Zod for validation
 const productSchema = z.object({
-  productId: z.string().min(1, "Product ID is required"),
+  productId: z.number().int().min(1, "Product ID is required"),
   name: z.string().min(1, "Name is required"),
-  description: z.string().min(1, "Description is required"),
-  category: z.string().min(1, "Category is required"),
+  description: z.string().optional(),
+  categoryId: z.number().int().optional(),
   sku: z.string().min(1, "SKU is required"),
   barcode: z.string().optional(),
-  quantity: z.number().min(0, "Quantity must be 0 or greater"),
-  reorderLevel: z.number().min(0, "Reorder level must be 0 or greater"),
+  quantityInStock: z
+    .number()
+    .int()
+    .min(0, "Quantity in stock must be 0 or greater"),
+  reorderLevel: z.number().int().min(0, "Reorder level must be 0 or greater"),
   unitPrice: z.number().min(0, "Unit price must be 0 or greater"),
   costPrice: z.number().min(0, "Cost price must be 0 or greater"),
-  supplier: z.string().min(1, "Supplier is required"),
+  supplierId: z.number().int().optional(),
   dateOfEntry: z.date(),
   size: z.string().optional(),
   color: z.string().optional(),
   material: z.string().optional(),
-  style: z.string().optional(),
-  brand: z.string().min(1, "Brand is required"),
+  styleDesign: z.string().optional(),
+  productImage: z.string().optional(),
+  dimensions: z.string().optional(),
+  weight: z.number().optional(),
+  brand: z.string().optional(),
   season: z.string().optional(),
+  expirationDate: z.date().optional(),
   status: z.string().min(1, "Status is required"),
-  location: z.string().min(1, "Location is required"),
+  location: z.string().optional(),
   discount: z.number().min(0, "Discount must be 0 or greater").optional(),
 });
 
-interface Product {
-  productId: string;
-  name: string;
-  description: string;
-  category: string;
-  sku: string;
-  barcode?: string;
-  quantity: number;
-  reorderLevel: number;
-  unitPrice: number;
-  costPrice: number;
-  supplier: string;
-  dateOfEntry: Date;
-  size?: string;
-  color?: string;
-  material?: string;
-  style?: string;
-  brand: string;
-  season?: string;
-  status: string;
-  location: string;
-  discount?: number;
-}
+import { Product } from "@/prisma/type";
 
 export function UpdateProductDialog({ product }: { product: Product }) {
   const [open, setOpen] = useState(false);
-  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
-  const [showFailPopup, setShowFailPopup] = useState(false);
+  // const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+  // const [showFailPopup, setShowFailPopup] = useState(false);
+
+  // Initialize form with default values from product
   const form = useForm<z.infer<typeof productSchema>>({
     resolver: zodResolver(productSchema),
     defaultValues: {
@@ -108,10 +96,10 @@ export function UpdateProductDialog({ product }: { product: Product }) {
       await new Promise((resolve) => setTimeout(resolve, 1000));
       console.log(values);
       setOpen(false);
-      setShowSuccessPopup(true);
+      // setShowSuccessPopup(true);
     } catch (error) {
       console.error(error);
-      setShowFailPopup(true);
+      // setShowFailPopup(true);
     }
   }
 
@@ -163,13 +151,13 @@ export function UpdateProductDialog({ product }: { product: Product }) {
                 />
                 <FormField
                   control={form.control}
-                  name="category"
+                  name="categoryId"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Category *</FormLabel>
                       <Select
                         onValueChange={field.onChange}
-                        defaultValue={field.value}
+                        // defaultValue={field.value}
                       >
                         <FormControl>
                           <SelectTrigger>
@@ -246,7 +234,7 @@ export function UpdateProductDialog({ product }: { product: Product }) {
                 />
                 <FormField
                   control={form.control}
-                  name="quantity"
+                  name="quantityInStock"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Quantity in Stock *</FormLabel>
@@ -326,7 +314,7 @@ export function UpdateProductDialog({ product }: { product: Product }) {
                 />
                 <FormField
                   control={form.control}
-                  name="supplier"
+                  name="supplierId"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Supplier *</FormLabel>
@@ -378,164 +366,7 @@ export function UpdateProductDialog({ product }: { product: Product }) {
                     </FormItem>
                   )}
                 />
-                <FormField
-                  control={form.control}
-                  name="size"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Size</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select size" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="xs">XS</SelectItem>
-                          <SelectItem value="s">S</SelectItem>
-                          <SelectItem value="m">M</SelectItem>
-                          <SelectItem value="l">L</SelectItem>
-                          <SelectItem value="xl">XL</SelectItem>
-                          <SelectItem value="xxl">XXL</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="color"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Color</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Enter color" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="material"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Material</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Enter material" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="style"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Style</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Enter style" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="season"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Season</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select season" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="spring">Spring</SelectItem>
-                          <SelectItem value="summer">Summer</SelectItem>
-                          <SelectItem value="fall">Fall</SelectItem>
-                          <SelectItem value="winter">Winter</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="status"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Status *</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select status" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="active">Active</SelectItem>
-                          <SelectItem value="discontinued">
-                            Discontinued
-                          </SelectItem>
-                          <SelectItem value="out_of_stock">
-                            Out of Stock
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="location"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Location *</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="Enter storage location"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="discount"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Discount (%)</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          placeholder="Enter discount percentage"
-                          {...field}
-                          onChange={(e) =>
-                            field.onChange(Number(e.target.value))
-                          }
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                {/* Add other fields for size, color, etc. here */}
               </div>
               <div className="flex justify-end space-x-4 pt-4">
                 <Button
@@ -545,24 +376,21 @@ export function UpdateProductDialog({ product }: { product: Product }) {
                 >
                   Cancel
                 </Button>
-                <Button type="submit">Update Product</Button>
+                <Button type="submit">Save Changes</Button>
               </div>
             </form>
           </Form>
         </DialogContent>
       </Dialog>
-      {showSuccessPopup && (
-        <SuccessPopup
-          message="Product updated successfully!"
-          onClose={() => setShowSuccessPopup(false)}
-        />
-      )}
-      {showFailPopup && (
-        <FailPopup
-          message="Failed to update product. Please try again."
-          onClose={() => setShowFailPopup(false)}
-        />
-      )}
+      {/* 
+      <SuccessPopup
+        isOpen={showSuccessPopup}
+        onClose={() => setShowSuccessPopup(false)}
+      />
+      <FailPopup
+        isOpen={showFailPopup}
+        onClose={() => setShowFailPopup(false)}
+      /> */}
     </>
   );
 }

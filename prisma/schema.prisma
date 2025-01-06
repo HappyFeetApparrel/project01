@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
@@ -46,7 +46,7 @@ model Product {
   brand          String?
   season         String?
   expiration_date DateTime?
-  tags           String[] @default([]) // Array of tags
+  // tags           String[] @default([]) // Array of tags
   status         String   // e.g., Active, Discontinued, Out of Stock
   location       String?
   discount       Float?   // Optional discount percentage

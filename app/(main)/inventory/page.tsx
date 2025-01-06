@@ -1,23 +1,46 @@
 "use client";
+import { useEffect, useState } from "react";
+import { api } from "@/lib/axios";
 
-import React from "react";
-import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Plus, Search } from "lucide-react";
-import { ProductTable } from "./components/product-table";
-import { products } from "../../../data/product";
 
 // components
 import { AddProductDialog } from "./components/add-product-dialog";
+import { ProductTable } from "./components/product-table";
 
 // right sidebar
 import QuickActions from "../dashboard/components/QuickActions";
 import RecentActivity from "@/components/global/RecentActivity";
 
+// types
+import { Product } from "@/prisma/type";
+
 const InventoryPage = () => {
-  "use client";
   const [open, setOpen] = useState<boolean>(false);
+  const [products, setProducts] = useState<Product[]>();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      setLoading(true);
+      setError("");
+
+      try {
+        const { data } = await api.get("/products"); // Adjust API path if necessary
+        setProducts(data.data);
+      } catch (err) {
+        setError("Failed to load products. Please try again.");
+        console.error("Error fetching products:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
 
   return (
     <div className="py-16 px-8 space-y-8 grid grid-cols-1 xl:grid-cols-3">
@@ -42,7 +65,8 @@ const InventoryPage = () => {
         </div>
         <div>
           <h2 className="text-xl font-semibold mb-4">Product List</h2>
-          <ProductTable products={products} />
+          {products && !loading && <ProductTable products={products} />}
+          {error && <p className="text-red-500">{error}</p>}
         </div>
       </div>
       <div className="col-span-1 p-4 mx:p-8 flex xl:block items-start gap-8 flex-col-reverse sm:flex-row">

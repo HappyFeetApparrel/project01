@@ -61,7 +61,7 @@ async function main() {
                 product_image: faker.image.url(),
                 brand: faker.company.name(),
                 season: faker.helpers.arrayElement(['Summer', 'Winter', 'All Seasons']),
-                tags: faker.lorem.words(3).split(' '),
+                // tags: faker.lorem.words(3).split(' '),
                 status: faker.helpers.arrayElement(['Active', 'Discontinued', 'Out of Stock']),
                 location: faker.location.streetAddress(),
                 discount: faker.number.float({ min: 0, max: 50 }),

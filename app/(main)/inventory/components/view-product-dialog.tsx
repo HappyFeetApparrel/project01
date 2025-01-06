@@ -12,29 +12,8 @@ import {
 import { Eye } from "lucide-react";
 import { format } from "date-fns";
 
-interface Product {
-  productId: string;
-  name: string;
-  description: string;
-  category: string;
-  sku: string;
-  barcode?: string;
-  quantity: number;
-  reorderLevel: number;
-  unitPrice: number;
-  costPrice: number;
-  supplier: string;
-  dateOfEntry: Date;
-  size?: string;
-  color?: string;
-  material?: string;
-  style?: string;
-  brand: string;
-  season?: string;
-  status: string;
-  location: string;
-  discount?: number;
-}
+import Image from "next/image";
+import { Product } from "@/prisma/type";
 
 export function ViewProductDialog({ product }: { product: Product }) {
   return (
@@ -53,9 +32,22 @@ export function ViewProductDialog({ product }: { product: Product }) {
           </DialogDescription>
         </DialogHeader>
         <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-1 col-span-2">
+            <Image
+              src={`https://picsum.photos/seed/${Math.random()
+                .toString(36)
+                .substring(2, 8)}/2428/2447`}
+              alt={product.name}
+              width={200}
+              height={100}
+              className="object-contain"
+            />
+          </div>
           <div className="space-y-1">
             <p className="text-sm font-medium">Product ID</p>
-            <p className="text-sm text-muted-foreground">{product.productId}</p>
+            <p className="text-sm text-muted-foreground">
+              {product.product_id}
+            </p>
           </div>
           <div className="space-y-1">
             <p className="text-sm font-medium">Name</p>
@@ -64,16 +56,20 @@ export function ViewProductDialog({ product }: { product: Product }) {
           <div className="space-y-1 col-span-2">
             <p className="text-sm font-medium">Description</p>
             <p className="text-sm text-muted-foreground">
-              {product.description}
+              {product.description || "N/A"}
             </p>
           </div>
           <div className="space-y-1">
             <p className="text-sm font-medium">Category</p>
-            <p className="text-sm text-muted-foreground">{product.category}</p>
+            <p className="text-sm text-muted-foreground">
+              {product.category?.name || "N/A"}
+            </p>
           </div>
           <div className="space-y-1">
             <p className="text-sm font-medium">Brand</p>
-            <p className="text-sm text-muted-foreground">{product.brand}</p>
+            <p className="text-sm text-muted-foreground">
+              {product.brand || "N/A"}
+            </p>
           </div>
           <div className="space-y-1">
             <p className="text-sm font-medium">SKU</p>
@@ -87,34 +83,38 @@ export function ViewProductDialog({ product }: { product: Product }) {
           </div>
           <div className="space-y-1">
             <p className="text-sm font-medium">Quantity in Stock</p>
-            <p className="text-sm text-muted-foreground">{product.quantity}</p>
+            <p className="text-sm text-muted-foreground">
+              {product.quantity_in_stock}
+            </p>
           </div>
           <div className="space-y-1">
             <p className="text-sm font-medium">Reorder Level</p>
             <p className="text-sm text-muted-foreground">
-              {product.reorderLevel}
+              {product.reorder_level}
             </p>
           </div>
           <div className="space-y-1">
             <p className="text-sm font-medium">Unit Price</p>
             <p className="text-sm text-muted-foreground">
-              ${product.unitPrice}
+              ₱{product.unit_price}
             </p>
           </div>
           <div className="space-y-1">
             <p className="text-sm font-medium">Cost Price</p>
             <p className="text-sm text-muted-foreground">
-              ${product.costPrice}
+              ₱{product.cost_price}
             </p>
           </div>
           <div className="space-y-1">
             <p className="text-sm font-medium">Supplier</p>
-            <p className="text-sm text-muted-foreground">{product.supplier}</p>
+            <p className="text-sm text-muted-foreground">
+              {product.supplier?.name || "N/A"}
+            </p>
           </div>
           <div className="space-y-1">
             <p className="text-sm font-medium">Date of Entry</p>
             <p className="text-sm text-muted-foreground">
-              {format(product.dateOfEntry, "PPP")}
+              {format(product.date_of_entry, "PPP")}
             </p>
           </div>
           <div className="space-y-1">
@@ -138,7 +138,7 @@ export function ViewProductDialog({ product }: { product: Product }) {
           <div className="space-y-1">
             <p className="text-sm font-medium">Style</p>
             <p className="text-sm text-muted-foreground">
-              {product.style || "N/A"}
+              {product.style_design || "N/A"}
             </p>
           </div>
           <div className="space-y-1">
@@ -153,12 +153,16 @@ export function ViewProductDialog({ product }: { product: Product }) {
           </div>
           <div className="space-y-1">
             <p className="text-sm font-medium">Location</p>
-            <p className="text-sm text-muted-foreground">{product.location}</p>
+            <p className="text-sm text-muted-foreground">
+              {product.location || "N/A"}
+            </p>
           </div>
           <div className="space-y-1">
             <p className="text-sm font-medium">Discount</p>
             <p className="text-sm text-muted-foreground">
-              {product.discount ? `${product.discount}%` : "No discount"}
+              {product.discount
+                ? `₱${product.discount.toLocaleString()}%`
+                : "No discount"}
             </p>
           </div>
         </div>
