@@ -15,10 +15,7 @@ import {
 import { SuccessPopup } from "./success-popup";
 import { FailPopup } from "./fail-popup";
 
-interface Product {
-  productId: string;
-  name: string;
-}
+import { Product } from "@/prisma/type";
 
 export default function DeleteProductDialog({ product }: { product: Product }) {
   const [open, setOpen] = useState(false);
@@ -29,7 +26,7 @@ export default function DeleteProductDialog({ product }: { product: Product }) {
     try {
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      console.log(`Deleting product ${product.productId}`);
+      console.log(`Deleting product ${product.product_id}`);
       setOpen(false);
       setShowSuccessPopup(true);
     } catch (error) {
