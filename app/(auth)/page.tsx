@@ -28,6 +28,8 @@ export default function LoginPage() {
     setError("");
     setLoading(true);
 
+    router.push("/dashboard");
+
     // This is where you would typically make an API call to your authentication endpoint
     // For this example, we'll just simulate a login process
     try {
@@ -75,7 +77,6 @@ export default function LoginPage() {
                 placeholder="Enter your email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                required
               />
             </div>
             <div className="space-y-2">
@@ -86,7 +87,6 @@ export default function LoginPage() {
                 placeholder="Enter your password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                required
               />
             </div>
           </CardContent>
