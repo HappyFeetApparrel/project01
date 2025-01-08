@@ -1,125 +1,187 @@
 "use client";
+
 import * as React from "react";
+import {
+  ColumnFiltersState,
+  SortingState,
+  VisibilityState,
+  flexRender,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  useReactTable,
+  ColumnDef,
+} from "@tanstack/react-table";
+
+import { Button } from "@/components/ui/button";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+
+import { LineWave } from "react-loader-spinner";
+
 import {
   Table,
   TableBody,
   TableCell,
   TableHead,
-  TableHeader, //I'll do it tomorrow
+  TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import Image from "next/image";
-import { Product } from "@/prisma/type";
 
-// components
-// import { UpdateProductDialog } from "./update-product-dialog";
-import { ViewProductDialog } from "./view-product-dialog";
-import DeleteProductDialog from "./delete-product-dialog";
-
-interface ProductTableProps {
-  products: Product[];
+interface ProductTableProps<TData, TValue> {
+  columns: ColumnDef<TData, TValue>[];
+  data: TData[];
+  loading: boolean;
+  error: string;
 }
 
-export function ProductTable({ products }: ProductTableProps) {
+export function ProductTable<TData, TValue>({
+  columns,
+  data,
+  loading,
+  error,
+}: ProductTableProps<TData, TValue>) {
   const [page, setPage] = React.useState(1);
-  const [paginatedProducts, setPaginatedProducts] = React.useState<Product[]>(
+  const itemsPerPage = 10; // Update to 10 items per page
+  const totalPages = Math.ceil(data.length / itemsPerPage);
+
+  const [sorting, setSorting] = React.useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
   );
-  const itemsPerPage = 10; // Update to 10 items per page
-  const totalPages = Math.ceil(products.length / itemsPerPage);
+  const [columnVisibility, setColumnVisibility] =
+    React.useState<VisibilityState>({});
+  const [rowSelection, setRowSelection] = React.useState({});
 
-  React.useEffect(() => {
-    const productArray = Object.values(products);
-    const paginatedProducts = productArray.slice(
-      (page - 1) * itemsPerPage,
-      page * itemsPerPage
-    );
-    setPaginatedProducts(paginatedProducts);
-  }, [products, page]);
+  const table = useReactTable({
+    data,
+    columns,
+    onSortingChange: setSorting,
+    onColumnFiltersChange: setColumnFilters,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    onColumnVisibilityChange: setColumnVisibility,
+    onRowSelectionChange: setRowSelection,
+    state: {
+      sorting,
+      columnFilters,
+      columnVisibility,
+      rowSelection,
+      pagination: {
+        pageIndex: page - 1,
+        pageSize: itemsPerPage,
+      },
+    },
+    pageCount: Math.ceil(data.length / itemsPerPage),
+  });
 
   return (
     <div className="space-y-4">
-      <Table>
+      <Table className="w-full">
         <TableHeader>
-          <TableRow className="bg-slate-50">
-            <TableHead className="w-12">
-              <Checkbox />
-            </TableHead>
-            <TableHead>Image</TableHead>
-            <TableHead>Name</TableHead>
-            <TableHead>Code</TableHead>
-            <TableHead>Type</TableHead>
-            <TableHead>Price</TableHead>
-            <TableHead>Quantity</TableHead>
-            <TableHead>Actions</TableHead> {/* Added column for actions */}
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {paginatedProducts.map((product) => (
-            <TableRow key={product.product_id}>
-              <TableCell>
-                <Checkbox />
-              </TableCell>
-              <TableCell>
-                <Image
-                  src={`https://picsum.photos/seed/${Math.random()
-                    .toString(36)
-                    .substring(2, 8)}/2428/2447`}
-                  alt={product.name}
-                  width={40}
-                  height={40}
-                  className="object-contain"
-                />
-              </TableCell>
-
-              <TableCell>{product.name}</TableCell>
-              <TableCell>{product.barcode}</TableCell>
-              <TableCell>{product.category_id}</TableCell>
-              <TableCell className="text-right">
-                ₱{product.unit_price.toLocaleString()}
-              </TableCell>
-              <TableCell>{product.quantity_in_stock}</TableCell>
-              <TableCell>
-                <div className="flex space-x-2">
-                  <ViewProductDialog product={product} />
-                  {/* <UpdateProductDialog product={product} /> */}
-                  <DeleteProductDialog product={product} />
-                </div>
-              </TableCell>
+          {table.getHeaderGroups().map((headerGroup) => (
+            <TableRow className="bg-slate-50" key={headerGroup.id}>
+              {headerGroup.headers.map((header) => {
+                return (
+                  <TableHead key={header.id}>
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+                  </TableHead>
+                );
+              })}
             </TableRow>
           ))}
+        </TableHeader>
+        <TableBody>
+          {loading ? (
+            <TableRow>
+              <TableCell colSpan={columns.length} className="h-24 text-center">
+                <LineWave
+                  visible={true}
+                  height="100"
+                  width="100"
+                  color="#00a3ff"
+                  ariaLabel="line-wave-loading"
+                  wrapperStyle={{}}
+                  wrapperClass="justify-center h-[300px] items-center"
+                  firstLineColor=""
+                  middleLineColor=""
+                  lastLineColor=""
+                />
+              </TableCell>
+            </TableRow>
+          ) : error ? (
+            <TableRow>
+              <TableCell
+                colSpan={columns.length}
+                className="h-24 text-center text-red-500"
+              >
+                Error loading data: {error}
+              </TableCell>
+            </TableRow>
+          ) : table.getRowModel().rows?.length ? (
+            table.getRowModel().rows.map((row) => (
+              <TableRow
+                key={row.id}
+                data-state={row.getIsSelected() && "selected"}
+              >
+                {row.getVisibleCells().map((cell) => (
+                  <TableCell key={cell.id}>
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))
+          ) : (
+            <TableRow>
+              <TableCell colSpan={columns.length} className="h-24 text-center">
+                No results.
+              </TableCell>
+            </TableRow>
+          )}
         </TableBody>
       </Table>
-      <div className="flex items-center justify-center space-x-2">
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={() => setPage((p) => Math.max(1, p - 1))}
-          disabled={page === 1}
-        >
-          <ChevronLeft className="h-4 w-4" />
-        </Button>
-        {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
+      <div className="flex items-center justify-end space-x-2 py-4 px-2">
+        <div className="flex-1 text-sm text-muted-foreground">
+          {table.getFilteredSelectedRowModel().rows.length} of{" "}
+          {table.getFilteredRowModel().rows.length} row(s) selected.
+        </div>
+        <div className="flex items-center justify-center space-x-2">
           <Button
-            key={pageNum}
-            variant={pageNum === page ? "default" : "outline"}
-            size="sm"
-            onClick={() => setPage(pageNum)}
+            variant="outline"
+            size="icon"
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            disabled={page === 1}
           >
-            {pageNum}
+            <ChevronLeft className="h-4 w-4" />
           </Button>
-        ))}
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-          disabled={page === totalPages}
-        >
-          <ChevronRight className="h-4 w-4" />
-        </Button>
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+            (pageNum) => (
+              <Button
+                key={pageNum}
+                variant={pageNum === page ? "default" : "outline"}
+                size="sm"
+                onClick={() => setPage(pageNum)}
+              >
+                {pageNum}
+              </Button>
+            )
+          )}
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+            disabled={page === totalPages}
+          >
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
     </div>
   );

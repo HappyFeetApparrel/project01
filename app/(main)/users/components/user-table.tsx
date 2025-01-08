@@ -28,19 +28,19 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-interface SupplierTableProps<TData, TValue> {
+interface UserTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   loading: boolean;
   error: string;
 }
 
-export function SupplierTable<TData, TValue>({
+export function UserTable<TData, TValue>({
   columns,
   data,
   loading,
   error,
-}: SupplierTableProps<TData, TValue>) {
+}: UserTableProps<TData, TValue>) {
   const [page, setPage] = React.useState(1);
   const itemsPerPage = 10; // Update to 10 items per page
   const totalPages = Math.ceil(data.length / itemsPerPage);

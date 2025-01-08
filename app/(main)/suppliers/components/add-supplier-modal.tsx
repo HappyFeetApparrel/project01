@@ -25,10 +25,14 @@ import {
 } from "@/components/ui/form";
 import { Supplier } from "@/prisma/type";
 
+import { ThreeDots } from "react-loader-spinner";
+import { useEffect } from "react";
+
 interface AddSupplierModalProps {
   isOpen: boolean;
   onClose: () => void;
   onAdd?: (supplier: Omit<Supplier, "supplier_id" | "products">) => void;
+  loadingAddSupplier: boolean;
 }
 
 // Define validation schema using Zod
@@ -53,6 +57,7 @@ export function AddSupplierModal({
   isOpen,
   onClose,
   onAdd,
+  loadingAddSupplier,
 }: AddSupplierModalProps) {
   const form = useForm<SupplierFormValues>({
     resolver: zodResolver(supplierSchema),
@@ -73,9 +78,15 @@ export function AddSupplierModal({
       };
       onAdd(supplierData);
     }
-    form.reset();
-    onClose();
   };
+
+  useEffect(() => {
+    console.log("loadingAddSupplier:", loadingAddSupplier);
+    if (loadingAddSupplier) {
+      form.reset();
+      onClose();
+    }
+  }, [loadingAddSupplier]);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -182,7 +193,21 @@ export function AddSupplierModal({
               />
             </div>
             <DialogFooter>
-              <Button type="submit">Add Supplier</Button>
+              <Button type="submit" disabled={loadingAddSupplier}>
+                <span className={`${loadingAddSupplier ? "hidden" : "block"}`}>
+                  Add Supplier
+                </span>
+                <ThreeDots
+                  visible={true}
+                  height="50"
+                  width="50"
+                  color="#fff"
+                  radius="9"
+                  ariaLabel="three-dots-loading"
+                  wrapperStyle={{}}
+                  wrapperClass={`${loadingAddSupplier ? "block" : "!hidden"}`}
+                />
+              </Button>
             </DialogFooter>
           </form>
         </Form>

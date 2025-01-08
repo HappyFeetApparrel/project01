@@ -50,6 +50,8 @@ export default function Suppliers() {
     "success" | "error"
   >("success");
 
+  const [loadingAddSupplier, setLoadingAddSupplier] = useState<boolean>(false);
+
   const showStatusPopup = (message: string, status: "success" | "error") => {
     setStatusPopupMessage(message);
     setStatusPopupStatus(status);
@@ -60,7 +62,10 @@ export default function Suppliers() {
     newSupplier: Omit<Supplier, "supplier_id" | "products">
   ) => {
     try {
+      setLoadingAddSupplier(true);
       const response = await api.post("/suppliers", newSupplier);
+      setLoadingAddSupplier(false);
+
       await fetchSuppliers(); // Refresh data after addition
       if (response.status === 201) {
         console.log("Supplier added:", response.data.data);
@@ -70,6 +75,7 @@ export default function Suppliers() {
         showStatusPopup("Unexpected response while adding supplier", "error");
       }
     } catch (error: unknown) {
+      setLoadingAddSupplier(false);
       if (error instanceof Error) {
         console.error("Error adding supplier:", error.message);
       } else {
@@ -120,6 +126,7 @@ export default function Suppliers() {
         onAdd={async (supplier) => {
           await handleAddSupplier(supplier);
         }}
+        loadingAddSupplier={loadingAddSupplier}
       />
 
       <StatusPopup
