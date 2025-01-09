@@ -1,16 +1,11 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend } from "recharts";
 import { Download } from "lucide-react";
-
-const data = [
-  { name: "Apple", value: 61, color: "#00A3FF" },
-  { name: "Samsung", value: 15, color: "#E91E63" },
-  { name: "Asus", value: 13, color: "#4CAF50" },
-  { name: "Xiaomi", value: 8, color: "#9C27B0" },
-];
+import { api } from "@/lib/axios";
 
 interface LabelConfig {
   cx: number;
@@ -48,6 +43,26 @@ const renderCustomizedLabel = ({
 };
 
 export default function SupplierAnalytics() {
+  const [data, setData] = useState<
+    { name: string; value: number; color: string }[]
+  >([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await api.get("/top-suppliers"); // Replace with your API route
+        setData(response.data.data || []); // Fallback to an empty array if no data
+      } catch (error) {
+        console.error("Error fetching top suppliers:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
   return (
     <div className="w-full xl:max-w-sm max-w-full space-y-8">
       {/* Top Suppliers Chart */}
@@ -56,36 +71,44 @@ export default function SupplierAnalytics() {
           <CardTitle className="text-2xl font-bold">Top Suppliers</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={data}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  label={renderCustomizedLabel}
-                  outerRadius={100}
-                  fill="#8884d8"
-                  dataKey="value"
-                >
-                  {data.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Legend
-                  layout="vertical"
-                  align="right"
-                  verticalAlign="middle"
-                  formatter={(value, entry) => (
-                    <span className="text-sm" style={{ color: entry.color }}>
-                      {value}
-                    </span>
-                  )}
-                />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
+          {loading ? (
+            <p className="text-center">Loading...</p>
+          ) : data.length === 0 ? (
+            <p className="text-center text-muted-foreground">
+              No supplier data available.
+            </p>
+          ) : (
+            <div className="h-[300px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={data}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={false}
+                    label={renderCustomizedLabel}
+                    outerRadius={100}
+                    fill="#8884d8"
+                    dataKey="value"
+                  >
+                    {data.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Legend
+                    layout="horizontal"
+                    align="center"
+                    verticalAlign="bottom"
+                    formatter={(value, entry) => (
+                      <span className="text-sm" style={{ color: entry.color }}>
+                        {value}
+                      </span>
+                    )}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          )}
         </CardContent>
       </Card>
 

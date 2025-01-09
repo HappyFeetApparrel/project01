@@ -108,10 +108,11 @@ async function main() {
 
     // Seed Inventory Adjustments
     for (let i = 0; i < 100; i++) {
+        const isStockIn = faker.datatype.boolean();
         await prisma.inventoryAdjustment.create({
             data: {
                 product_id: faker.number.int({ min: 1, max: 100 }),
-                quantity_changed: faker.number.int({ min: 1000, max: 15000 }),
+                quantity_changed: faker.number.int({ min: 1000, max: 15000 }) * (isStockIn ? 1 : -1), // Positive for stock-in, negative for stock-out
                 reason: faker.lorem.sentence(),
                 adjusted_by: faker.number.int({ min: 1, max: 100 }),
             },

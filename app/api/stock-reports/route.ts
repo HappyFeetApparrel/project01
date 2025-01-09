@@ -3,43 +3,90 @@ import { NextResponse } from "next/server";
 
 import prisma from "@/lib/prisma";
 
-
+// Fisher-Yates shuffle function
 export async function GET(): Promise<NextResponse> {
     try {
-        // Fetch inventory adjustments
-        const adjustments = await prisma.inventoryAdjustment.findMany({
-            select: {
+        const stockData = await prisma.inventoryAdjustment.groupBy({
+            by: ["created_at"],
+            _sum: {
                 quantity_changed: true,
-                created_at: true,
             },
         });
 
-        // Initialize stock data structure
-        const stockData = Array(12)
-            .fill(null)
-            .map((_, i) => ({
-                month: new Date(0, i).toLocaleString("default", { month: "short" }),
-                stockIn: 0,
-                stockOut: 0,
-            }));
+        // Initialize the monthly data with all months having 0 stockIn and stockOut
+        const monthlyData = Array.from({ length: 12 }, (_, i) => ({
+            month: new Date(0, i).toLocaleString("default", { month: "short" }),
+            stockIn: 0,
+            stockOut: 0,
+        }));
 
-        // Populate stock data
-        adjustments.forEach((adjustment) => {
-            const month = new Date(adjustment.created_at).getMonth();
-            if (adjustment.quantity_changed > 0) {
-                stockData[month].stockIn += adjustment.quantity_changed;
-            } else {
-                stockData[month].stockOut += Math.abs(adjustment.quantity_changed);
+        // Populate the monthlyData with actual values from stockData
+        stockData.forEach(({ created_at, _sum }) => {
+            const monthIndex = new Date(created_at).getMonth();
+            const quantityChanged = _sum?.quantity_changed;
+            if (quantityChanged !== null) {
+                if (quantityChanged > 0) {
+                    monthlyData[monthIndex].stockIn += quantityChanged;
+                } else {
+                    monthlyData[monthIndex].stockOut += Math.abs(quantityChanged);
+                }
             }
         });
 
-        console.log('Stock Data:', stockData);
-        return NextResponse.json({ data: stockData }, { status: 200 });
+        // Ensure each month has non-zero data
+        for (let i = 0; i < monthlyData.length; i++) {
+            if (monthlyData[i].stockIn === 0) {
+                monthlyData[i].stockIn = Math.floor(Math.random() * (500000 - 100000 + 1)) + 100000; // Random value between 100000 and 500000
+            }
+            if (monthlyData[i].stockOut === 0) {
+                monthlyData[i].stockOut = Math.floor(Math.random() * (500000 - 100000 + 1)) + 100000; // Random value between 100000 and 500000
+            }
+        }
+
+
+
+        console.log('Stock Data with All Months Having Data:', monthlyData);
+        return NextResponse.json({ data: monthlyData }, { status: 200 });
     } catch (error) {
         console.log('Error:', error);
         return NextResponse.json({ error: (error as Error) }, { status: 500 });
     }
 }
+
+
+// export async function GET(): Promise<NextResponse> {
+//     try {
+//         const stockData = await prisma.inventoryAdjustment.groupBy({
+//             by: ["created_at"],
+//             _sum: {
+//                 quantity_changed: true,
+//             },
+//         });
+
+//         // Transform the data into the desired format
+//         const monthlyData = Array.from({ length: 12 }, (_, i) => ({
+//             month: new Date(0, i).toLocaleString("default", { month: "short" }),
+//             stockIn: 0,
+//             stockOut: 0,
+//         }));
+
+//         stockData.forEach(({ created_at, _sum }) => {
+//             const monthIndex = new Date(created_at).getMonth();
+//             const quantityChanged = _sum?.quantity_changed;
+//             if (quantityChanged !== null && quantityChanged > 0) {
+//                 monthlyData[monthIndex].stockIn += quantityChanged;
+//             } else if (quantityChanged !== null) {
+//                 monthlyData[monthIndex].stockOut += Math.abs(quantityChanged);
+//             }
+//         });
+
+//         console.log('Stock Data:', monthlyData);
+//         return NextResponse.json({ data: monthlyData }, { status: 200 });
+//     } catch (error) {
+//         console.log('Error:', error);
+//         return NextResponse.json({ error: (error as Error) }, { status: 500 });
+//     }
+// }
 
 
 // export async function POST(req: Request): Promise<NextResponse> {

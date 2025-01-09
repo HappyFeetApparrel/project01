@@ -1,5 +1,7 @@
+import { useEffect, useState } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import Image from "next/image";
+import { api } from "@/lib/axios"; // Import the api from your axios configuration
 
 interface Product {
   id: number;
@@ -7,45 +9,41 @@ interface Product {
   image: string;
 }
 
-const products: Product[] = [
-  {
-    id: 1,
-    name: "Macbook Pro",
-    image: "/placeholder.svg?height=40&width=40",
-  },
-  {
-    id: 2,
-    name: "iPhone 14 Pro",
-    image: "/placeholder.svg?height=40&width=40",
-  },
-  {
-    id: 3,
-    name: "Zoom75",
-    image: "/placeholder.svg?height=40&width=40",
-  },
-  {
-    id: 4,
-    name: "Airpods Pro",
-    image: "/placeholder.svg?height=40&width=40",
-  },
-  {
-    id: 5,
-    name: "Samsung Galaxy Fold",
-    image: "/placeholder.svg?height=40&width=40",
-  },
-  {
-    id: 6,
-    name: "Samsung Odyssey",
-    image: "/placeholder.svg?height=40&width=40",
-  },
-  {
-    id: 7,
-    name: "Logitech Superlight",
-    image: "/placeholder.svg?height=40&width=40",
-  },
-];
-
 export default function FastMovingItems() {
+  const [fastMovingItems, setFastMovingItems] = useState<Product[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [errorMessage, setErrorMessage] = useState<string>("");
+
+  // Fetch data on mount
+  useEffect(() => {
+    const fetchFastMovingItems = async () => {
+      try {
+        const { data } = await api.get("/fast-moving-items"); // Replace with actual API endpoint
+        if (data?.data?.length > 0) {
+          setFastMovingItems(data.data);
+        } else {
+          setFastMovingItems([]);
+          setErrorMessage("No fast-moving items available.");
+        }
+      } catch (error) {
+        console.error("Error fetching fast-moving items:", error);
+        setErrorMessage("Error fetching the data.");
+      } finally {
+        setIsLoading(false); // Set loading state to false after fetching is done
+      }
+    };
+
+    fetchFastMovingItems();
+  }, []);
+
+  if (isLoading) {
+    return <div>Loading...</div>; // Placeholder for loading state
+  }
+
+  if (errorMessage) {
+    return <div>{errorMessage}</div>; // Show error message if any
+  }
+
   return (
     <Card className="w-full xl:max-w-sm max-w-full">
       <CardHeader>
@@ -53,17 +51,19 @@ export default function FastMovingItems() {
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          {products.map((product) => (
+          {fastMovingItems.map((product) => (
             <div
               key={product.id}
               className="flex items-center gap-3 rounded-lg transition-colors hover:bg-muted/50"
             >
               <div className="flex h-10 w-10 items-center justify-center rounded-lg border bg-background p-1">
                 <Image
-                  src={product.image}
+                  src={`https://picsum.photos/seed/${Math.random()
+                    .toString(36)
+                    .substring(2, 8)}/2428/2447`}
                   alt={product.name}
-                  width={32}
-                  height={32}
+                  width={40}
+                  height={40}
                   className="object-contain"
                 />
               </div>

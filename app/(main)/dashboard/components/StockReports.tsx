@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect /**useState*/ } from "react";
+import React, { useEffect, useState } from "react";
 import {
   BarChart,
   Bar,
@@ -16,15 +16,15 @@ import { api } from "@/lib/axios"; // Import the api from your axios configurati
 
 export default function StockReports() {
   // State to store the fetched stock report data
-  // const [stockData, setStockData] = useState([]);
+  const [stockData, setStockData] = useState([]);
 
   useEffect(() => {
     // Fetch data on component mount
     const fetchStockData = async () => {
       try {
-        const response = await api.get("/stock-reports"); // Replace with your actual endpoint
-        // setStockData(response.data); // Set the fetched data to state
-        console.log(response.data);
+        const { data } = await api.get("/stock-reports"); // Replace with your actual endpoint
+        setStockData(data.data); // Set the fetched data to state
+        console.log(data.data);
       } catch (error) {
         console.error("Error fetching stock data:", error);
       }
@@ -32,21 +32,6 @@ export default function StockReports() {
 
     fetchStockData();
   }, []);
-
-  const stockData = [
-    { month: "Jan", stockIn: 8500, stockOut: 6500 },
-    { month: "Feb", stockIn: 6500, stockOut: 6000 },
-    { month: "Mar", stockIn: 7000, stockOut: 8000 },
-    { month: "Apr", stockIn: 8000, stockOut: 9500 },
-    { month: "May", stockIn: 5000, stockOut: 4000 },
-    { month: "Jun", stockIn: 5500, stockOut: 6000 },
-    { month: "Jul", stockIn: 7500, stockOut: 6500 },
-    { month: "Aug", stockIn: 10000, stockOut: 8500 },
-    { month: "Sep", stockIn: 9500, stockOut: 7000 },
-    { month: "Oct", stockIn: 7000, stockOut: 5000 },
-    { month: "Nov", stockIn: 8000, stockOut: 6500 },
-    { month: "Dec", stockIn: 6000, stockOut: 4500 },
-  ];
 
   return (
     <div className="py-8 px-4 md:px-8 space-y-8 ">
@@ -99,13 +84,13 @@ export default function StockReports() {
                   />
                   <Bar
                     dataKey="stockIn"
-                    fill="#2196F3"
+                    fill="#2196F3" // Stock In color
                     stackId="a"
                     radius={[4, 4, 0, 0]}
                   />
                   <Bar
                     dataKey="stockOut"
-                    fill="#9C27B0"
+                    fill="#9C27B0" // Stock Out color
                     stackId="a"
                     radius={[4, 4, 0, 0]}
                   />
