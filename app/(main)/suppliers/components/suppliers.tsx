@@ -1,18 +1,14 @@
+"use client";
 // import axios
 import { api } from "@/lib/axios";
 
 import { Search, Plus /**ChevronLeft, ChevronRight**/ } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-// import Image from "next/image";
-import { useState, useEffect } from "react";
-// import { Pencil, Trash2, Eye } from "lucide-react";
+import { useState } from "react";
 
 // components
 import { AddSupplierModal } from "./add-supplier-modal";
-// import { UpdateSupplierModal } from "./update-supplier-modal";
-// import { ViewSupplierModal } from "./view-supplier-modal";
-// import { DeleteSupplierConfirmation } from "./delete-supplier-confirmation";
 import { StatusPopup } from "@/components/global/status-popup";
 
 // types
@@ -23,25 +19,29 @@ import { SupplierTable } from "./supplier-table";
 
 import { columns } from "./columns";
 
+import { useSupplierContext } from "../provider/supplier-provider";
+
 export default function Suppliers() {
-  const [suppliers, setSuppliers] = useState<Supplier[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const fetchSuppliers = async () => {
-    setLoading(true);
-    try {
-      const { data } = await api.get("/suppliers");
-      setSuppliers(data.data);
-    } catch (err) {
-      setError("Failed to load suppliers. Please try again.");
-      console.error("Error fetching suppliers:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-  useEffect(() => {
-    fetchSuppliers();
-  }, []);
+  // const [suppliers, setSuppliers] = useState<Supplier[]>([]);
+  // const [loading, setLoading] = useState(true);
+  // const [error, setError] = useState("");
+  // const fetchSuppliers = async () => {
+  //   setLoading(true);
+  //   try {
+  //     const { data } = await api.get("/suppliers");
+  //     setSuppliers(data.data);
+  //   } catch (err) {
+  //     setError("Failed to load suppliers. Please try again.");
+  //     console.error("Error fetching suppliers:", err);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+  // useEffect(() => {
+  //   fetchSuppliers();
+  // }, []);
+
+  const { suppliers, loading, error, fetchSuppliers } = useSupplierContext();
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isStatusPopupOpen, setIsStatusPopupOpen] = useState(false);

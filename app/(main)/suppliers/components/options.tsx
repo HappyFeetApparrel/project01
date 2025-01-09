@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { api } from "@/lib/axios";
 
@@ -27,6 +27,8 @@ import { StatusPopup } from "@/components/global/status-popup";
 // icons
 import { Pencil, Trash2, Eye } from "lucide-react";
 
+import { useSupplierContext } from "../provider/supplier-provider";
+
 interface OptionsProps {
   row: Supplier;
 }
@@ -41,7 +43,16 @@ const Options = ({ row }: OptionsProps) => {
   const [statusPopupStatus, setStatusPopupStatus] = useState<
     "success" | "error"
   >("success");
+
+  const [loadingUpdateSupplier, setLoadingUpdateSupplier] =
+    useState<boolean>(false);
+
+  const [loadingDeleteSupplier, setLoadingDeleteSupplier] =
+    useState<boolean>(false);
+
   const supplier = row;
+
+  const { fetchSuppliers } = useSupplierContext();
 
   const showStatusPopup = (message: string, status: "success" | "error") => {
     setStatusPopupMessage(message);
@@ -51,16 +62,21 @@ const Options = ({ row }: OptionsProps) => {
 
   const handleDeleteSupplier = async () => {
     try {
+      setLoadingDeleteSupplier(true);
       // Call the delete API
       const response = await api.delete("/suppliers", {
         data: { supplier_id: supplier.supplier_id },
       });
+      setLoadingDeleteSupplier(false);
 
       if (response.status === 200) {
+        fetchSuppliers();
         // Update the local suppliers state
         showStatusPopup("Supplier deleted successfully", "success");
       }
     } catch (error) {
+      setLoadingDeleteSupplier(false);
+
       console.error("Error deleting supplier:", error);
       showStatusPopup("Failed to delete supplier", "error");
     }
@@ -70,18 +86,28 @@ const Options = ({ row }: OptionsProps) => {
     updatedSupplier: Omit<Supplier, "suppliers">
   ) => {
     try {
+      setLoadingUpdateSupplier(true);
       // Call the update API
       updatedSupplier.supplier_id = supplier.supplier_id;
       const response = await api.put("/suppliers", updatedSupplier);
+      setLoadingUpdateSupplier(false);
 
       if (response.status === 200) {
+        fetchSuppliers();
         showStatusPopup("Supplier updated successfully", "success");
       }
     } catch (error) {
+      setLoadingUpdateSupplier(false);
       console.error("Error updating supplier:", error);
       showStatusPopup("Failed to update supplier", "error");
     }
   };
+
+  useEffect(() => {
+    if (!loadingDeleteSupplier) {
+      setIsDeleteConfirmationOpen(false);
+    }
+  }, [loadingDeleteSupplier]);
 
   return (
     <>
@@ -135,15 +161,16 @@ const Options = ({ row }: OptionsProps) => {
         onClose={() => setIsUpdateModalOpen(false)}
         onUpdate={(updatedSupplier) => handleUpdateSupplier(updatedSupplier)}
         supplier={supplier}
+        loadingUpdateSupplier={loadingUpdateSupplier}
       />
       <DeleteSupplierConfirmation
         isOpen={isDeleteConfirmationOpen}
         onClose={() => setIsDeleteConfirmationOpen(false)}
         onConfirm={() => {
           handleDeleteSupplier();
-          setIsDeleteConfirmationOpen(false);
         }}
         supplierName={supplier.name}
+        loadingDeleteSupplier={loadingDeleteSupplier}
       />
       <StatusPopup
         isOpen={isStatusPopupOpen}

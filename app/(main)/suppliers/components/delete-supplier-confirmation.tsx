@@ -9,11 +9,14 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 
+import { ThreeDots } from "react-loader-spinner";
+
 interface DeleteSupplierConfirmationProps {
   isOpen: boolean;
   onClose: () => void;
   onConfirm: () => void;
   supplierName: string;
+  loadingDeleteSupplier: boolean;
 }
 
 export function DeleteSupplierConfirmation({
@@ -21,6 +24,7 @@ export function DeleteSupplierConfirmation({
   onClose,
   onConfirm,
   supplierName,
+  loadingDeleteSupplier,
 }: DeleteSupplierConfirmationProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -34,12 +38,29 @@ export function DeleteSupplierConfirmation({
             action cannot be undone.
           </p>
         </div>
-        <DialogFooter>
-          <Button variant="outline" onClick={onClose}>
+        <DialogFooter className="flex justify-between">
+          <Button variant="outline" onClick={onClose} className="flex-1">
             Cancel
           </Button>
-          <Button variant="destructive" onClick={onConfirm}>
-            Delete
+          <Button
+            disabled={loadingDeleteSupplier}
+            className="flex-1"
+            variant="destructive"
+            onClick={onConfirm}
+          >
+            <span className={`${loadingDeleteSupplier ? "hidden" : "block"}`}>
+              Delete
+            </span>
+            <ThreeDots
+              visible={true}
+              height="50"
+              width="50"
+              color="#fff"
+              radius="9"
+              ariaLabel="three-dots-loading"
+              wrapperStyle={{}}
+              wrapperClass={`${loadingDeleteSupplier ? "block" : "!hidden"}`}
+            />
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -3,6 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { useEffect } from "react";
 
 import {
   Dialog,
@@ -25,11 +26,14 @@ import {
 } from "@/components/ui/form";
 import { Supplier } from "@/prisma/type";
 
+import { ThreeDots } from "react-loader-spinner";
+
 interface UpdateSupplierModalProps {
   isOpen: boolean;
   onClose: () => void;
   supplier: Supplier;
   onUpdate: (supplier: Omit<Supplier, "suppliers">) => void;
+  loadingUpdateSupplier: boolean;
 }
 
 // Validation schema using Zod
@@ -55,6 +59,7 @@ export function UpdateSupplierModal({
   onClose,
   supplier,
   onUpdate,
+  loadingUpdateSupplier,
 }: UpdateSupplierModalProps) {
   const form = useForm<SupplierFormValues>({
     resolver: zodResolver(supplierSchema),
@@ -74,8 +79,15 @@ export function UpdateSupplierModal({
       ...data, // spread the updated data
     };
     onUpdate(updatedSupplier);
-    onClose();
   };
+
+  useEffect(() => {
+    console.log("loadingUpdateSupplier:", loadingUpdateSupplier);
+    if (!loadingUpdateSupplier) {
+      form.reset();
+      onClose();
+    }
+  }, [loadingUpdateSupplier]);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -182,7 +194,29 @@ export function UpdateSupplierModal({
               />
             </div>
             <DialogFooter>
-              <Button type="submit">Update Supplier</Button>
+              <Button
+                type="submit"
+                disabled={loadingUpdateSupplier}
+                className="min-w-[50%]"
+              >
+                <span
+                  className={`${loadingUpdateSupplier ? "hidden" : "block"}`}
+                >
+                  Update Supplier
+                </span>
+                <ThreeDots
+                  visible={true}
+                  height="50"
+                  width="50"
+                  color="#fff"
+                  radius="9"
+                  ariaLabel="three-dots-loading"
+                  wrapperStyle={{}}
+                  wrapperClass={`${
+                    loadingUpdateSupplier ? "block" : "!hidden"
+                  }`}
+                />
+              </Button>
             </DialogFooter>
           </form>
         </Form>

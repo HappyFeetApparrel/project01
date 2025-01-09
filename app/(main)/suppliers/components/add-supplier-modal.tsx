@@ -193,7 +193,11 @@ export function AddSupplierModal({
               />
             </div>
             <DialogFooter>
-              <Button type="submit" disabled={loadingAddSupplier}>
+              <Button
+                type="submit"
+                disabled={loadingAddSupplier}
+                className="min-w-[50%]"
+              >
                 <span className={`${loadingAddSupplier ? "hidden" : "block"}`}>
                   Add Supplier
                 </span>

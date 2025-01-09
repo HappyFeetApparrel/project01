@@ -56,7 +56,9 @@ export function ViewSupplierModal({
           </dl>
         </div>
         <DialogFooter>
-          <Button onClick={onClose}>Close</Button>
+          <Button onClick={onClose} className="min-w-[50%]">
+            Close
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
