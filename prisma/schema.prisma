@@ -29,7 +29,7 @@ model Product {
   name           String
   description    String?
   category_id    Int?
-  sku            String   @unique
+  // sku            String   @unique
   barcode        String?  @unique
   quantity_in_stock Int
   reorder_level  Int

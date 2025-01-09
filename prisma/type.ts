@@ -18,7 +18,7 @@ export type Product = {
     name: string;
     description?: string;
     category_id?: number;
-    sku: string;
+    // sku: string;
     barcode?: string;
     quantity_in_stock: number;
     reorder_level: number;

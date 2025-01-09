@@ -81,8 +81,7 @@ export function AddSupplierModal({
   };
 
   useEffect(() => {
-    console.log("loadingAddSupplier:", loadingAddSupplier);
-    if (loadingAddSupplier) {
+    if (!loadingAddSupplier) {
       form.reset();
       onClose();
     }

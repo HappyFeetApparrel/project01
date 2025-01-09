@@ -2,9 +2,6 @@
 // import axios
 import { api } from "@/lib/axios";
 
-import { Search, Plus /**ChevronLeft, ChevronRight**/ } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { useState } from "react";
 
 // components
@@ -66,7 +63,6 @@ export default function Suppliers() {
       const response = await api.post("/suppliers", newSupplier);
       setLoadingAddSupplier(false);
 
-      await fetchSuppliers(); // Refresh data after addition
       if (response.status === 201) {
         console.log("Supplier added:", response.data.data);
         showStatusPopup("Supplier added successfully", "success");
@@ -74,6 +70,7 @@ export default function Suppliers() {
         console.error("Unexpected response:", response);
         showStatusPopup("Unexpected response while adding supplier", "error");
       }
+      await fetchSuppliers(); // Refresh data after addition
     } catch (error: unknown) {
       setLoadingAddSupplier(false);
       if (error instanceof Error) {
@@ -87,37 +84,13 @@ export default function Suppliers() {
 
   return (
     <>
-      <div className="w-full space-y-6">
-        <div className="flex items-center justify-between flex-wrap lg:flex-nowrap gap-4">
-          <h2 className="text-2xl font-semibold">Suppliers</h2>
-          <div className="flex gap-4 flex-wrap flex-col w-full sm:flex-row">
-            <div className="flex items-center gap-4 flex-1 max-w-xl flex-nowrap flex-grow">
-              <div className="relative flex-1">
-                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input type="search" placeholder="Search" className="pl-8" />
-              </div>
-            </div>
-            <Button
-              className="bg-[#00A3FF] hover:bg-[#00A3FF]/90"
-              onClick={() => setIsAddModalOpen(true)}
-            >
-              <Plus className="mr-2 h-4 w-4" />
-              Add New Supplier
-            </Button>
-          </div>
-        </div>
-
-        <div className="rounded-lg border bg-card">
-          <div className="relative w-full overflow-auto">
-            <SupplierTable
-              columns={columns}
-              data={suppliers}
-              loading={loading}
-              error={error}
-            />
-          </div>
-        </div>
-      </div>
+      <SupplierTable
+        columns={columns}
+        data={suppliers}
+        loading={loading}
+        error={error}
+        setIsAddModalOpen={() => setIsAddModalOpen(true)}
+      />
 
       {/* Modals */}
       <AddSupplierModal

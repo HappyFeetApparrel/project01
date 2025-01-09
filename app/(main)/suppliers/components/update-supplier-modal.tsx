@@ -82,7 +82,6 @@ export function UpdateSupplierModal({
   };
 
   useEffect(() => {
-    console.log("loadingUpdateSupplier:", loadingUpdateSupplier);
     if (!loadingUpdateSupplier) {
       form.reset();
       onClose();
