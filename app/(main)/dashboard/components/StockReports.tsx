@@ -24,7 +24,6 @@ export default function StockReports() {
       try {
         const { data } = await api.get("/stock-reports"); // Replace with your actual endpoint
         setStockData(data.data); // Set the fetched data to state
-        console.log(data.data);
       } catch (error) {
         console.error("Error fetching stock data:", error);
       }
