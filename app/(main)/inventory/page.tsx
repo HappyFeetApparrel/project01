@@ -1,8 +1,8 @@
 import Products from "./components/products";
 
 // right sidebar
-// import ProductAnalytics from "@/components/product-analytics";
 import QuickActions from "../dashboard/components/QuickActions";
+import RecentActivity from "@/components/global/RecentActivity";
 
 // types
 // providers
@@ -18,7 +18,7 @@ const ProductsPage = () => {
       </div>
       <div className="col-span-1 p-4 mx:p-8 flex xl:block items-start gap-8 flex-col-reverse sm:flex-row">
         <QuickActions />
-        {/* <ProductAnalytics /> */}
+        <RecentActivity />
       </div>
     </div>
   );

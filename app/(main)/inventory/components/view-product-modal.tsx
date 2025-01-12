@@ -100,7 +100,7 @@ export function ViewProductModal({
                   <img
                     src={product.product_image}
                     alt="Product"
-                    className="w-32 h-32 object-cover"
+                    className="w-16 h-16 object-cover"
                   />
                 ) : (
                   "N/A"

@@ -2,7 +2,10 @@
 
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import Image from "next/image";
+import { useEffect, useState } from "react";
+import { api } from "@/lib/axios";
 
+// Define the structure of ActivityItem
 interface ActivityItem {
   id: number;
   name: string;
@@ -11,45 +14,30 @@ interface ActivityItem {
   timeAgo: string;
 }
 
-const activities: ActivityItem[] = [
-  {
-    id: 1,
-    name: "Grace Moreta",
-    avatar: "/placeholder.svg?height=40&width=40",
-    products: 11,
-    timeAgo: "1 m ago",
-  },
-  {
-    id: 2,
-    name: "Allison Siphron",
-    avatar: "/placeholder.svg?height=40&width=40",
-    products: 24,
-    timeAgo: "12 m ago",
-  },
-  {
-    id: 3,
-    name: "Makenna Doman",
-    avatar: "/placeholder.svg?height=40&width=40",
-    products: 4,
-    timeAgo: "23 m ago",
-  },
-  {
-    id: 4,
-    name: "Makenna Doman",
-    avatar: "/placeholder.svg?height=40&width=40",
-    products: 24,
-    timeAgo: "42 m ago",
-  },
-  {
-    id: 5,
-    name: "Ahmad Vetrovs",
-    avatar: "/placeholder.svg?height=40&width=40",
-    products: 16,
-    timeAgo: "2 h ago",
-  },
-];
-
 export default function RecentActivity() {
+  const [activities, setActivities] = useState<ActivityItem[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch user activity data
+  useEffect(() => {
+    const fetchActivities = async () => {
+      try {
+        const response = await api.get("/recent-activity"); // Replace with actual endpoint
+        setActivities(response.data.data);
+      } catch {
+        setError("Failed to fetch activities.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchActivities();
+  }, []);
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>{error}</div>;
+
   return (
     <Card className="w-full m-0 xl:my-8 xl:max-w-sm max-w-full">
       <CardHeader>

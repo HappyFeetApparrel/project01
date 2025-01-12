@@ -4,14 +4,11 @@ import { Button } from "@/components/ui/button";
 import { ArrowUpDown } from "lucide-react";
 
 // types
-import { Product } from "@/prisma/type";
+import { FormattedOrder } from "./sales-dashboard";
 
-// components
-import Options from "./options";
-
-export const columns: ColumnDef<Product>[] = [
+export const columns: ColumnDef<FormattedOrder>[] = [
   {
-    accessorKey: "product_image",
+    accessorKey: "productImage",
     header: ({ column }) => {
       return (
         <Button
@@ -25,8 +22,8 @@ export const columns: ColumnDef<Product>[] = [
     },
     cell: ({ row }) => (
       <img
-        src={row.getValue("product_image")}
-        alt="Product"
+        src={row.getValue("productImage")}
+        alt="Sales"
         className="w-32 h-32 object-cover"
       />
     ),
@@ -35,7 +32,7 @@ export const columns: ColumnDef<Product>[] = [
     size: 250,
   },
   {
-    accessorKey: "name",
+    accessorKey: "orderCode",
     header: ({ column }) => {
       return (
         <Button
@@ -47,13 +44,15 @@ export const columns: ColumnDef<Product>[] = [
         </Button>
       );
     },
-    cell: ({ row }) => <div className="capitalize">{row.getValue("name")}</div>,
+    cell: ({ row }) => (
+      <div className="capitalize">{row.getValue("orderCode")}</div>
+    ),
     minSize: 200,
     maxSize: 400,
     size: 250,
   },
   {
-    accessorKey: "quantity_in_stock",
+    accessorKey: "productName",
     header: ({ column }) => {
       return (
         <Button
@@ -65,13 +64,13 @@ export const columns: ColumnDef<Product>[] = [
         </Button>
       );
     },
-    cell: ({ row }) => <div>{row.getValue("quantity_in_stock")}</div>,
+    cell: ({ row }) => <div>{row.getValue("productName")}</div>,
     minSize: 100,
     maxSize: 200,
     size: 150,
   },
   {
-    accessorKey: "unit_price",
+    accessorKey: "category",
     header: ({ column }) => {
       return (
         <Button
@@ -83,13 +82,13 @@ export const columns: ColumnDef<Product>[] = [
         </Button>
       );
     },
-    cell: ({ row }) => <div>${row.getValue("unit_price")}</div>,
+    cell: ({ row }) => <div>${row.getValue("category")}</div>,
     minSize: 100,
     maxSize: 200,
     size: 150,
   },
   {
-    accessorKey: "status",
+    accessorKey: "quantity",
     header: ({ column }) => {
       return (
         <Button
@@ -101,13 +100,13 @@ export const columns: ColumnDef<Product>[] = [
         </Button>
       );
     },
-    cell: ({ row }) => <div>{row.getValue("status")}</div>,
+    cell: ({ row }) => <div>{row.getValue("quantity")}</div>,
     minSize: 100,
     maxSize: 200,
     size: 150,
   },
   {
-    accessorKey: "brand",
+    accessorKey: "totalPrice",
     header: ({ column }) => {
       return (
         <Button
@@ -119,15 +118,9 @@ export const columns: ColumnDef<Product>[] = [
         </Button>
       );
     },
-    cell: ({ row }) => <div>{row.getValue("brand")}</div>,
+    cell: ({ row }) => <div>{row.getValue("totalPrice")}</div>,
     minSize: 100,
     maxSize: 200,
     size: 150,
-  },
-  {
-    id: "actions",
-    enableHiding: false,
-    cell: ({ row }) => <Options row={row.original} />,
-    size: 100,
   },
 ];

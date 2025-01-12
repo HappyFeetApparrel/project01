@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { Button } from "@/components/ui/button";
@@ -16,45 +18,57 @@ import {
 } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
-
 import nProgress from "nprogress";
+import { ThreeDots } from "react-loader-spinner";
+
+// 🔎 Validation Schema
+const loginSchema = z.object({
+  email: z.string().min(1, "Email is required").email("Invalid email address"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+});
+
+type LoginFormValues = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const form = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-    setLoading(true);
+  const {
+    handleSubmit,
+    formState: { errors, isSubmitting },
+    register,
+  } = form;
 
+  const onSubmit = async (data: LoginFormValues) => {
+    nProgress.start();
     try {
       const result = await signIn("credentials", {
         redirect: false,
-        email,
-        password,
+        email: data.email,
+        password: data.password,
       });
 
       if (result?.ok) {
-        nProgress.start();
         router.push("/dashboard");
       } else {
-        nProgress.done();
-        setError("Invalid email or password");
+        form.setError("password", {
+          type: "manual",
+          message: "Invalid email or password",
+        });
       }
     } catch (err: unknown) {
-      nProgress.done();
-
-      if (err instanceof Error) {
-        setError(`An unexpected error occurred: ${err.message}`);
-      } else {
-        setError(`An unexpected error occurred: ${err}`);
-      }
+      form.setError("password", {
+        type: "manual",
+        message: "An unexpected error occurred",
+      });
     } finally {
-      setLoading(false);
+      nProgress.done();
     }
   };
 
@@ -67,13 +81,13 @@ export default function LoginPage() {
             Enter your credentials to access your account
           </CardDescription>
         </CardHeader>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit(onSubmit)}>
           <CardContent className="space-y-4">
-            {error && (
+            {errors.password?.message && (
               <Alert variant="destructive">
                 <AlertCircle className="h-4 w-4" />
                 <AlertTitle>Error</AlertTitle>
-                <AlertDescription>{error}</AlertDescription>
+                <AlertDescription>{errors.password.message}</AlertDescription>
               </Alert>
             )}
             <div className="space-y-2">
@@ -82,10 +96,11 @@ export default function LoginPage() {
                 id="email"
                 type="email"
                 placeholder="Enter your email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
+                {...register("email")}
               />
+              {errors.email && (
+                <p className="text-sm text-red-600">{errors.email.message}</p>
+              )}
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
@@ -93,15 +108,18 @@ export default function LoginPage() {
                 id="password"
                 type="password"
                 placeholder="Enter your password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
+                {...register("password")}
               />
+              {errors.password && (
+                <p className="text-sm text-red-600">
+                  {errors.password.message}
+                </p>
+              )}
             </div>
           </CardContent>
           <CardFooter>
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Logging in..." : "Log in"}
+            <Button type="submit" disabled={isSubmitting} className="w-full">
+              {isSubmitting ? <ThreeDots width="30" color="#fff" /> : "Log in"}
             </Button>
           </CardFooter>
         </form>

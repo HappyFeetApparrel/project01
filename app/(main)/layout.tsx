@@ -37,6 +37,34 @@ const Layout = ({ children }: Readonly<{ children: React.ReactNode }>) => {
     fetchSession();
   }, []);
 
+  if (session === null) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <img
+          src="/loading-logo.svg"
+          alt="Loading..."
+          className="h-32 w-32"
+          style={{
+            animation: "fade 2s ease-in-out infinite",
+          }}
+        />
+        <style jsx>{`
+          @keyframes fade {
+            0% {
+              opacity: 0;
+            }
+            50% {
+              opacity: 1;
+            }
+            100% {
+              opacity: 0;
+            }
+          }
+        `}</style>
+      </div>
+    );
+  }
+
   return (
     <LayoutProvider session={session}>
       <SidebarProvider>
