@@ -1,99 +1,114 @@
 import { NextResponse } from "next/server";
-
-
 import prisma from "@/lib/prisma";
+import bcrypt from "bcryptjs";
 
 
+interface UpdateData {
+    name: string;
+    email: string;
+    role: string;
+    updated_at: Date;
+    password?: string; // password is optional
+}
+
+// GET all users
 export async function GET(): Promise<NextResponse> {
     try {
         const users = await prisma.user.findMany({
             orderBy: {
-                user_id: "desc", // Adjust this to the appropriate timestamp field (e.g., "updatedAt")
+                user_id: "desc",
+            },
+            include: {
+                orders: true,
+                adjustments: true,
+                logs: true,
             },
         });
 
-        console.log('Suppliers:', users);
         return NextResponse.json({ data: users }, { status: 200 });
     } catch (error) {
-        console.log('Error:', error);
-        return NextResponse.json({ error: (error as Error) }, { status: 500 });
+        console.error('Error:', error);
+        return NextResponse.json({ error: (error as Error).message }, { status: 500 });
     }
 }
 
+// POST: Create a new user
+export async function POST(req: Request): Promise<NextResponse> {
+    try {
+        const { name, email, password, role } = await req.json();
 
-// export async function POST(req: Request): Promise<NextResponse> {
-//     try {
-//         const data = await req.json();
+        if (!name || !email || !password || !role) {
+            return NextResponse.json({ error: "All fields are required." }, { status: 400 });
+        }
 
-//         // Create a new user in the database
-//         const newSupplier = await prisma.user.create({
-//             data: {
-//                 name: data.name,
-//                 contact_person: data.contact_person,
-//                 phone_number: data.phone_number,
-//                 email_address: data.email_address,
-//                 address: data.address,
-//                 supplied_products: data.supplied_products,
-//             },
-//         });
+        const hashedPassword = await bcrypt.hash(password, 10);
 
-//         return NextResponse.json({ data: newSupplier }, { status: 201 });
-//     } catch (error) {
-//         console.error("Error:", error);
-//         return NextResponse.json({ error: (error as Error).message }, { status: 500 });
-//     }
-// }
+        const newUser = await prisma.user.create({
+            data: {
+                name,
+                email,
+                password: hashedPassword,
+                role,
+                created_at: new Date(),
+                updated_at: new Date(),
+            },
+        });
 
-// // Update an existing user
-// export async function PUT(req: Request): Promise<NextResponse> {
-//     try {
-//         const data = await req.json();
+        return NextResponse.json({ data: newUser }, { status: 201 });
+    } catch (error) {
+        console.error("Error:", error);
+        return NextResponse.json({ error: (error as Error).message }, { status: 500 });
+    }
+}
 
-//         // Ensure the user ID is provided
-//         if (!data.user_id) {
-//             return NextResponse.json({ error: "Supplier ID is required" }, { status: 400 });
-//         }
+// PUT: Update an existing user
+export async function PUT(req: Request): Promise<NextResponse> {
+    try {
+        const { user_id, name, email, password, role } = await req.json();
 
-//         const updatedSupplier = await prisma.user.update({
-//             where: {
-//                 user_id: data.user_id,
-//             },
-//             data: {
-//                 name: data.name,
-//                 contact_person: data.contact_person,
-//                 phone_number: data.phone_number,
-//                 email_address: data.email_address,
-//                 address: data.address,
-//                 supplied_products: data.supplied_products,
-//             },
-//         });
+        if (!user_id) {
+            return NextResponse.json({ error: "User ID is required." }, { status: 400 });
+        }
 
-//         return NextResponse.json({ data: updatedSupplier }, { status: 200 });
-//     } catch (error) {
-//         console.error("Error:", error);
-//         return NextResponse.json({ error: (error as Error).message }, { status: 500 });
-//     }
-// }
+        const updateData: UpdateData = {
+            name,
+            email,
+            role,
+            updated_at: new Date(),
+        };
 
-// // Delete a user
-// export async function DELETE(req: Request): Promise<NextResponse> {
-//     try {
-//         const data = await req.json();
+        if (password) {
+            updateData.password = await bcrypt.hash(password, 10);
+        }
 
-//         // Ensure the user ID is provided
-//         if (!data.user_id) {
-//             return NextResponse.json({ error: "Supplier ID is required" }, { status: 400 });
-//         }
+        const updatedUser = await prisma.user.update({
+            where: { user_id },
+            data: updateData,
+        });
 
-//         await prisma.user.delete({
-//             where: {
-//                 user_id: data.user_id,
-//             },
-//         });
+        return NextResponse.json({ data: updatedUser }, { status: 200 });
+    } catch (error) {
+        console.error("Error:", error);
+        return NextResponse.json({ error: (error as Error).message }, { status: 500 });
+    }
+}
 
-//         return NextResponse.json({ message: "Supplier deleted successfully" }, { status: 200 });
-//     } catch (error) {
-//         console.error("Error:", error);
-//         return NextResponse.json({ error: (error as Error).message }, { status: 500 });
-//     }
-// }
+// DELETE: Remove a user
+export async function DELETE(req: Request): Promise<NextResponse> {
+    try {
+        const { user_id } = await req.json();
+
+        if (!user_id) {
+            return NextResponse.json({ error: "User ID is required." }, { status: 400 });
+        }
+
+        await prisma.user.delete({
+            where: { user_id },
+        });
+
+        return NextResponse.json({ message: "User deleted successfully." }, { status: 200 });
+    } catch (error) {
+        console.error("Error:", error);
+        return NextResponse.json({ error: (error as Error).message }, { status: 500 });
+    }
+}

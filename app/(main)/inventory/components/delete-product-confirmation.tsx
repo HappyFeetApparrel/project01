@@ -8,24 +8,25 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { ThreeDots } from "react-loader-spinner";
 
-// --------------------- DeleteUserConfirmation ---------------------
-interface DeleteUserConfirmationProps {
+import { ThreeDots } from "react-loader-spinner";
+import { Product } from "@/prisma/type";
+
+interface DeleteProductConfirmationProps {
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: () => void;
-  userName: string;
-  loadingDeleteUser: boolean;
+  onConfirm: (product: Product) => void;
+  product: Product;
+  loadingDeleteProduct: boolean;
 }
 
-export function DeleteUserConfirmation({
+export function DeleteProductConfirmation({
   isOpen,
   onClose,
   onConfirm,
-  userName,
-  loadingDeleteUser,
-}: DeleteUserConfirmationProps) {
+  product,
+  loadingDeleteProduct,
+}: DeleteProductConfirmationProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px]">
@@ -34,9 +35,8 @@ export function DeleteUserConfirmation({
         </DialogHeader>
         <div className="py-4">
           <p>
-            Are you sure you want to delete the user <strong>{userName}</strong>
-            ? This action cannot be undone and will remove all associated data
-            such as orders, inventory adjustments, and activity logs.
+            Are you sure you want to delete the product{" "}
+            <strong>{product.name}</strong>? This action cannot be undone.
           </p>
         </div>
         <DialogFooter className="flex justify-between">
@@ -44,22 +44,23 @@ export function DeleteUserConfirmation({
             Cancel
           </Button>
           <Button
-            disabled={loadingDeleteUser}
+            disabled={loadingDeleteProduct}
             className="flex-1"
             variant="destructive"
-            onClick={onConfirm}
+            onClick={() => onConfirm(product)}
           >
-            <span className={`${loadingDeleteUser ? "hidden" : "block"}`}>
+            <span className={`${loadingDeleteProduct ? "hidden" : "block"}`}>
               Delete
             </span>
             <ThreeDots
               visible={true}
-              height="30"
-              width="30"
+              height="50"
+              width="50"
               color="#fff"
               radius="9"
               ariaLabel="three-dots-loading"
-              wrapperClass={`${loadingDeleteUser ? "block" : "!hidden"}`}
+              wrapperStyle={{}}
+              wrapperClass={`${loadingDeleteProduct ? "block" : "!hidden"}`}
             />
           </Button>
         </DialogFooter>

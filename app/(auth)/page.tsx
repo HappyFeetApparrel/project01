@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -16,6 +17,8 @@ import {
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
 
+import nProgress from "nprogress";
+
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -28,24 +31,28 @@ export default function LoginPage() {
     setError("");
     setLoading(true);
 
-    router.push("/dashboard");
-
-    // This is where you would typically make an API call to your authentication endpoint
-    // For this example, we'll just simulate a login process
     try {
-      // Simulating an API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const result = await signIn("credentials", {
+        redirect: false,
+        email,
+        password,
+      });
 
-      // Check for a mock valid login
-      if (email === "user@example.com" && password === "password") {
-        // Redirect to dashboard on successful login
+      if (result?.ok) {
+        nProgress.start();
         router.push("/dashboard");
       } else {
+        nProgress.done();
         setError("Invalid email or password");
       }
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Unknown error";
-      setError(errorMessage);
+    } catch (err: unknown) {
+      nProgress.done();
+
+      if (err instanceof Error) {
+        setError(`An unexpected error occurred: ${err.message}`);
+      } else {
+        setError(`An unexpected error occurred: ${err}`);
+      }
     } finally {
       setLoading(false);
     }
@@ -77,6 +84,7 @@ export default function LoginPage() {
                 placeholder="Enter your email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                required
               />
             </div>
             <div className="space-y-2">
@@ -87,6 +95,7 @@ export default function LoginPage() {
                 placeholder="Enter your password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                required
               />
             </div>
           </CardContent>

@@ -8,11 +8,37 @@ import { AppSidebar } from "@/components/app-sidebar";
 import Footer from "@/components/global/Footer";
 import Search from "@/components/global/Search";
 
-const layout = async ({
-  children,
-}: Readonly<{ children: React.ReactNode }>) => {
+import { getSession } from "next-auth/react"; // ✅ Correct import for client-side session
+import { signOut } from "next-auth/react";
+
+interface Session {
+  user: {
+    id: string;
+    token: string;
+    uuid: string;
+    role: string;
+    name: string;
+    email: string;
+  };
+}
+
+const Layout = ({ children }: Readonly<{ children: React.ReactNode }>) => {
+  const [session, setSession] = React.useState<Session | null>(null);
+
+  React.useEffect(() => {
+    const fetchSession = async () => {
+      const sessionData = await getSession(); // ✅ Client-side session fetching
+      if (!sessionData) {
+        signOut(); // Sign out if no session
+      } else {
+        setSession(sessionData as Session);
+      }
+    };
+    fetchSession();
+  }, []);
+
   return (
-    <LayoutProvider>
+    <LayoutProvider session={session}>
       <SidebarProvider>
         <AppSidebar />
         <div className="flex flex-col flex-grow ">
@@ -39,4 +65,4 @@ const layout = async ({
   );
 };
 
-export default layout;
+export default Layout;

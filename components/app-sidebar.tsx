@@ -14,7 +14,6 @@ import {
   SidebarFooter,
 } from "@/components/ui/sidebar";
 
-// icons
 import { IconType } from "react-icons/lib";
 import { RxDashboard } from "react-icons/rx";
 import { BsBoxSeam } from "react-icons/bs";
@@ -22,36 +21,96 @@ import { LuShoppingCart } from "react-icons/lu";
 import { CiDeliveryTruck } from "react-icons/ci";
 import { AiOutlineStock } from "react-icons/ai";
 import { HiUsers } from "react-icons/hi2";
-
 import { CiCircleInfo } from "react-icons/ci";
 import { IoSettingsOutline } from "react-icons/io5";
 
 import { usePathname } from "next/navigation";
 import Account from "./global/Account";
 
+import { useLayout } from "./context/LayoutProvider";
+
 interface SidebarMenuItem {
   id: number;
   icon: IconType;
   label: string;
   link: string;
+  rolesAllowed: string[];
 }
 
 const sidebarMenuItemsGeneral: SidebarMenuItem[] = [
-  { id: 1, icon: RxDashboard, label: "Dashboard", link: "/dashboard" },
-  { id: 2, icon: BsBoxSeam, label: "Inventory", link: "/inventory" },
-  { id: 3, icon: LuShoppingCart, label: "Sales Orders", link: "/sales-orders" },
-  { id: 4, icon: CiDeliveryTruck, label: "Suppliers", link: "/suppliers" },
-  { id: 5, icon: AiOutlineStock, label: "Reports", link: "/reports" },
-  { id: 6, icon: HiUsers, label: "Users", link: "/users" },
+  {
+    id: 1,
+    icon: RxDashboard,
+    label: "Dashboard",
+    link: "/dashboard",
+    rolesAllowed: ["Admin", "Manager", "Staff"],
+  },
+  {
+    id: 2,
+    icon: BsBoxSeam,
+    label: "Inventory",
+    link: "/inventory",
+    rolesAllowed: ["Admin", "Manager"],
+  },
+  {
+    id: 3,
+    icon: LuShoppingCart,
+    label: "Sales Orders",
+    link: "/sales-orders",
+    rolesAllowed: ["Admin", "Manager"],
+  },
+  {
+    id: 4,
+    icon: CiDeliveryTruck,
+    label: "Suppliers",
+    link: "/suppliers",
+    rolesAllowed: ["Admin", "Manager"],
+  },
+  {
+    id: 5,
+    icon: AiOutlineStock,
+    label: "Reports",
+    link: "/reports",
+    rolesAllowed: ["Admin"],
+  },
+  {
+    id: 6,
+    icon: HiUsers,
+    label: "Users",
+    link: "/users",
+    rolesAllowed: ["Admin"],
+  },
 ];
 
 const sidebarMenuItemsSupport: SidebarMenuItem[] = [
-  { id: 1, icon: CiCircleInfo, label: "Help", link: "/help" },
-  { id: 2, icon: IoSettingsOutline, label: "Settings", link: "/settings" },
+  {
+    id: 1,
+    icon: CiCircleInfo,
+    label: "Help",
+    link: "/help",
+    rolesAllowed: ["Admin", "Manager", "Staff"],
+  },
+  {
+    id: 2,
+    icon: IoSettingsOutline,
+    label: "Settings",
+    link: "/settings",
+    rolesAllowed: ["Admin"],
+  },
 ];
 
 export function AppSidebar() {
   const pathname = usePathname();
+  const { user } = useLayout();
+  const userRole = user?.user?.role;
+
+  const filterMenuItems = (items: SidebarMenuItem[]) => {
+    return items.filter(({ rolesAllowed }) =>
+      rolesAllowed.includes(userRole ?? "")
+    );
+  };
+
+  console.log(user);
 
   return (
     <Sidebar>
@@ -67,7 +126,7 @@ export function AppSidebar() {
           </SidebarGroupLabel>
           <SidebarGroupContent className="flex flex-col py-6">
             <SidebarMenu>
-              {sidebarMenuItemsGeneral.map(
+              {filterMenuItems(sidebarMenuItemsGeneral).map(
                 ({ id, icon: Icon, label, link }) => (
                   <Link
                     href={link}
@@ -92,11 +151,15 @@ export function AppSidebar() {
           </SidebarGroupLabel>
           <SidebarGroupContent className="flex flex-col py-6">
             <SidebarMenu>
-              {sidebarMenuItemsSupport.map(
+              {filterMenuItems(sidebarMenuItemsSupport).map(
                 ({ id, icon: Icon, label, link }) => (
                   <Link
                     href={link}
-                    className={`flex items-center gap-2 p-3 hover:bg-primary/80 hover:text-white hover:font-semibold hover:rounded-md transition-all`}
+                    className={`flex items-center gap-2 p-3 hover:bg-primary/80 hover:text-white hover:font-semibold hover:rounded-md transition-all ${
+                      pathname == link
+                        ? "bg-primary/80 text-white font-semibold rounded-md"
+                        : ""
+                    }`}
                     key={id}
                   >
                     <Icon />

@@ -1,39 +1,39 @@
 import { ColumnDef } from "@tanstack/react-table";
 
 import { Button } from "@/components/ui/button";
-// import { Checkbox } from "@/components/ui/checkbox";
+import { Checkbox } from "@/components/ui/checkbox";
 import { ArrowUpDown } from "lucide-react";
 
 // types
 import { User } from "@/prisma/type";
 
 // components
-import Options from "./options";
+// import Options from "./options";
 
 export const columns: ColumnDef<User>[] = [
-  // {
-  //   id: "select",
-  //   header: ({ table }) => (
-  //     <Checkbox
-  //       checked={
-  //         table.getIsAllPageRowsSelected() ||
-  //         (table.getIsSomePageRowsSelected() && "indeterminate")
-  //       }
-  //       onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-  //       aria-label="Select all"
-  //     />
-  //   ),
-  //   cell: ({ row }) => (
-  //     <Checkbox
-  //       checked={row.getIsSelected()}
-  //       onCheckedChange={(value) => row.toggleSelected(!!value)}
-  //       aria-label="Select row"
-  //     />
-  //   ),
-  //   enableSorting: false,
-  //   enableHiding: false,
-  //   size: 50,
-  // },
+  {
+    id: "select",
+    header: ({ table }) => (
+      <Checkbox
+        checked={
+          table.getIsAllPageRowsSelected() ||
+          (table.getIsSomePageRowsSelected() && "indeterminate")
+        }
+        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+        aria-label="Select all"
+      />
+    ),
+    cell: ({ row }) => (
+      <Checkbox
+        checked={row.getIsSelected()}
+        onCheckedChange={(value) => row.toggleSelected(!!value)}
+        aria-label="Select row"
+      />
+    ),
+    enableSorting: false,
+    enableHiding: false,
+    size: 50,
+  },
   {
     accessorKey: "name",
     header: ({ column }) => {
@@ -60,7 +60,7 @@ export const columns: ColumnDef<User>[] = [
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Phone Number
+          Email Address
           <ArrowUpDown />
         </Button>
       );
@@ -78,21 +78,20 @@ export const columns: ColumnDef<User>[] = [
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Email Address
+          User Role
           <ArrowUpDown />
         </Button>
       );
     },
-    cell: ({ row }) => <div className="capilatize">{row.getValue("role")}</div>,
+    cell: ({ row }) => <div className="capitalize">{row.getValue("role")}</div>,
     minSize: 200,
     maxSize: 400,
     size: 250,
   },
-
-  {
-    id: "actions",
-    enableHiding: false,
-    cell: ({ row }) => <Options row={row.original} />,
-    size: 100,
-  },
+  // {
+  //   id: "actions",
+  //   enableHiding: false,
+  //   cell: ({ row }) => <Options row={row.original} />,
+  //   size: 100,
+  // },
 ];

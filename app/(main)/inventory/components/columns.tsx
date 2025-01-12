@@ -1,61 +1,15 @@
 import { ColumnDef } from "@tanstack/react-table";
 
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { ArrowUpDown } from "lucide-react";
-
-import Image from "next/image";
 
 // types
 import { Product } from "@/prisma/type";
 
 // components
-// import Options from "./options";
+import Options from "./options";
 
 export const columns: ColumnDef<Product>[] = [
-  {
-    id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-    size: 50,
-  },
-  {
-    accessorKey: "image",
-    header: () => {
-      return <Button variant="ghost">Image</Button>;
-    },
-    cell: ({ row }) => (
-      <Image
-        src={`https://picsum.photos/seed/${Math.random()
-          .toString(36)
-          .substring(2, 8)}/2428/2447`}
-        alt={row.getValue("name")}
-        width={40}
-        height={40}
-        className="object-contain"
-      />
-    ),
-    minSize: 200,
-    maxSize: 400,
-    size: 250,
-  },
   {
     accessorKey: "name",
     header: ({ column }) => {
@@ -69,7 +23,7 @@ export const columns: ColumnDef<Product>[] = [
         </Button>
       );
     },
-    cell: ({ row }) => <div className="lowercase">{row.getValue("name")}</div>,
+    cell: ({ row }) => <div className="capitalize">{row.getValue("name")}</div>,
     minSize: 200,
     maxSize: 400,
     size: 250,
@@ -82,41 +36,33 @@ export const columns: ColumnDef<Product>[] = [
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Quantity in stock
+          Quantity in Stock
           <ArrowUpDown />
         </Button>
       );
     },
-    cell: ({ row }) => (
-      <div className="lowercase text-center">
-        {row.getValue("quantity_in_stock")}
-      </div>
-    ),
-    minSize: 200,
-    maxSize: 400,
-    size: 250,
+    cell: ({ row }) => <div>{row.getValue("quantity_in_stock")}</div>,
+    minSize: 100,
+    maxSize: 200,
+    size: 150,
   },
   {
-    accessorKey: "cost_price",
+    accessorKey: "unit_price",
     header: ({ column }) => {
       return (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Price
+          Unit Price
           <ArrowUpDown />
         </Button>
       );
     },
-    cell: ({ row }) => (
-      <div className="lowercase">
-        ₱{row.getValue("cost_price")?.toLocaleString()}
-      </div>
-    ),
-    minSize: 200,
-    maxSize: 400,
-    size: 250,
+    cell: ({ row }) => <div>${row.getValue("unit_price")}</div>,
+    minSize: 100,
+    maxSize: 200,
+    size: 150,
   },
   {
     accessorKey: "status",
@@ -131,17 +77,33 @@ export const columns: ColumnDef<Product>[] = [
         </Button>
       );
     },
-    cell: ({ row }) => (
-      <div className="lowercase">{row.getValue("status")}</div>
-    ),
-    minSize: 200,
-    maxSize: 400,
-    size: 250,
+    cell: ({ row }) => <div>{row.getValue("status")}</div>,
+    minSize: 100,
+    maxSize: 200,
+    size: 150,
   },
-  // {
-  //   id: "actions",
-  //   enableHiding: false,
-  //   cell: ({ row }) => <Options row={row.original} />,
-  //   size: 100,
-  // },
+  {
+    accessorKey: "brand",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Brand
+          <ArrowUpDown />
+        </Button>
+      );
+    },
+    cell: ({ row }) => <div>{row.getValue("brand")}</div>,
+    minSize: 100,
+    maxSize: 200,
+    size: 150,
+  },
+  {
+    id: "actions",
+    enableHiding: false,
+    cell: ({ row }) => <Options row={row.original} />,
+    size: 100,
+  },
 ];
