@@ -72,10 +72,6 @@ export function ViewProductDialog({ product }: { product: Product }) {
             </p>
           </div>
           <div className="space-y-1">
-            <p className="text-sm font-medium">SKU</p>
-            <p className="text-sm text-muted-foreground">{product.sku}</p>
-          </div>
-          <div className="space-y-1">
             <p className="text-sm font-medium">Barcode</p>
             <p className="text-sm text-muted-foreground">
               {product.barcode || "N/A"}

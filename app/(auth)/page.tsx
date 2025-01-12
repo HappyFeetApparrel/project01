@@ -62,7 +62,7 @@ export default function LoginPage() {
           message: "Invalid email or password",
         });
       }
-    } catch (err: unknown) {
+    } catch {
       form.setError("password", {
         type: "manual",
         message: "An unexpected error occurred",
