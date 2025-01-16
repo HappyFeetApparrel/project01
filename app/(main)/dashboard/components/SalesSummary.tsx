@@ -7,6 +7,8 @@ import { FaRegCalendarAlt } from "react-icons/fa";
 import { CiDollar } from "react-icons/ci";
 import { IoBagOutline } from "react-icons/io5";
 
+import { Skeleton } from "@/components/ui/skeleton";
+
 // Define the structure of the response data
 interface SalesSummaryData {
   icon: IconType;
@@ -48,7 +50,26 @@ const SalesSummary = () => {
   ];
 
   if (loading) {
-    return <p>Loading...</p>;
+    return (
+      <div className="py-16 px-4 md:px-8 space-y-8">
+        <h3 className="font-semibold">Sales Summary</h3>
+
+        <div className="container mx-auto grid grid-cols-1 sm:grid-cols-2 gap-4 2xl:grid-cols-4">
+          {Array.from({ length: 4 }, (_, index) => (
+            <div
+              key={index}
+              className="flex py-3 px-5 lg:p-5 bg-white shadow-lg rounded-lg gap-4 items-center group hover:shadow-xl transition-all duration-300 hover:bg-primary-foreground cursor-pointer"
+            >
+              <Skeleton className="w-8 h-8 rounded-full" />
+              <div className="flex-1">
+                <Skeleton className="h-4 w-1/3" />
+                <Skeleton className="h-4 w-full mt-2" />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
   }
 
   return (

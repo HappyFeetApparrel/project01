@@ -3,6 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import Image from "next/image";
 
 import {
   Dialog,
@@ -26,6 +27,7 @@ import { Product } from "@/prisma/type";
 
 import { ThreeDots } from "react-loader-spinner";
 import { useEffect } from "react";
+import { ChangeEvent } from "react";
 
 interface AddProductModalProps {
   isOpen: boolean;
@@ -53,7 +55,7 @@ const productSchema = z.object({
   color: z.string().optional(),
   material: z.string().optional(),
   style_design: z.string().optional(),
-  product_image: z.string().optional(),
+  product_image: z.instanceof(File).optional(),
   dimensions: z.string().optional(),
   weight: z.number().optional(),
   brand: z.string().optional(),
@@ -91,7 +93,7 @@ export function AddProductModal({
       color: "",
       material: "",
       style_design: "",
-      product_image: "",
+      product_image: undefined,
       dimensions: "",
       weight: undefined,
       brand: "",
@@ -111,6 +113,10 @@ export function AddProductModal({
       > = {
         ...data,
         date_of_entry: new Date(),
+        product_image:
+          data.product_image instanceof File
+            ? URL.createObjectURL(data.product_image)
+            : data.product_image,
       };
       onAdd(productData);
     }
@@ -123,9 +129,34 @@ export function AddProductModal({
     }
   }, [loadingAddProduct]);
 
+  const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const target = event.target as HTMLInputElement;
+    if (target.files) {
+      const file = target.files[0];
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+    }
+  };
+
+  // const onSubmit = async (data: any) => {
+  //   try {
+  //     const response = await fetch('/api/products', {
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: JSON.stringify(data),
+  //     });
+  //     const result = await response.json();
+  //     console.log(result);
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // };
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-2xl">
+      <DialogContent className="sm:max-w-2xl h-4/6 overflow-auto">
         <DialogHeader>
           <DialogTitle>Add New Product</DialogTitle>
         </DialogHeader>
@@ -136,7 +167,7 @@ export function AddProductModal({
                 control={form.control}
                 name="name"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className=" col-span-2">
                     <FormLabel>Name</FormLabel>
                     <FormControl>
                       <Input placeholder="Product Name" {...field} />
@@ -301,19 +332,31 @@ export function AddProductModal({
                   </FormItem>
                 )}
               />
-              <FormField
-                control={form.control}
-                name="product_image"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Product Image URL</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Product Image URL" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
+              <FormControl>
+                <Input
+                  type="file"
+                  accept="image/*"
+                  {...form.register("product_image", {
+                    onChange: (event) => handleImageChange(event),
+                  })}
+                  placeholder="Select an image"
+                />
+                {form.watch("product_image") && (
+                  <Image
+                    src={
+                      form.watch("product_image") instanceof File
+                        ? URL.createObjectURL(
+                            form.watch("product_image") as File
+                          )
+                        : "" // Provide a default value, e.g., an empty string
+                    }
+                    alt="Uploaded Image"
+                    width={100}
+                    height={100}
+                    objectFit="cover"
+                  />
                 )}
-              />
+              </FormControl>
               <FormField
                 control={form.control}
                 name="dimensions"

@@ -27,7 +27,7 @@ export const columns: ColumnDef<Product>[] = [
       <img
         src={row.getValue("product_image")}
         alt="Product"
-        className="w-32 h-32 object-cover"
+        className="w-16 h-16 object-cover"
       />
     ),
     minSize: 200,
@@ -83,7 +83,15 @@ export const columns: ColumnDef<Product>[] = [
         </Button>
       );
     },
-    cell: ({ row }) => <div>${row.getValue("unit_price")}</div>,
+    cell: ({ row }) => (
+      <div className="text-right">
+        ₱
+        {new Intl.NumberFormat("en-PH", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        }).format(row.getValue("unit_price"))}
+      </div>
+    ),
     minSize: 100,
     maxSize: 200,
     size: 150,

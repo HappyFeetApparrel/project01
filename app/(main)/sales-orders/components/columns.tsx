@@ -24,7 +24,7 @@ export const columns: ColumnDef<FormattedOrder>[] = [
       <img
         src={row.getValue("productImage")}
         alt="Sales"
-        className="w-32 h-32 object-cover"
+        className="w-16 h-16 object-cover"
       />
     ),
     minSize: 200,
