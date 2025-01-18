@@ -42,7 +42,7 @@ model Product {
   color          String?
   material       String?
   style_design   String?
-  product_image  Bytes?  // URL or path to image
+  product_image  String?  // URL or path to image
   dimensions     String?  // JSON-like structure
   weight         Float?
   brand          String?

@@ -64,7 +64,7 @@ export async function GET(): Promise<NextResponse> {
 
         return NextResponse.json({ data: responseData }, { status: 200 });
     } catch (error) {
-        console.error("Error fetching fast-moving items:", error);
-        return NextResponse.json({ error: "Error fetching fast-moving items" }, { status: 500 });
+        console.log(error);
+        return NextResponse.json({ error: (error as Error).message }, { status: 500 });
     }
 }

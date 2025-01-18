@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -22,6 +23,8 @@ import nProgress from "nprogress";
 import { ThreeDots } from "react-loader-spinner";
 import Image from "next/image";
 
+import { FaEye, FaEyeSlash } from "react-icons/fa";
+
 // 🔎 Validation Schema
 const loginSchema = z.object({
   email: z.string().min(1, "Email is required").email("Invalid email address"),
@@ -32,6 +35,8 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
   const router = useRouter();
+  const [passwordVisible, setPasswordVisible] = useState(false);
+
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -73,6 +78,10 @@ export default function LoginPage() {
     }
   };
 
+  const togglePasswordVisibility = () => {
+    setPasswordVisible(!passwordVisible);
+  };
+
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <Card className="w-full max-w-md">
@@ -112,12 +121,21 @@ export default function LoginPage() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="Enter your password"
-                {...register("password")}
-              />
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={passwordVisible ? "text" : "password"}
+                  placeholder="Enter your password"
+                  {...register("password")}
+                />
+                <span className="absolute right-3 top-2 cursor-pointer transition-all delay-100 hover:text-primary">
+                  {passwordVisible ? (
+                    <FaEyeSlash onClick={togglePasswordVisibility} />
+                  ) : (
+                    <FaEye onClick={togglePasswordVisibility} />
+                  )}
+                </span>
+              </div>
               {errors.password && (
                 <p className="text-sm text-red-600">
                   {errors.password.message}
