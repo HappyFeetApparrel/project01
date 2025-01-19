@@ -63,7 +63,7 @@ export default function Suppliers() {
       const response = await api.post("/suppliers", newSupplier);
       setLoadingAddSupplier(false);
 
-      if (response.status === 201) {
+      if (response.status === 200) {
         console.log("Supplier added:", response.data.data);
         showStatusPopup("Supplier added successfully", "success");
       } else {

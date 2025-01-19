@@ -1,9 +1,11 @@
 "use client";
 
+import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import Image from "next/image";
+import { useEdgeStore } from "@/components/context/EdgesProvider";
 
 import {
   Dialog,
@@ -27,7 +29,6 @@ import { Product } from "@/prisma/type";
 
 import { ThreeDots } from "react-loader-spinner";
 import { useEffect } from "react";
-import { ChangeEvent } from "react";
 
 interface AddProductModalProps {
   isOpen: boolean;
@@ -39,31 +40,102 @@ interface AddProductModalProps {
 }
 
 const productSchema = z.object({
-  product_id: z.number().min(1, "Product ID is required"),
-  name: z.string().min(1, "Name is required"),
-  description: z.string().optional(),
-  category_id: z.number().optional(),
-  sku: z.string().optional(),
-  barcode: z.string().optional(),
-  quantity_in_stock: z.number().min(0, "Quantity must be 0 or greater"),
-  reorder_level: z.number().min(0, "Reorder level must be 0 or greater"),
-  unit_price: z.number().min(0, "Unit price must be 0 or greater"),
-  cost_price: z.number().min(0, "Cost price must be 0 or greater"),
-  supplier_id: z.number().optional(),
-  date_of_entry: z.date(),
-  size: z.string().optional(),
-  color: z.string().optional(),
-  material: z.string().optional(),
-  style_design: z.string().optional(),
-  product_image: z.instanceof(File).optional(),
+  name: z
+    .string()
+    .min(1, "Name is required")
+    .max(100, "Name cannot exceed 100 characters"),
+  description: z
+    .string()
+    .max(500, "Description cannot exceed 500 characters")
+    .optional(),
+  category_id: z
+    .number()
+    .int()
+    .positive("Category ID must be a positive integer")
+    .optional(),
+  // sku: z
+  //   .string()
+  //   .regex(/^[A-Za-z0-9_-]+$/, "SKU must contain only alphanumeric characters, dashes, or underscores")
+  //   .max(50, "SKU cannot exceed 50 characters")
+  //   .optional(),
+  barcode: z
+    .string()
+    .regex(/^\d{12,13}$/, "Barcode must be 12 or 13 digits long")
+    .optional(),
+  quantity_in_stock: z.number().int().min(0, "Quantity must be 0 or greater"),
+  reorder_level: z.number().int().min(0, "Reorder level must be 0 or greater"),
+  unit_price: z
+    .number()
+    .min(0, "Unit price must be 0 or greater")
+    .max(10000, "Unit price cannot exceed 10,000"),
+  cost_price: z
+    .number()
+    .min(0, "Cost price must be 0 or greater")
+    .max(10000, "Cost price cannot exceed 10,000"),
+  supplier_id: z
+    .number()
+    .int()
+    .positive("Supplier ID must be a positive integer")
+    .optional(),
+  date_of_entry: z
+    .date()
+    .refine(
+      (date) => date <= new Date(),
+      "Date of entry cannot be in the future"
+    ),
+  size: z
+    .string()
+    .regex(
+      /^(\d+|\d+(?:\.\d+)?|XS|S|M|L|XL|XXL)$/,
+      "Size must be numeric or standard sizes like XS, S, M, etc."
+    )
+    .optional(),
+  color: z
+    .string()
+    .min(1, "Color is required")
+    .max(30, "Color cannot exceed 30 characters")
+    .optional(),
+  material: z
+    .string()
+    .min(1, "Material is required")
+    .max(50, "Material cannot exceed 50 characters")
+    .optional(),
+  style_design: z
+    .string()
+    .max(100, "Style/Design cannot exceed 100 characters")
+    .optional(),
+  product_image: z.string().optional(),
   dimensions: z.string().optional(),
-  weight: z.number().optional(),
-  brand: z.string().optional(),
-  season: z.string().optional(),
-  expiration_date: z.date().optional(),
-  status: z.string().min(1, "Status is required"),
-  location: z.string().optional(),
-  discount: z.number().min(0, "Discount must be 0 or greater").optional(),
+  weight: z
+    .number()
+    .min(0, "Weight must be 0 or greater")
+    .max(50, "Weight cannot exceed 50 kg")
+    .optional(),
+  brand: z
+    .string()
+    .min(1, "Brand is required")
+    .max(50, "Brand cannot exceed 50 characters"),
+  season: z.string().max(30, "Season cannot exceed 30 characters").optional(),
+  expiration_date: z
+    .date()
+    .optional()
+    .refine(
+      (date) => !date || date > new Date(),
+      "Expiration date must be in the future"
+    ),
+  status: z
+    .string()
+    .min(1, "Status is required")
+    .max(20, "Status cannot exceed 20 characters"),
+  location: z
+    .string()
+    .max(100, "Location cannot exceed 100 characters")
+    .optional(),
+  discount: z
+    .number()
+    .min(0, "Discount must be 0 or greater")
+    .max(100, "Discount cannot exceed 100%")
+    .optional(),
 });
 
 type ProductFormValues = z.infer<typeof productSchema>;
@@ -77,11 +149,10 @@ export function AddProductModal({
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(productSchema),
     defaultValues: {
-      product_id: 0,
       name: "",
       description: "",
       category_id: undefined,
-      sku: "",
+      // sku: "",
       barcode: "",
       quantity_in_stock: 0,
       reorder_level: 0,
@@ -93,7 +164,7 @@ export function AddProductModal({
       color: "",
       material: "",
       style_design: "",
-      product_image: undefined,
+      product_image: "",
       dimensions: "",
       weight: undefined,
       brand: "",
@@ -113,10 +184,6 @@ export function AddProductModal({
       > = {
         ...data,
         date_of_entry: new Date(),
-        product_image:
-          data.product_image instanceof File
-            ? URL.createObjectURL(data.product_image)
-            : data.product_image,
       };
       onAdd(productData);
     }
@@ -129,31 +196,25 @@ export function AddProductModal({
     }
   }, [loadingAddProduct]);
 
-  const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const target = event.target as HTMLInputElement;
-    if (target.files) {
-      const file = target.files[0];
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
+  const { edgestore } = useEdgeStore();
+  const [progress, setProgress] = useState(0);
+
+  const handleFileUpload = async (file: File) => {
+    if (file) {
+      const res = await edgestore.publicFiles.upload({
+        file,
+        onProgressChange: (progress) => {
+          // you can use this to show a progress bar
+          console.log(progress);
+          setProgress(progress);
+        },
+      });
+      // you can run some server action or api here
+      // to add the necessary data to your database
+      console.log(res);
+      form.setValue("product_image", res.url);
     }
   };
-
-  // const onSubmit = async (data: any) => {
-  //   try {
-  //     const response = await fetch('/api/products', {
-  //       method: 'POST',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //       },
-  //       body: JSON.stringify(data),
-  //     });
-  //     const result = await response.json();
-  //     console.log(result);
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  // };
-
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-2xl h-4/6 overflow-auto">
@@ -175,6 +236,58 @@ export function AddProductModal({
                     <FormMessage />
                   </FormItem>
                 )}
+              />
+              <FormField
+                control={form.control}
+                name="product_image"
+                render={() => {
+                  console.log(form.getValues("product_image"));
+                  return (
+                    <FormItem className=" col-span-2">
+                      <FormLabel>Image Upload</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="file"
+                          accept="image/*"
+                          onChange={(event) => {
+                            const file = event.target.files?.[0];
+                            if (file) {
+                              handleFileUpload(file);
+                            }
+                          }}
+                          placeholder="Select an image"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                      <div>
+                        {progress > 0 && progress < 100 && (
+                          <div className={`bg-gray-200 h-2 rounded w-full`}>
+                            <div
+                              className={`bg-blue-500 h-2 rounded`}
+                              style={{ width: `${progress}%` }}
+                            />
+                          </div>
+                        )}
+                        {progress === 100 && (
+                          <div className="upload-complete">
+                            Upload complete!
+                          </div>
+                        )}
+                        {form.getValues("product_image") !== "" && (
+                          <Image
+                            src={
+                              form.getValues("product_image")?.toString() ?? ""
+                            }
+                            alt="Product Image"
+                            className="w-full h-auto"
+                            width={100}
+                            height={100}
+                          />
+                        )}
+                      </div>
+                    </FormItem>
+                  );
+                }}
               />
               <FormField
                 control={form.control}
@@ -254,7 +367,7 @@ export function AddProductModal({
                   </FormItem>
                 )}
               />
-              <FormField
+              {/* <FormField
                 control={form.control}
                 name="sku"
                 render={({ field }) => (
@@ -266,7 +379,7 @@ export function AddProductModal({
                     <FormMessage />
                   </FormItem>
                 )}
-              />
+              /> */}
               <FormField
                 control={form.control}
                 name="barcode"
@@ -332,31 +445,7 @@ export function AddProductModal({
                   </FormItem>
                 )}
               />
-              <FormControl>
-                <Input
-                  type="file"
-                  accept="image/*"
-                  {...form.register("product_image", {
-                    onChange: (event) => handleImageChange(event),
-                  })}
-                  placeholder="Select an image"
-                />
-                {form.watch("product_image") && (
-                  <Image
-                    src={
-                      form.watch("product_image") instanceof File
-                        ? URL.createObjectURL(
-                            form.watch("product_image") as File
-                          )
-                        : "" // Provide a default value, e.g., an empty string
-                    }
-                    alt="Uploaded Image"
-                    width={100}
-                    height={100}
-                    objectFit="cover"
-                  />
-                )}
-              </FormControl>
+
               <FormField
                 control={form.control}
                 name="dimensions"

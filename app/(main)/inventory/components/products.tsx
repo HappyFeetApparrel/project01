@@ -44,7 +44,7 @@ export default function Products() {
       const response = await api.post("/products", newProduct);
       setLoadingAddProduct(false);
 
-      if (response.status === 201) {
+      if (response.status === 200) {
         console.log("Product added:", response.data.data);
         showStatusPopup("Product added successfully", "success");
       } else {

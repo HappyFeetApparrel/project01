@@ -67,7 +67,7 @@ export default function Products() {
   //       setLoadingAddProduct(false);
 
   //       await fetchProducts(); // Refresh data after addition
-  //       if (response.status === 201) {
+  //       if (response.status === 200) {
   //         console.log("Product added:", response.data.data);
   //         showStatusPopup("Product added successfully", "success");
   //       } else {
