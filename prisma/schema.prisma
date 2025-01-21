@@ -31,7 +31,7 @@ model Product {
   description    String?
   category_id    Int?
   // sku            String   @unique
-  barcode        String?  @unique
+  // barcode        String?  @unique
   quantity_in_stock Int
   reorder_level  Int
   unit_price     Float

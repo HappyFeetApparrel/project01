@@ -23,6 +23,7 @@ import { AiOutlineStock } from "react-icons/ai";
 import { HiUsers } from "react-icons/hi2";
 import { CiCircleInfo } from "react-icons/ci";
 import { IoSettingsOutline } from "react-icons/io5";
+import { TbCategoryPlus } from "react-icons/tb";
 
 import { usePathname } from "next/navigation";
 import Account from "./global/Account";
@@ -64,6 +65,13 @@ const sidebarMenuItemsGeneral: SidebarMenuItem[] = [
     icon: CiDeliveryTruck,
     label: "Suppliers",
     link: "/suppliers",
+    rolesAllowed: ["Admin", "Manager"],
+  },
+  {
+    id: 4,
+    icon: TbCategoryPlus,
+    label: "Product Categories",
+    link: "/categories",
     rolesAllowed: ["Admin", "Manager"],
   },
   {

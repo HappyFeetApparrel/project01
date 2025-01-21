@@ -8,6 +8,14 @@ import Image from "next/image";
 import { useEdgeStore } from "@/components/context/EdgesProvider";
 
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+import {
   Dialog,
   DialogContent,
   DialogHeader,
@@ -58,10 +66,10 @@ const productSchema = z.object({
   //   .regex(/^[A-Za-z0-9_-]+$/, "SKU must contain only alphanumeric characters, dashes, or underscores")
   //   .max(50, "SKU cannot exceed 50 characters")
   //   .optional(),
-  barcode: z
-    .string()
-    .regex(/^\d{12,13}$/, "Barcode must be 12 or 13 digits long")
-    .optional(),
+  // barcode: z
+  //   .string()
+  //   .regex(/^\d{12,13}$/, "Barcode must be 12 or 13 digits long")
+  //   .optional(),
   quantity_in_stock: z.number().int().min(0, "Quantity must be 0 or greater"),
   reorder_level: z.number().int().min(0, "Reorder level must be 0 or greater"),
   unit_price: z
@@ -153,7 +161,7 @@ export function AddProductModal({
       description: "",
       category_id: undefined,
       // sku: "",
-      barcode: "",
+      // barcode: "",
       quantity_in_stock: 0,
       reorder_level: 0,
       unit_price: 0,
@@ -170,7 +178,7 @@ export function AddProductModal({
       brand: "",
       season: "",
       expiration_date: undefined,
-      status: "Active",
+      status: "active",
       location: "",
       discount: 0,
     },
@@ -224,27 +232,195 @@ export function AddProductModal({
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <div className="grid gap-4 py-4 grid-cols-2">
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem className=" col-span-2">
-                    <FormLabel>Name</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Product Name" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="product_image"
-                render={() => {
-                  console.log(form.getValues("product_image"));
-                  return (
-                    <FormItem className=" col-span-2">
-                      <FormLabel>Image Upload</FormLabel>
+              {/* General Information */}
+              <div className="col-span-2">
+                <h2 className="text-lg font-semibold">General Information</h2>
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Name</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Product Name" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Description</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder="Product Description"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              {/* Pricing & Stock */}
+              <div className="col-span-2">
+                <h2 className="text-lg font-semibold">Pricing & Stock</h2>
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="quantity_in_stock"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Quantity In Stock</FormLabel>
+                        <FormControl>
+                          <Input type="number" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="unit_price"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Unit Price</FormLabel>
+                        <FormControl>
+                          <Input type="number" step="0.01" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="cost_price"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Cost Price</FormLabel>
+                        <FormControl>
+                          <Input type="number" step="0.01" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </div>
+
+              {/* Additional Details */}
+              <div className="col-span-2">
+                <h2 className="text-lg font-semibold">Additional Details</h2>
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="status"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Status</FormLabel>
+                        <FormControl>
+                          <Select
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select status" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="active">Active</SelectItem>
+                              <SelectItem value="out_of_stock">
+                                Out of Stock
+                              </SelectItem>
+                              <SelectItem value="pre_order">
+                                Pre-Order
+                              </SelectItem>
+                              <SelectItem value="discontinued">
+                                Discontinued
+                              </SelectItem>
+                              <SelectItem value="archived">Archived</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="category_id"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Category ID</FormLabel>
+                        <FormControl>
+                          <Input type="number" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </div>
+
+              {/* Product Attributes */}
+              <div className="col-span-2">
+                <h2 className="text-lg font-semibold">Product Attributes</h2>
+                <div className="grid grid-cols-2 gap-4">
+                  {/* <FormField
+                    control={form.control}
+                    name="barcode"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Barcode</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Barcode" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  /> */}
+                  <FormField
+                    control={form.control}
+                    name="size"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Size</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Size" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="color"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Color</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Color" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </div>
+
+              {/* Image Upload */}
+              <div className="col-span-2">
+                <h2 className="text-lg font-semibold">Image Upload</h2>
+                <FormField
+                  control={form.control}
+                  name="product_image"
+                  render={() => (
+                    <FormItem>
+                      <FormLabel>Upload Product Image</FormLabel>
                       <FormControl>
                         <Input
                           type="file"
@@ -255,7 +431,6 @@ export function AddProductModal({
                               handleFileUpload(file);
                             }
                           }}
-                          placeholder="Select an image"
                         />
                       </FormControl>
                       <FormMessage />
@@ -286,241 +461,10 @@ export function AddProductModal({
                         )}
                       </div>
                     </FormItem>
-                  );
-                }}
-              />
-              <FormField
-                control={form.control}
-                name="description"
-                render={({ field }) => (
-                  <FormItem className="col-span-2">
-                    <FormLabel>Description</FormLabel>
-                    <FormControl>
-                      <Textarea placeholder="Product Description" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="quantity_in_stock"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Quantity In Stock</FormLabel>
-                    <FormControl>
-                      <Input type="number" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="unit_price"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Unit Price</FormLabel>
-                    <FormControl>
-                      <Input type="number" step="0.01" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="cost_price"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Cost Price</FormLabel>
-                    <FormControl>
-                      <Input type="number" step="0.01" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="status"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Status</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Active/Discontinued" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="category_id"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Category ID</FormLabel>
-                    <FormControl>
-                      <Input type="number" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              {/* <FormField
-                control={form.control}
-                name="sku"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>SKU</FormLabel>
-                    <FormControl>
-                      <Input placeholder="SKU" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              /> */}
-              <FormField
-                control={form.control}
-                name="barcode"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Barcode</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Barcode" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="size"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Size</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Size" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="color"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Color</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Color" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="material"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Material</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Material" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="style_design"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Style Design</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Style Design" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="dimensions"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Dimensions</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Dimensions" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="weight"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Weight</FormLabel>
-                    <FormControl>
-                      <Input type="number" step="0.01" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="brand"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Brand</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Brand" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="season"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Season</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Season" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="expiration_date"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Expiration Date</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="date"
-                        {...field}
-                        value={
-                          field.value
-                            ? field.value.toISOString().split("T")[0]
-                            : ""
-                        }
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                  )}
+                />
+              </div>
             </div>
-
             <DialogFooter>
               <Button
                 type="submit"

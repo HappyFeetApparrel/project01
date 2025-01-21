@@ -19,7 +19,7 @@ export type Product = {
     description?: string;
     category_id?: number;
     // sku: string;
-    barcode?: string;
+    // barcode?: string;
     quantity_in_stock: number;
     reorder_level: number;
     unit_price: number;
