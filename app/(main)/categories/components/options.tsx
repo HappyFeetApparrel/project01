@@ -16,21 +16,21 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 // types
-import { Supplier } from "@/prisma/type";
+import { Category } from "@/prisma/type";
 
 // components
-import { DeleteSupplierConfirmation } from "./delete-supplier-confirmation";
-import { ViewSupplierModal } from "./view-supplier-modal";
-import { UpdateSupplierModal } from "./update-supplier-modal";
+import { DeleteCategoryConfirmation } from "./delete-category-confirmation";
+import { ViewCategoryModal } from "./view-category-modal";
+import { UpdateCategoryModal } from "./update-category-modal";
 import { StatusPopup } from "@/components/global/status-popup";
 
 // icons
 import { Pencil, Trash2, Eye } from "lucide-react";
 
-import { useSupplierContext } from "../provider/supplier-provider";
+import { useCategoryContext } from "../provider/category-provider";
 
 interface OptionsProps {
-  row: Supplier;
+  row: Category;
 }
 
 const Options = ({ row }: OptionsProps) => {
@@ -44,15 +44,15 @@ const Options = ({ row }: OptionsProps) => {
     "success" | "error"
   >("success");
 
-  const [loadingUpdateSupplier, setLoadingUpdateSupplier] =
+  const [loadingUpdateCategory, setLoadingUpdateCategory] =
     useState<boolean>(false);
 
-  const [loadingDeleteSupplier, setLoadingDeleteSupplier] =
+  const [loadingDeleteCategory, setLoadingDeleteCategory] =
     useState<boolean>(false);
 
-  const supplier = row;
+  const category = row;
 
-  const { fetchSuppliers } = useSupplierContext();
+  const { fetchCategories } = useCategoryContext();
 
   const showStatusPopup = (message: string, status: "success" | "error") => {
     setStatusPopupMessage(message);
@@ -60,54 +60,54 @@ const Options = ({ row }: OptionsProps) => {
     setIsStatusPopupOpen(true);
   };
 
-  const handleDeleteSupplier = async () => {
+  const handleDeleteCategory = async () => {
     try {
-      setLoadingDeleteSupplier(true);
+      setLoadingDeleteCategory(true);
       // Call the delete API
-      const response = await api.delete("/suppliers", {
-        data: { supplier_id: supplier.supplier_id },
+      const response = await api.delete("/categories", {
+        data: { category_id: category.category_id },
       });
-      setLoadingDeleteSupplier(false);
+      setLoadingDeleteCategory(false);
 
       if (response.status === 200) {
-        fetchSuppliers();
-        // Update the local suppliers state
-        showStatusPopup("Supplier deleted successfully", "success");
+        fetchCategories();
+        // Update the local categories state
+        showStatusPopup("Category deleted successfully", "success");
       }
     } catch (error) {
-      setLoadingDeleteSupplier(false);
+      setLoadingDeleteCategory(false);
 
-      console.error("Error deleting supplier:", error);
-      showStatusPopup("Failed to delete supplier", "error");
+      console.error("Error deleting category:", error);
+      showStatusPopup("Failed to delete category", "error");
     }
   };
 
-  const handleUpdateSupplier = async (
-    updatedSupplier: Omit<Supplier, "suppliers">
+  const handleUpdateCategory = async (
+    updatedCategory: Omit<Category, "categories">
   ) => {
     try {
-      setLoadingUpdateSupplier(true);
+      setLoadingUpdateCategory(true);
       // Call the update API
-      updatedSupplier.supplier_id = supplier.supplier_id;
-      const response = await api.put("/suppliers", updatedSupplier);
-      setLoadingUpdateSupplier(false);
+      updatedCategory.category_id = category.category_id;
+      const response = await api.put("/categories", updatedCategory);
+      setLoadingUpdateCategory(false);
 
       if (response.status === 200) {
-        fetchSuppliers();
-        showStatusPopup("Supplier updated successfully", "success");
+        fetchCategories();
+        showStatusPopup("Category updated successfully", "success");
       }
     } catch (error) {
-      setLoadingUpdateSupplier(false);
-      console.error("Error updating supplier:", error);
-      showStatusPopup("Failed to update supplier", "error");
+      setLoadingUpdateCategory(false);
+      console.error("Error updating category:", error);
+      showStatusPopup("Failed to update category", "error");
     }
   };
 
   useEffect(() => {
-    if (!loadingDeleteSupplier) {
+    if (!loadingDeleteCategory) {
       setIsDeleteConfirmationOpen(false);
     }
-  }, [loadingDeleteSupplier]);
+  }, [loadingDeleteCategory]);
 
   return (
     <>
@@ -151,26 +151,26 @@ const Options = ({ row }: OptionsProps) => {
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-      <ViewSupplierModal
+      <ViewCategoryModal
         isOpen={isViewModalOpen}
         onClose={() => setIsViewModalOpen(false)}
-        supplier={supplier}
+        category={category}
       />
-      <UpdateSupplierModal
+      <UpdateCategoryModal
         isOpen={isUpdateModalOpen}
         onClose={() => setIsUpdateModalOpen(false)}
-        onUpdate={(updatedSupplier) => handleUpdateSupplier(updatedSupplier)}
-        supplier={supplier}
-        loadingUpdateSupplier={loadingUpdateSupplier}
+        onUpdate={(updatedCategory) => handleUpdateCategory(updatedCategory)}
+        category={category}
+        loadingUpdateCategory={loadingUpdateCategory}
       />
-      <DeleteSupplierConfirmation
+      <DeleteCategoryConfirmation
         isOpen={isDeleteConfirmationOpen}
         onClose={() => setIsDeleteConfirmationOpen(false)}
         onConfirm={() => {
-          handleDeleteSupplier();
+          handleDeleteCategory();
         }}
-        supplierName={supplier.name}
-        loadingDeleteSupplier={loadingDeleteSupplier}
+        categoryName={category.name}
+        loadingDeleteCategory={loadingDeleteCategory}
       />
       <StatusPopup
         isOpen={isStatusPopupOpen}

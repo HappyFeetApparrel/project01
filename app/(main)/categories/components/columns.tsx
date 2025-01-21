@@ -5,12 +5,12 @@ import { Button } from "@/components/ui/button";
 import { ArrowUpDown } from "lucide-react";
 
 // types
-import { Supplier } from "@/prisma/type";
+import { Category } from "@/prisma/type";
 
 // components
 import Options from "./options";
 
-export const columns: ColumnDef<Supplier>[] = [
+export const columns: ColumnDef<Category>[] = [
   // {
   //   id: "select",
   //   header: ({ table }) => (
@@ -53,60 +53,20 @@ export const columns: ColumnDef<Supplier>[] = [
     size: 250,
   },
   {
-    accessorKey: "phone_number",
+    accessorKey: "description",
     header: ({ column }) => {
       return (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Phone Number
+          Description
           <ArrowUpDown />
         </Button>
       );
     },
     cell: ({ row }) => (
-      <div className="lowercase">{row.getValue("phone_number")}</div>
-    ),
-    minSize: 200,
-    maxSize: 400,
-    size: 250,
-  },
-  {
-    accessorKey: "email_address",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Email Address
-          <ArrowUpDown />
-        </Button>
-      );
-    },
-    cell: ({ row }) => (
-      <div className="lowercase">{row.getValue("email_address")}</div>
-    ),
-    minSize: 200,
-    maxSize: 400,
-    size: 250,
-  },
-  {
-    accessorKey: "address",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Address
-          <ArrowUpDown />
-        </Button>
-      );
-    },
-    cell: ({ row }) => (
-      <div className="lowercase">{row.getValue("address")}</div>
+      <div className="lowercase">{row.getValue("description")}</div>
     ),
     minSize: 200,
     maxSize: 400,

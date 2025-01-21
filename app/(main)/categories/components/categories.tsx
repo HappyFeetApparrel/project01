@@ -5,40 +5,40 @@ import { api } from "@/lib/axios";
 import { useState } from "react";
 
 // components
-import { AddSupplierModal } from "./add-supplier-modal";
+import { AddCategoryModal } from "./add-category-modal";
 import { StatusPopup } from "@/components/global/status-popup";
 
 // types
-import { Supplier } from "@/prisma/type";
+import { Category } from "@/prisma/type";
 
 // components
-import { SupplierTable } from "./supplier-table";
+import CategoryTable from "./category-table";
 
 import { columns } from "./columns";
 
-import { useSupplierContext } from "../provider/supplier-provider";
+import { useCategoryContext } from "../provider/category-provider";
 
-export default function Suppliers() {
-  // const [suppliers, setSuppliers] = useState<Supplier[]>([]);
+export default function Categories() {
+  // const [categories, setCategories] = useState<Category[]>([]);
   // const [loading, setLoading] = useState(true);
   // const [error, setError] = useState("");
-  // const fetchSuppliers = async () => {
+  // const fetchCategories = async () => {
   //   setLoading(true);
   //   try {
-  //     const { data } = await api.get("/suppliers");
-  //     setSuppliers(data.data);
+  //     const { data } = await api.get("/categories");
+  //     setCategories(data.data);
   //   } catch (err) {
-  //     setError("Failed to load suppliers. Please try again.");
-  //     console.error("Error fetching suppliers:", err);
+  //     setError("Failed to load categories. Please try again.");
+  //     console.error("Error fetching categories:", err);
   //   } finally {
   //     setLoading(false);
   //   }
   // };
   // useEffect(() => {
-  //   fetchSuppliers();
+  //   fetchCategories();
   // }, []);
 
-  const { suppliers, loading, error, fetchSuppliers } = useSupplierContext();
+  const { categories, loading, error, fetchCategories } = useCategoryContext();
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isStatusPopupOpen, setIsStatusPopupOpen] = useState(false);
@@ -47,7 +47,7 @@ export default function Suppliers() {
     "success" | "error"
   >("success");
 
-  const [loadingAddSupplier, setLoadingAddSupplier] = useState<boolean>(false);
+  const [loadingAddCategory, setLoadingAddCategory] = useState<boolean>(false);
 
   const showStatusPopup = (message: string, status: "success" | "error") => {
     setStatusPopupMessage(message);
@@ -55,26 +55,26 @@ export default function Suppliers() {
     setIsStatusPopupOpen(true);
   };
 
-  const handleAddSupplier = async (
-    newSupplier: Omit<Supplier, "supplier_id" | "products">
+  const handleAddCategory = async (
+    newCategory: Pick<Category, "name" | "description">
   ) => {
     try {
-      setLoadingAddSupplier(true);
-      const response = await api.post("/suppliers", newSupplier);
-      setLoadingAddSupplier(false);
+      setLoadingAddCategory(true);
+      const response = await api.post("/categories", newCategory);
+      setLoadingAddCategory(false);
 
       if (response.status === 200) {
-        console.log("Supplier added:", response.data.data);
-        showStatusPopup("Supplier added successfully", "success");
+        console.log("Category added:", response.data.data);
+        showStatusPopup("Category added successfully", "success");
       } else {
         console.error("Unexpected response:", response);
-        showStatusPopup("Unexpected response while adding supplier", "error");
+        showStatusPopup("Unexpected response while adding category", "error");
       }
-      await fetchSuppliers(); // Refresh data after addition
+      await fetchCategories(); // Refresh data after addition
     } catch (error: unknown) {
-      setLoadingAddSupplier(false);
+      setLoadingAddCategory(false);
       if (error instanceof Error) {
-        console.error("Error adding supplier:", error.message);
+        console.error("Error adding category:", error.message);
       } else {
         console.error("An unknown error occurred:", error);
       }
@@ -84,22 +84,22 @@ export default function Suppliers() {
 
   return (
     <>
-      <SupplierTable
+      <CategoryTable
         columns={columns}
-        data={suppliers}
+        data={categories}
         loading={loading}
         error={error}
         setIsAddModalOpen={() => setIsAddModalOpen(true)}
       />
 
       {/* Modals */}
-      <AddSupplierModal
+      <AddCategoryModal
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
-        onAdd={async (supplier) => {
-          await handleAddSupplier(supplier);
+        onAdd={async (category) => {
+          await handleAddCategory(category);
         }}
-        loadingAddSupplier={loadingAddSupplier}
+        loadingAddCategory={loadingAddCategory}
       />
 
       <StatusPopup

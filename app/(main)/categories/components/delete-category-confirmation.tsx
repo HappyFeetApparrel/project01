@@ -11,21 +11,21 @@ import { Button } from "@/components/ui/button";
 
 import { ThreeDots } from "react-loader-spinner";
 
-interface DeleteSupplierConfirmationProps {
+interface DeleteCategoryConfirmationProps {
   isOpen: boolean;
   onClose: () => void;
   onConfirm: () => void;
-  supplierName: string;
-  loadingDeleteSupplier: boolean;
+  categoryName: string;
+  loadingDeleteCategory: boolean;
 }
 
-export function DeleteSupplierConfirmation({
+export function DeleteCategoryConfirmation({
   isOpen,
   onClose,
   onConfirm,
-  supplierName,
-  loadingDeleteSupplier,
-}: DeleteSupplierConfirmationProps) {
+  categoryName,
+  loadingDeleteCategory,
+}: DeleteCategoryConfirmationProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px]">
@@ -34,7 +34,7 @@ export function DeleteSupplierConfirmation({
         </DialogHeader>
         <div className="py-4">
           <p>
-            Are you sure you want to delete the supplier {supplierName}? This
+            Are you sure you want to delete the category {categoryName}? This
             action cannot be undone.
           </p>
         </div>
@@ -43,12 +43,12 @@ export function DeleteSupplierConfirmation({
             Cancel
           </Button>
           <Button
-            disabled={loadingDeleteSupplier}
+            disabled={loadingDeleteCategory}
             className="flex-1"
             variant="destructive"
             onClick={onConfirm}
           >
-            <span className={`${loadingDeleteSupplier ? "hidden" : "block"}`}>
+            <span className={`${loadingDeleteCategory ? "hidden" : "block"}`}>
               Delete
             </span>
             <ThreeDots
@@ -59,7 +59,7 @@ export function DeleteSupplierConfirmation({
               radius="9"
               ariaLabel="three-dots-loading"
               wrapperStyle={{}}
-              wrapperClass={`${loadingDeleteSupplier ? "block" : "!hidden"}`}
+              wrapperClass={`${loadingDeleteCategory ? "block" : "!hidden"}`}
             />
           </Button>
         </DialogFooter>
