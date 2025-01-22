@@ -4,8 +4,14 @@ import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import Image from "next/image";
+// import Image from "next/image";
 import { useEdgeStore } from "@/components/context/EdgesProvider";
+
+import CategorySearch from "./category-search";
+import BrandSearch from "./brand-search";
+import SupplierSearch from "./supplier-search";
+
+import { Progress } from "@/components/ui/progress";
 
 import {
   Select,
@@ -56,22 +62,8 @@ const productSchema = z.object({
     .string()
     .max(500, "Description cannot exceed 500 characters")
     .optional(),
-  category_id: z
-    .number()
-    .int()
-    .positive("Category ID must be a positive integer")
-    .optional(),
-  // sku: z
-  //   .string()
-  //   .regex(/^[A-Za-z0-9_-]+$/, "SKU must contain only alphanumeric characters, dashes, or underscores")
-  //   .max(50, "SKU cannot exceed 50 characters")
-  //   .optional(),
-  // barcode: z
-  //   .string()
-  //   .regex(/^\d{12,13}$/, "Barcode must be 12 or 13 digits long")
-  //   .optional(),
+  category_id: z.number().int().positive("Category is required."),
   quantity_in_stock: z.number().int().min(0, "Quantity must be 0 or greater"),
-  reorder_level: z.number().int().min(0, "Reorder level must be 0 or greater"),
   unit_price: z
     .number()
     .min(0, "Unit price must be 0 or greater")
@@ -80,11 +72,8 @@ const productSchema = z.object({
     .number()
     .min(0, "Cost price must be 0 or greater")
     .max(10000, "Cost price cannot exceed 10,000"),
-  supplier_id: z
-    .number()
-    .int()
-    .positive("Supplier ID must be a positive integer")
-    .optional(),
+  supplier_id: z.number().int().positive("Supplier is required."),
+  brand_id: z.number().int().positive("Brand is required."),
   date_of_entry: z
     .date()
     .refine(
@@ -103,27 +92,9 @@ const productSchema = z.object({
     .min(1, "Color is required")
     .max(30, "Color cannot exceed 30 characters")
     .optional(),
-  material: z
-    .string()
-    .min(1, "Material is required")
-    .max(50, "Material cannot exceed 50 characters")
-    .optional(),
-  style_design: z
-    .string()
-    .max(100, "Style/Design cannot exceed 100 characters")
-    .optional(),
+
   product_image: z.string().optional(),
-  dimensions: z.string().optional(),
-  weight: z
-    .number()
-    .min(0, "Weight must be 0 or greater")
-    .max(50, "Weight cannot exceed 50 kg")
-    .optional(),
-  brand: z
-    .string()
-    .min(1, "Brand is required")
-    .max(50, "Brand cannot exceed 50 characters"),
-  season: z.string().max(30, "Season cannot exceed 30 characters").optional(),
+
   expiration_date: z
     .date()
     .optional()
@@ -135,15 +106,8 @@ const productSchema = z.object({
     .string()
     .min(1, "Status is required")
     .max(20, "Status cannot exceed 20 characters"),
-  location: z
-    .string()
-    .max(100, "Location cannot exceed 100 characters")
-    .optional(),
-  discount: z
-    .number()
-    .min(0, "Discount must be 0 or greater")
-    .max(100, "Discount cannot exceed 100%")
-    .optional(),
+
+  discount: z.number().optional(),
 });
 
 type ProductFormValues = z.infer<typeof productSchema>;
@@ -160,26 +124,17 @@ export function AddProductModal({
       name: "",
       description: "",
       category_id: undefined,
-      // sku: "",
-      // barcode: "",
       quantity_in_stock: 0,
-      reorder_level: 0,
       unit_price: 0,
       cost_price: 0,
       supplier_id: undefined,
       date_of_entry: new Date(),
       size: "",
       color: "",
-      material: "",
-      style_design: "",
       product_image: "",
-      dimensions: "",
-      weight: undefined,
-      brand: "",
-      season: "",
+      brand_id: undefined,
       expiration_date: undefined,
       status: "active",
-      location: "",
       discount: 0,
     },
   });
@@ -258,6 +213,7 @@ export function AddProductModal({
                         <Textarea
                           placeholder="Product Description"
                           {...field}
+                          className="h-[200px]"
                         />
                       </FormControl>
                       <FormMessage />
@@ -277,7 +233,13 @@ export function AddProductModal({
                       <FormItem>
                         <FormLabel>Quantity In Stock</FormLabel>
                         <FormControl>
-                          <Input type="number" {...field} />
+                          <Input
+                            type="number"
+                            {...field}
+                            onChange={(e) =>
+                              field.onChange(parseInt(e.target.value))
+                            }
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -290,7 +252,13 @@ export function AddProductModal({
                       <FormItem>
                         <FormLabel>Unit Price</FormLabel>
                         <FormControl>
-                          <Input type="number" step="0.01" {...field} />
+                          <Input
+                            type="number"
+                            {...field}
+                            onChange={(e) =>
+                              field.onChange(parseInt(e.target.value))
+                            }
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -303,7 +271,13 @@ export function AddProductModal({
                       <FormItem>
                         <FormLabel>Cost Price</FormLabel>
                         <FormControl>
-                          <Input type="number" step="0.01" {...field} />
+                          <Input
+                            type="number"
+                            {...field}
+                            onChange={(e) =>
+                              field.onChange(parseInt(e.target.value))
+                            }
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -355,9 +329,51 @@ export function AddProductModal({
                     name="category_id"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Category ID</FormLabel>
+                        <FormLabel>Category</FormLabel>
                         <FormControl>
-                          <Input type="number" {...field} />
+                          {/* <Input type="number" {...field} /> */}
+                          <CategorySearch
+                            value={field.value}
+                            onChange={(categoryId) =>
+                              field.onChange(categoryId)
+                            }
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="supplier_id"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Supplier</FormLabel>
+                        <FormControl>
+                          {/* <Input type="number" {...field} /> */}
+                          <SupplierSearch
+                            value={field.value}
+                            onChange={(supplierId) =>
+                              field.onChange(supplierId)
+                            }
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="brand_id"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Brand</FormLabel>
+                        <FormControl>
+                          {/* <Input type="number" {...field} /> */}
+                          <BrandSearch
+                            value={field.value}
+                            onChange={(brandId) => field.onChange(brandId)}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -428,6 +444,7 @@ export function AddProductModal({
                           onChange={(event) => {
                             const file = event.target.files?.[0];
                             if (file) {
+                              setProgress(0);
                               handleFileUpload(file);
                             }
                           }}
@@ -435,20 +452,13 @@ export function AddProductModal({
                       </FormControl>
                       <FormMessage />
                       <div>
-                        {progress > 0 && progress < 100 && (
-                          <div className={`bg-gray-200 h-2 rounded w-full`}>
-                            <div
-                              className={`bg-blue-500 h-2 rounded`}
-                              style={{ width: `${progress}%` }}
-                            />
-                          </div>
-                        )}
+                        <Progress value={progress} />
                         {progress === 100 && (
-                          <div className="upload-complete">
+                          <div className="upload-complete text-green-500">
                             Upload complete!
                           </div>
                         )}
-                        {form.getValues("product_image") !== "" && (
+                        {/* {form.getValues("product_image") !== "" && (
                           <Image
                             src={
                               form.getValues("product_image")?.toString() ?? ""
@@ -458,7 +468,7 @@ export function AddProductModal({
                             width={100}
                             height={100}
                           />
-                        )}
+                        )} */}
                       </div>
                     </FormItem>
                   )}

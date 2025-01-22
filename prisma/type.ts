@@ -18,30 +18,22 @@ export type Product = {
     name: string;
     description?: string;
     category_id?: number;
-    // sku: string;
-    // barcode?: string;
     quantity_in_stock: number;
-    reorder_level: number;
     unit_price: number;
     cost_price: number;
     supplier_id?: number;
     date_of_entry: Date;
     size?: string; // e.g., S, M, L, XL
     color?: string;
-    material?: string;
-    style_design?: string;
     product_image?: string; // URL or path to image
-    dimensions?: string; // JSON-like structure
-    weight?: number;
-    brand?: string;
-    season?: string;
+    brand_id?: number;
     expiration_date?: Date;
     status: string; // e.g., Active, Discontinued, Out of Stock
-    location?: string;
     discount?: number; // Optional discount percentage
 
     // Relations
     category?: Category;
+    brand?: Brand;
     supplier?: Supplier;
     order_items: OrderItem[];
     adjustments: InventoryAdjustment[];
@@ -113,6 +105,17 @@ export type InventoryAdjustment = {
 
 export type Category = {
     category_id: number;
+    name: string;
+    description?: string;
+    created_at: Date;
+    updated_at: Date;
+
+    // Relations
+    products: Product[];
+};
+
+export type Brand = {
+    brand_id: number;
     name: string;
     description?: string;
     created_at: Date;

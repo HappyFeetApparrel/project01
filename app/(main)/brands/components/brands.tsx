@@ -5,40 +5,40 @@ import { api } from "@/lib/axios";
 import { useState } from "react";
 
 // components
-import { AddCategoryModal } from "./add-category-modal";
+import { AddBrandModal } from "./add-brand-modal";
 import { StatusPopup } from "@/components/global/status-popup";
 
 // types
-import { Category } from "@/prisma/type";
+import { Brand } from "@/prisma/type";
 
 // components
-import CategoryTable from "./category-table";
+import BrandTable from "./brand-table";
 
 import { columns } from "./columns";
 
-import { useCategoryContext } from "../provider/category-provider";
+import { useBrandContext } from "../provider/brand-provider";
 
-export default function Categories() {
-  // const [categories, setCategories] = useState<Category[]>([]);
+export default function Brands() {
+  // const [brands, setBrands] = useState<Brand[]>([]);
   // const [loading, setLoading] = useState(true);
   // const [error, setError] = useState("");
-  // const fetchCategories = async () => {
+  // const fetchBrands = async () => {
   //   setLoading(true);
   //   try {
-  //     const { data } = await api.get("/categories");
-  //     setCategories(data.data);
+  //     const { data } = await api.get("/brands");
+  //     setBrands(data.data);
   //   } catch (err) {
-  //     setError("Failed to load categories. Please try again.");
-  //     console.error("Error fetching categories:", err);
+  //     setError("Failed to load brands. Please try again.");
+  //     console.error("Error fetching brands:", err);
   //   } finally {
   //     setLoading(false);
   //   }
   // };
   // useEffect(() => {
-  //   fetchCategories();
+  //   fetchBrands();
   // }, []);
 
-  const { categories, loading, error, fetchCategories } = useCategoryContext();
+  const { brands, loading, error, fetchBrands } = useBrandContext();
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isStatusPopupOpen, setIsStatusPopupOpen] = useState(false);
@@ -47,7 +47,7 @@ export default function Categories() {
     "success" | "error"
   >("success");
 
-  const [loadingAddCategory, setLoadingAddCategory] = useState<boolean>(false);
+  const [loadingAddBrand, setLoadingAddBrand] = useState<boolean>(false);
 
   const showStatusPopup = (message: string, status: "success" | "error") => {
     setStatusPopupMessage(message);
@@ -55,26 +55,26 @@ export default function Categories() {
     setIsStatusPopupOpen(true);
   };
 
-  const handleAddCategory = async (
-    newCategory: Pick<Category, "name" | "description">
+  const handleAddBrand = async (
+    newBrand: Pick<Brand, "name" | "description">
   ) => {
     try {
-      setLoadingAddCategory(true);
-      const response = await api.post("/categories", newCategory);
-      setLoadingAddCategory(false);
+      setLoadingAddBrand(true);
+      const response = await api.post("/brands", newBrand);
+      setLoadingAddBrand(false);
 
       if (response.status === 201) {
-        console.log("Category added:", response.data.data);
-        showStatusPopup("Category added successfully", "success");
+        console.log("Brand added:", response.data.data);
+        showStatusPopup("Brand added successfully", "success");
       } else {
         console.error("Unexpected response:", response);
-        showStatusPopup("Unexpected response while adding category", "error");
+        showStatusPopup("Unexpected response while adding brand", "error");
       }
-      await fetchCategories(); // Refresh data after addition
+      await fetchBrands(); // Refresh data after addition
     } catch (error: unknown) {
-      setLoadingAddCategory(false);
+      setLoadingAddBrand(false);
       if (error instanceof Error) {
-        console.error("Error adding category:", error.message);
+        console.error("Error adding brand:", error.message);
       } else {
         console.error("An unknown error occurred:", error);
       }
@@ -84,22 +84,22 @@ export default function Categories() {
 
   return (
     <>
-      <CategoryTable
+      <BrandTable
         columns={columns}
-        data={categories}
+        data={brands}
         loading={loading}
         error={error}
         setIsAddModalOpen={() => setIsAddModalOpen(true)}
       />
 
       {/* Modals */}
-      <AddCategoryModal
+      <AddBrandModal
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
-        onAdd={async (category) => {
-          await handleAddCategory(category);
+        onAdd={async (brand) => {
+          await handleAddBrand(brand);
         }}
-        loadingAddCategory={loadingAddCategory}
+        loadingAddBrand={loadingAddBrand}
       />
 
       <StatusPopup

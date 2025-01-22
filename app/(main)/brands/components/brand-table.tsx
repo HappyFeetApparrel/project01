@@ -34,7 +34,7 @@ import { Input } from "@/components/ui/input";
 
 import Pagination from "@/components/global/pagination";
 
-interface ProductTableProps<TData, TValue> {
+interface BrandTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   loading: boolean;
@@ -42,13 +42,13 @@ interface ProductTableProps<TData, TValue> {
   setIsAddModalOpen: () => void;
 }
 
-export function ProductTable<TData, TValue>({
+export default function BrandTable<TData, TValue>({
   columns,
   data,
   loading,
   error,
   setIsAddModalOpen,
-}: ProductTableProps<TData, TValue>) {
+}: BrandTableProps<TData, TValue>) {
   const [page, setPage] = React.useState(1);
   const itemsPerPage = 10; // Update to 10 items per page
   const totalPages = Math.ceil(data.length / itemsPerPage);
@@ -90,8 +90,8 @@ export function ProductTable<TData, TValue>({
   return (
     <div className="w-full space-y-6">
       <div className="flex items-center justify-between flex-wrap lg:flex-nowrap gap-4">
-        <h2 className="text-2xl font-semibold">Products</h2>
-        <div className="flex gap-4 flex-wrap flex-col w-full sm:flex-row justify-end">
+        <h2 className="text-2xl font-semibold">Brands</h2>
+        <div className="flex gap-4 flex-wrap flex-col w-full sm:flex-row justify-between">
           <div className="flex items-center gap-4 flex-1 max-w-xl flex-nowrap flex-grow">
             <div className="relative flex-1">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -109,7 +109,7 @@ export function ProductTable<TData, TValue>({
             onClick={() => setIsAddModalOpen()}
           >
             <Plus className="mr-2 h-4 w-4" />
-            Add New Product
+            Add New Brand
           </Button>
         </div>
       </div>
@@ -119,7 +119,7 @@ export function ProductTable<TData, TValue>({
           <div className="space-y-4">
             <Table className="w-full">
               <TableHeader>
-                {table?.getHeaderGroups().map((headerGroup) => (
+                {table.getHeaderGroups().map((headerGroup) => (
                   <TableRow className="bg-slate-50" key={headerGroup.id}>
                     {headerGroup.headers.map((header) => {
                       return (

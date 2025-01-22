@@ -24,6 +24,7 @@ import { HiUsers } from "react-icons/hi2";
 import { CiCircleInfo } from "react-icons/ci";
 import { IoSettingsOutline } from "react-icons/io5";
 import { TbCategoryPlus } from "react-icons/tb";
+import { MdOutlineBrandingWatermark } from "react-icons/md";
 
 import { usePathname } from "next/navigation";
 import Account from "./global/Account";
@@ -68,21 +69,28 @@ const sidebarMenuItemsGeneral: SidebarMenuItem[] = [
     rolesAllowed: ["Admin", "Manager"],
   },
   {
-    id: 4,
+    id: 5,
     icon: TbCategoryPlus,
-    label: "Product Categories",
+    label: "Categories",
     link: "/categories",
     rolesAllowed: ["Admin", "Manager"],
   },
   {
-    id: 5,
+    id: 6,
+    icon: MdOutlineBrandingWatermark,
+    label: "Brands",
+    link: "/brands",
+    rolesAllowed: ["Admin", "Manager"],
+  },
+  {
+    id: 7,
     icon: AiOutlineStock,
     label: "Reports",
     link: "/reports",
     rolesAllowed: ["Admin"],
   },
   {
-    id: 6,
+    id: 8,
     icon: HiUsers,
     label: "Users",
     link: "/users",

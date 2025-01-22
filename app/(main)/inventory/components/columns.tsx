@@ -127,7 +127,9 @@ export const columns: ColumnDef<Product>[] = [
         </Button>
       );
     },
-    cell: ({ row }) => <div>{row.getValue("brand")}</div>,
+    cell: ({ row }) => (
+      <div className="capitalize">{row.original.brand?.name}</div>
+    ),
     minSize: 100,
     maxSize: 200,
     size: 150,
