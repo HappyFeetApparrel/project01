@@ -126,8 +126,6 @@ export function AppSidebar() {
     );
   };
 
-  console.log(user);
-
   return (
     <Sidebar>
       <SidebarHeader className="pt-8 px-8 justify-center">

@@ -45,7 +45,6 @@ interface UpdateProductModalProps {
   onUpdate: (product: Product) => void;
   loadingUpdateProduct: boolean;
 }
-
 const productSchema = z.object({
   product_id: z.number().min(1, "Product ID is required"),
   name: z
@@ -68,12 +67,6 @@ const productSchema = z.object({
     .max(10000, "Cost price cannot exceed 10,000"),
   supplier_id: z.number().int().positive("Supplier is required."),
   brand_id: z.number().int().positive("Brand is required."),
-  date_of_entry: z
-    .date()
-    .refine(
-      (date) => date <= new Date(),
-      "Date of entry cannot be in the future"
-    ),
   size: z
     .string()
     .regex(
@@ -89,13 +82,6 @@ const productSchema = z.object({
 
   product_image: z.string().optional(),
 
-  expiration_date: z
-    .date()
-    .optional()
-    .refine(
-      (date) => !date || date > new Date(),
-      "Expiration date must be in the future"
-    ),
   status: z
     .string()
     .min(1, "Status is required")
@@ -124,13 +110,11 @@ export function UpdateProductModal({
       unit_price: product.unit_price ?? 0,
       cost_price: product.cost_price ?? 0,
       supplier_id: product.supplier_id ?? undefined,
-      date_of_entry: product.date_of_entry ?? new Date(),
+      brand_id: product.brand_id ?? 0,
       size: product.size ?? "",
       color: product.color ?? "",
       product_image: product.product_image ?? "",
-      brand_id: product.brand_id ?? 0,
-      expiration_date: product.expiration_date ?? undefined,
-      status: product.status ?? "Active",
+      status: product.status ?? undefined,
       discount: product.discount ?? 0,
     },
   });
@@ -141,6 +125,8 @@ export function UpdateProductModal({
       ...data,
     };
     onUpdate(updatedProduct);
+
+    console.log(data);
   };
 
   useEffect(() => {
@@ -282,37 +268,46 @@ export function UpdateProductModal({
                   <FormField
                     control={form.control}
                     name="status"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Status</FormLabel>
-                        <FormControl>
-                          <Select
-                            onValueChange={field.onChange}
-                            defaultValue={field.value}
-                          >
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select status" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="active">Active</SelectItem>
-                              <SelectItem value="out_of_stock">
-                                Out of Stock
-                              </SelectItem>
-                              <SelectItem value="pre_order">
-                                Pre-Order
-                              </SelectItem>
-                              <SelectItem value="discontinued">
-                                Discontinued
-                              </SelectItem>
-                              <SelectItem value="archived">Archived</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                    render={({ field }) => {
+                      const value = field.value
+                        .toLowerCase()
+                        .replace(/-/g, "_")
+                        .replace(/ /g, "_");
 
+                      return (
+                        <FormItem>
+                          <FormLabel>Status</FormLabel>
+
+                          <FormControl>
+                            <Select
+                              onValueChange={field.onChange}
+                              defaultValue={value}
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select status" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="active">Active</SelectItem>
+                                <SelectItem value="out_of_stock">
+                                  Out of Stock
+                                </SelectItem>
+                                <SelectItem value="pre_order">
+                                  Pre-Order
+                                </SelectItem>
+                                <SelectItem value="discontinued">
+                                  Discontinued
+                                </SelectItem>
+                                <SelectItem value="archived">
+                                  Archived
+                                </SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      );
+                    }}
+                  />
                   <FormField
                     control={form.control}
                     name="category_id"

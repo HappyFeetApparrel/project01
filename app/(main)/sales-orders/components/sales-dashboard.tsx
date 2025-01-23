@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 // import { Checkbox } from "@/components/ui/checkbox";
 
+import { Skeleton } from "@/components/ui/skeleton";
+
 import {
   LineChart,
   Line,
@@ -63,7 +65,6 @@ export default function SalesDashboard() {
     const fetchOrderData = async () => {
       try {
         const { data } = await api.get(`/order-data?period=${period}`);
-        console.log(data.data);
         setOrdersData(data.data);
       } catch {
         setErrorOrders("Failed to fetch order data");
@@ -99,83 +100,13 @@ export default function SalesDashboard() {
             </div>
           </div>
 
-          {
-            loadingOrders ? (
-              <p>Loading orders...</p>
-            ) : errorOrders ? (
-              <p className="text-red-500">{errorOrders}</p>
-            ) : (
-              <SalesTable
-                data={ordersData}
-                loading={loadingOrders}
-                error={errorOrders}
-                columns={columns}
-                setPeriod={setPeriod}
-              />
-            )
-            // <div className="rounded-lg border bg-card">
-            //   <div className="relative w-full overflow-auto">
-            //     <table className="w-full caption-bottom text-sm">
-            //       <thead className="bg-muted/50">
-            //         <tr className="border-b transition-colors">
-            //           <th className="h-12 px-4 text-left align-middle">
-            //             <Checkbox />
-            //           </th>
-            //           <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">
-            //             Product Name
-            //           </th>
-            //           <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">
-            //             Order Code
-            //           </th>
-            //           <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">
-            //             Category
-            //           </th>
-            //           <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">
-            //             Quantity
-            //           </th>
-            //           <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">
-            //             Total Price
-            //           </th>
-            //           <th className="h-12 px-4 text-right align-middle">
-            //             <Select defaultValue="7days">
-            //               <SelectTrigger className="w-[130px] text-[#00A3FF]">
-            //                 <SelectValue placeholder="Select period" />
-            //               </SelectTrigger>
-            //               <SelectContent>
-            //                 <SelectItem value="7days">Last 7 Days</SelectItem>
-            //                 <SelectItem value="30days">Last 30 Days</SelectItem>
-            //                 <SelectItem value="90days">Last 90 Days</SelectItem>
-            //               </SelectContent>
-            //             </Select>
-            //           </th>
-            //         </tr>
-            //       </thead>
-            //       <tbody className="divide-y">
-            //         {ordersData.map((order) => (
-            //           <tr
-            //             key={order.id}
-            //             className="border-b transition-colors hover:bg-muted/50"
-            //           >
-            //             <td className="p-4">
-            //               <Checkbox />
-            //             </td>
-            //             <td className="p-4 font-medium">{order.productName}</td>
-            //             <td className="p-4">{order.orderCode}</td>
-            //             <td className="p-4">{order.category}</td>
-            //             <td className="p-4">{order.quantity}</td>
-            //             <td className="p-4">${order.totalPrice}</td>
-            //             <td className="p-4 text-right">
-            //               <Button variant="link" className="text-[#00A3FF]">
-            //                 View Invoice
-            //               </Button>
-            //             </td>
-            //           </tr>
-            //         ))}
-            //       </tbody>
-            //     </table>
-            //   </div>
-            // </div>
-          }
+          <SalesTable
+            data={ordersData}
+            loading={loadingOrders}
+            error={errorOrders}
+            columns={columns}
+            setPeriod={setPeriod}
+          />
         </div>
 
         {/* Sales Report Section */}
@@ -202,7 +133,11 @@ export default function SalesDashboard() {
 
           <div className="h-[400px] w-full">
             {loadingSales ? (
-              <p>Loading orders...</p>
+              <ResponsiveContainer width="100%" height="100%">
+                <div className="h-full w-full flex justify-center items-center">
+                  <Skeleton className="w-full h-[350px]" />
+                </div>
+              </ResponsiveContainer>
             ) : errorSales ? (
               <p className="text-red-500">{errorSales}</p>
             ) : (
