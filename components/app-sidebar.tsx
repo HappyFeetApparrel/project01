@@ -25,6 +25,7 @@ import { CiCircleInfo } from "react-icons/ci";
 import { IoSettingsOutline } from "react-icons/io5";
 import { TbCategoryPlus } from "react-icons/tb";
 import { MdOutlineBrandingWatermark } from "react-icons/md";
+import { MdOutlinePayment } from "react-icons/md";
 
 import { usePathname } from "next/navigation";
 import Account from "./global/Account";
@@ -80,6 +81,13 @@ const sidebarMenuItemsGeneral: SidebarMenuItem[] = [
     icon: MdOutlineBrandingWatermark,
     label: "Brands",
     link: "/brands",
+    rolesAllowed: ["Admin", "Manager"],
+  },
+  {
+    id: 6,
+    icon: MdOutlinePayment,
+    label: "Payment Methods",
+    link: "/payment-methods",
     rolesAllowed: ["Admin", "Manager"],
   },
   {

@@ -43,6 +43,7 @@ const getOrdersData = async (period: string) => {
                     product: {
                         include: {
                             category: true,
+                            brand: true,
                         },
                     },
                 },
@@ -59,6 +60,8 @@ const getOrdersData = async (period: string) => {
             category: item.product.category?.name || "Uncategorized",
             quantity: item.quantity,
             totalPrice: item.total_price,
+            brand: item.product.brand?.name || "Unknown Brand",
+            status: item.product.status,
         }))
     );
 

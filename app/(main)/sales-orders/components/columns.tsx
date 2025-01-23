@@ -32,6 +32,26 @@ export const columns: ColumnDef<FormattedOrder>[] = [
     size: 250,
   },
   {
+    accessorKey: "productName",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Product Name
+          <ArrowUpDown />
+        </Button>
+      );
+    },
+    cell: ({ row }) => (
+      <div className="capitalize">{row.getValue("productName")}</div>
+    ),
+    minSize: 200,
+    maxSize: 400,
+    size: 250,
+  },
+  {
     accessorKey: "orderCode",
     header: ({ column }) => {
       return (
@@ -39,7 +59,7 @@ export const columns: ColumnDef<FormattedOrder>[] = [
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Name
+          Order Code
           <ArrowUpDown />
         </Button>
       );
@@ -52,42 +72,6 @@ export const columns: ColumnDef<FormattedOrder>[] = [
     size: 250,
   },
   {
-    accessorKey: "productName",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Quantity in Stock
-          <ArrowUpDown />
-        </Button>
-      );
-    },
-    cell: ({ row }) => <div>{row.getValue("productName")}</div>,
-    minSize: 100,
-    maxSize: 200,
-    size: 150,
-  },
-  {
-    accessorKey: "category",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Unit Price
-          <ArrowUpDown />
-        </Button>
-      );
-    },
-    cell: ({ row }) => <div>${row.getValue("category")}</div>,
-    minSize: 100,
-    maxSize: 200,
-    size: 150,
-  },
-  {
     accessorKey: "quantity",
     header: ({ column }) => {
       return (
@@ -95,7 +79,7 @@ export const columns: ColumnDef<FormattedOrder>[] = [
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Status
+          Quantity in Stock
           <ArrowUpDown />
         </Button>
       );
@@ -113,12 +97,48 @@ export const columns: ColumnDef<FormattedOrder>[] = [
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
+          Unit Price
+          <ArrowUpDown />
+        </Button>
+      );
+    },
+    cell: ({ row }) => <div>${row.getValue("totalPrice")}</div>,
+    minSize: 100,
+    maxSize: 200,
+    size: 150,
+  },
+  {
+    accessorKey: "status",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Status
+          <ArrowUpDown />
+        </Button>
+      );
+    },
+    cell: ({ row }) => <div>{row.getValue("status")}</div>,
+    minSize: 100,
+    maxSize: 200,
+    size: 150,
+  },
+  {
+    accessorKey: "brand",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
           Brand
           <ArrowUpDown />
         </Button>
       );
     },
-    cell: ({ row }) => <div>{row.getValue("totalPrice")}</div>,
+    cell: ({ row }) => <div>{row.getValue("brand")}</div>,
     minSize: 100,
     maxSize: 200,
     size: 150,

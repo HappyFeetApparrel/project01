@@ -4,6 +4,10 @@ import { useState, useEffect } from "react";
 import { Plus, Minus, X, Search } from "lucide-react";
 import Image from "next/image";
 
+import { Skeleton } from "@/components/ui/skeleton";
+
+import { api } from "@/lib/axios";
+
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -31,15 +35,15 @@ import {
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { SuccessPopup } from "./success-popup";
-import { FailPopup } from "./fail-popup";
-import { PrintInvoiceDialog } from "./print-invoice-dialog";
-import { getInventory, updateInventory } from "../utils/inventory";
+// import { SuccessPopup } from "./success-popup";
+// import { FailPopup } from "./fail-popup";
+// import { PrintInvoiceDialog } from "./print-invoice-dialog";
+// import { getInventory, updateInventory } from "../utils/inventory";
 
 // import types
-import { Product } from "@/data/product";
+// import { Product } from "@/data/product";
 import OrderItem from "../types/order-item";
-import OrderData from "../types/order-data";
+// import OrderData from "../types/order-data";
 
 const orderSchema = z.object({
   paymentMethod: z.enum(["credit_card", "bank_transfer", "cash"], {
@@ -53,18 +57,42 @@ interface PlaceOrderDialogProps {
   setOpen: (open: boolean) => void;
 }
 
+import { Product } from "@/prisma/type";
+
 export function PlaceOrderDialog({ open, setOpen }: PlaceOrderDialogProps) {
-  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
-  const [showFailPopup, setShowFailPopup] = useState(false);
-  const [showPrintInvoice, setShowPrintInvoice] = useState(false);
+  // const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+  // const [showFailPopup, setShowFailPopup] = useState(false);
+  // const [showPrintInvoice, setShowPrintInvoice] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
   const [change, setChange] = useState(0);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [currentOrderData, setCurrentOrderData] = useState<OrderData | null>(
-    null
-  );
-  const [inventory, setInventory] = useState<Product[]>([]);
+  // const [isProcessing, setIsProcessing] = useState(false);
+  // const [currentOrderData, setCurrentOrderData] = useState<OrderData | null>(
+  //   null
+  // );
+
+  // const [inventory, setInventory] = useState<Product[]>([]);
+
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  const fetchProducts = async () => {
+    setLoading(true);
+    try {
+      const { data } = await api.get("/products");
+      setProducts(data.data);
+    } catch (err) {
+      setError("Failed to load products. Please try again.");
+      console.error("Error fetching products:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchProducts();
+  }, []);
 
   const form = useForm<z.infer<typeof orderSchema>>({
     resolver: zodResolver(orderSchema),
@@ -74,35 +102,33 @@ export function PlaceOrderDialog({ open, setOpen }: PlaceOrderDialogProps) {
     },
   });
 
-  useEffect(() => {
-    setInventory(getInventory());
-  }, []);
+  // useEffect(() => {
+  //   setInventory(getInventory());
+  // }, []);
 
-  const filteredProducts = inventory.filter(
-    (product) =>
-      product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.sku.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.barcode.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // const filteredProducts = inventory.filter(
+  //   (product) =>
+  //     product.name.toLowerCase().includes(searchTerm.toLowerCase())
+  // );
 
-  const addToOrder = (product: Product) => {
-    const existingItem = orderItems.find(
-      (item) => item.product.productId === product.productId
-    );
-    if (existingItem) {
-      if (existingItem.quantity < product.quantity) {
-        setOrderItems(
-          orderItems.map((item) =>
-            item.product.productId === product.productId
-              ? { ...item, quantity: item.quantity + 1 }
-              : item
-          )
-        );
-      }
-    } else {
-      setOrderItems([...orderItems, { product, quantity: 1 }]);
-    }
-  };
+  // const addToOrder = (product: Product) => {
+  //   const existingItem = orderItems.find(
+  //     (item) => item.product.productId === product.productId
+  //   );
+  //   if (existingItem) {
+  //     if (existingItem.quantity < product.quantity) {
+  //       setOrderItems(
+  //         orderItems.map((item) =>
+  //           item.product.productId === product.productId
+  //             ? { ...item, quantity: item.quantity + 1 }
+  //             : item
+  //         )
+  //       );
+  //     }
+  //   } else {
+  //     setOrderItems([...orderItems, { product, quantity: 1 }]);
+  //   }
+  // };
 
   const removeFromOrder = (productId: string) => {
     setOrderItems(
@@ -110,22 +136,22 @@ export function PlaceOrderDialog({ open, setOpen }: PlaceOrderDialogProps) {
     );
   };
 
-  const updateQuantity = (productId: string, newQuantity: number) => {
-    const product = inventory.find((p) => p.productId === productId);
-    if (!product) return;
+  // const updateQuantity = (productId: string, newQuantity: number) => {
+  //   const product = inventory.find((p) => p.productId === productId);
+  //   if (!product) return;
 
-    if (newQuantity < 1) {
-      removeFromOrder(productId);
-    } else if (newQuantity <= product.quantity) {
-      setOrderItems(
-        orderItems.map((item) =>
-          item.product.productId === productId
-            ? { ...item, quantity: newQuantity }
-            : item
-        )
-      );
-    }
-  };
+  //   if (newQuantity < 1) {
+  //     removeFromOrder(productId);
+  //   } else if (newQuantity <= product.quantity) {
+  //     setOrderItems(
+  //       orderItems.map((item) =>
+  //         item.product.productId === productId
+  //           ? { ...item, quantity: newQuantity }
+  //           : item
+  //       )
+  //     );
+  //   }
+  // };
 
   const calculateTotal = () => {
     return orderItems.reduce((total, item) => {
@@ -142,59 +168,60 @@ export function PlaceOrderDialog({ open, setOpen }: PlaceOrderDialogProps) {
   }, [orderItems, form.watch("amountGiven")]);
 
   async function onSubmit(values: z.infer<typeof orderSchema>) {
-    try {
-      if (orderItems.length === 0) {
-        throw new Error("No products in order");
-      }
+    console.log(values);
+    // try {
+    //   if (orderItems.length === 0) {
+    //     throw new Error("No products in order");
+    //   }
 
-      const total = calculateTotal();
-      if (values.amountGiven < total) {
-        throw new Error("Insufficient payment amount");
-      }
+    //   const total = calculateTotal();
+    //   if (values.amountGiven < total) {
+    //     throw new Error("Insufficient payment amount");
+    //   }
 
-      setIsProcessing(true);
+    //   setIsProcessing(true);
 
-      const orderData: OrderData = {
-        ...values,
-        items: orderItems,
-        totalAmount: total,
-        change: values.amountGiven - total,
-        orderDate: new Date(),
-      };
+    //   const orderData: OrderData = {
+    //     ...values,
+    //     items: orderItems,
+    //     totalAmount: total,
+    //     change: values.amountGiven - total,
+    //     orderDate: new Date(),
+    //   };
 
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      console.log(orderData);
+    //   // Simulate API call
+    //   await new Promise((resolve) => setTimeout(resolve, 2000));
+    //   console.log(orderData);
 
-      // Update inventory
-      updateInventory(
-        orderItems.map((item) => ({
-          productId: item.product.productId,
-          quantity: item.quantity,
-        }))
-      );
-      setInventory(getInventory());
+    //   // Update inventory
+    //   updateInventory(
+    //     orderItems.map((item) => ({
+    //       productId: item.product.productId,
+    //       quantity: item.quantity,
+    //     }))
+    //   );
+    //   setInventory(getInventory());
 
-      setCurrentOrderData(orderData);
-      setIsProcessing(false);
-      setShowPrintInvoice(true);
-    } catch (error) {
-      console.error(error);
-      setIsProcessing(false);
-      setShowFailPopup(true);
-    }
+    //   setCurrentOrderData(orderData);
+    //   setIsProcessing(false);
+    //   setShowPrintInvoice(true);
+    // } catch (error) {
+    //   console.error(error);
+    //   setIsProcessing(false);
+    //   setShowFailPopup(true);
+    // }
   }
 
-  const handlePrintInvoiceClose = () => {
-    setShowPrintInvoice(false);
-    setShowSuccessPopup(true);
-    setTimeout(() => {
-      setShowSuccessPopup(false);
-      setOpen(false);
-      setOrderItems([]);
-      form.reset();
-    }, 3000);
-  };
+  // const handlePrintInvoiceClose = () => {
+  //   setShowPrintInvoice(false);
+  //   setShowSuccessPopup(true);
+  //   setTimeout(() => {
+  //     setShowSuccessPopup(false);
+  //     setOpen(false);
+  //     setOrderItems([]);
+  //     form.reset();
+  //   }, 3000);
+  // };
 
   return (
     <>
@@ -207,7 +234,7 @@ export function PlaceOrderDialog({ open, setOpen }: PlaceOrderDialogProps) {
             </DialogDescription>
           </DialogHeader>
 
-          <div className="grid grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div className="space-y-6">
               {/* Product Search */}
               <div className="relative">
@@ -222,41 +249,68 @@ export function PlaceOrderDialog({ open, setOpen }: PlaceOrderDialogProps) {
 
               {/* Product List */}
               <div className="border rounded-md max-h-[50vh] overflow-y-auto">
-                {filteredProducts.map((product) => (
-                  <div
-                    key={product.productId}
-                    className="flex items-center gap-4 p-4 hover:bg-muted transition-colors border-b last:border-b-0"
-                  >
-                    <Image
-                      src={product.image}
-                      alt={product.name}
-                      width={48}
-                      height={48}
-                      className="rounded-md object-cover"
-                    />
-                    <div className="flex-1">
-                      <h4 className="font-medium">{product.name}</h4>
-                      <p className="text-sm text-muted-foreground">
-                        SKU: {product.sku}
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <p className="font-medium">
-                        ${product.unitPrice.toFixed(2)}
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        Stock: {product.quantity}
-                      </p>
-                    </div>
-                    <Button
-                      size="sm"
-                      onClick={() => addToOrder(product)}
-                      disabled={product.quantity === 0}
+                {loading ? (
+                  Array.from({ length: 5 }).map((_, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center gap-4 p-4 hover:bg-muted transition-colors border-b last:border-b-0 animate-pulse"
                     >
-                      <Plus className="h-4 w-4" />
-                    </Button>
+                      <Skeleton className="w-12 h-12 rounded-md" />
+                      <div className="flex-1">
+                        <Skeleton className="w-1/2 h-4 mb-2" />
+                        <Skeleton className="w-1/3 h-4" />
+                      </div>
+                      <div className="text-right">
+                        <Skeleton className="w-1/2 h-4 mb-2" />
+                        <Skeleton className="w-1/3 h-4" />
+                      </div>
+                      <Button size="sm" disabled>
+                        <Skeleton className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  ))
+                ) : error ? (
+                  <div className="border rounded-md max-h-[50vh] overflow-y-auto">
+                    <div className="flex items-center gap-4 p-4 hover:bg-muted transition-colors border-b last:border-b-0"></div>
+                    <p className="text-red-500">{error}</p>
                   </div>
-                ))}
+                ) : (
+                  products.map((product: Product, index: number) => (
+                    <div
+                      key={index}
+                      className="flex items-center gap-4 p-4 hover:bg-muted transition-colors border-b last:border-b-0"
+                    >
+                      <Image
+                        src={product.product_image ?? ""}
+                        alt={product.name}
+                        width={48}
+                        height={48}
+                        className="rounded-md object-cover w-14 h-14"
+                      />
+                      <div className="flex-1">
+                        <h4 className="font-medium">{product.name}</h4>
+                        {/* <p className="text-sm text-muted-foreground">
+                        SKU: {product.sku}
+                      </p> */}
+                      </div>
+                      <div className="text-right">
+                        <p className="font-medium">
+                          ${product.unit_price.toFixed(2)}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          Stock: {product.quantity_in_stock}
+                        </p>
+                      </div>
+                      <Button
+                        size="sm"
+                        // onClick={() => addToOrder(product)}
+                        disabled={product.quantity_in_stock === 0}
+                      >
+                        <Plus className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ))
+                )}
               </div>
             </div>
 
@@ -278,12 +332,12 @@ export function PlaceOrderDialog({ open, setOpen }: PlaceOrderDialogProps) {
                             size="icon"
                             variant="outline"
                             className="h-6 w-6"
-                            onClick={() =>
-                              updateQuantity(
-                                item.product.productId,
-                                item.quantity - 1
-                              )
-                            }
+                            // onClick={() =>
+                            //   updateQuantity(
+                            //     item.product.productId,
+                            //     item.quantity - 1
+                            //   )
+                            // }
                           >
                             <Minus className="h-3 w-3" />
                           </Button>
@@ -292,12 +346,12 @@ export function PlaceOrderDialog({ open, setOpen }: PlaceOrderDialogProps) {
                             size="icon"
                             variant="outline"
                             className="h-6 w-6"
-                            onClick={() =>
-                              updateQuantity(
-                                item.product.productId,
-                                item.quantity + 1
-                              )
-                            }
+                            // onClick={() =>
+                            //   updateQuantity(
+                            //     item.product.productId,
+                            //     item.quantity + 1
+                            //   )
+                            // }
                             disabled={item.quantity >= item.product.quantity}
                           >
                             <Plus className="h-3 w-3" />
@@ -398,11 +452,12 @@ export function PlaceOrderDialog({ open, setOpen }: PlaceOrderDialogProps) {
                     </Button>
                     <Button
                       type="submit"
-                      disabled={
-                        orderItems.length === 0 || change < 0 || isProcessing
-                      }
+                      // disabled={
+                      //   orderItems.length === 0 || change < 0 || isProcessing
+                      // }
                     >
-                      {isProcessing ? "Processing..." : "Place Order"}
+                      {/* {isProcessing ? "Processing..." : "Place Order"} */}
+                      Place Order
                     </Button>
                   </div>
                 </form>
@@ -411,7 +466,7 @@ export function PlaceOrderDialog({ open, setOpen }: PlaceOrderDialogProps) {
           </div>
         </DialogContent>
       </Dialog>
-      {showPrintInvoice && (
+      {/* {showPrintInvoice && (
         <PrintInvoiceDialog
           isOpen={showPrintInvoice}
           onClose={handlePrintInvoiceClose}
@@ -429,7 +484,7 @@ export function PlaceOrderDialog({ open, setOpen }: PlaceOrderDialogProps) {
           message="Failed to place order. Please try again."
           onClose={() => setShowFailPopup(false)}
         />
-      )}
+      )} */}
     </>
   );
 }
