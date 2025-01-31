@@ -80,7 +80,7 @@ export function UpdatePaymentMethodModal({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
-          <DialogTitle>Update PaymentMethod</DialogTitle>
+          <DialogTitle>Update Payment Method</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
@@ -93,7 +93,7 @@ export function UpdatePaymentMethodModal({
                   <FormItem>
                     <FormLabel>Name</FormLabel>
                     <FormControl>
-                      <Input placeholder="PaymentMethod Name" {...field} />
+                      <Input placeholder="Payment Method Name" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -107,7 +107,7 @@ export function UpdatePaymentMethodModal({
                     <FormLabel>Description</FormLabel>
                     <FormControl>
                       <Textarea
-                        placeholder="PaymentMethod Description"
+                        placeholder="Payment Method Description"
                         {...field}
                         className="h-[200px]"
                       />

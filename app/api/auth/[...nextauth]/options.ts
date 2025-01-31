@@ -66,10 +66,11 @@ export const authOptions: NextAuthOptions = {
     },
     async jwt({ token, user }) {
       if (user) {
-        token.id = user.id;
-        token.name = user.name;
-        token.email = user.email;
-        token.role = user.role;
+        const extendedUser = user as ExtendedUser;
+        token.id = extendedUser.user_id;
+        token.name = extendedUser.name;
+        token.email = extendedUser.email;
+        token.role = extendedUser.role;
       }
       return token;
     },

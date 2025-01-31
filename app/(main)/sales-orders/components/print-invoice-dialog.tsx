@@ -9,7 +9,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import OrderData from "../types/order-data";
+import { OrderData } from "./place-order-dialog";
 
 interface PrintInvoiceDialogProps {
   isOpen: boolean;

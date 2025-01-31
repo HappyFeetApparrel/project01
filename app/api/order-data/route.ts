@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import crypto from "crypto";
+
+import { OrderItem } from "@/app/(main)/sales-orders/components/place-order-dialog";
 
 // Helper function to filter orders based on the selected period
 const filterOrdersByPeriod = (period: string) => {
@@ -80,5 +83,71 @@ export async function GET(request: Request): Promise<NextResponse> {
     } catch (error) {
         console.error("Error fetching orders:", error);
         return NextResponse.json({ error: (error as Error).message }, { status: 500 });
+    }
+}
+
+
+export async function POST(req: Request): Promise<NextResponse> {
+    try {
+        const data = await req.json();
+
+        // Generate a unique order code with a hexadecimal identifier
+        const orderCode = `ORD-${crypto.randomBytes(4).toString("hex").toUpperCase()}`;
+
+        // Create a new SalesOrder
+        const salesOrder = await prisma.salesOrder.create({
+            data: {
+                order_code: orderCode,
+                user_id: data.user_id, // Ensure this is passed in the request
+                payment_method_id: data.paymentMethod,
+                amount_given: data.amountGiven,
+                change: data.change,
+                total_price: data.totalAmount,
+            },
+        });
+
+
+        // Insert Order Items
+        const orderItems = await Promise.all(
+            data.items.map(async (item: OrderItem) => {
+                return prisma.orderItem.create({
+                    data: {
+                        order_id: salesOrder.order_id,
+                        product_id: item.product.product_id,
+                        quantity: item.quantity_in_stock,
+                        unit_price: item.product.unit_price,
+                        total_price: item.product.unit_price * item.quantity_in_stock,
+                    },
+                });
+            })
+        );
+
+        // Adjust inventory stock
+        await Promise.all(
+            data.items.map(async (item: OrderItem) => {
+                await prisma.inventoryAdjustment.create({
+                    data: {
+                        product_id: item.product.product_id,
+                        quantity_changed: -item.quantity_in_stock,
+                        reason: "Order Purchase",
+                        adjusted_by: data.user_id, // Ensure this is passed in the request
+                    },
+                });
+
+                // Reduce stock in Product table
+                await prisma.product.update({
+                    where: { product_id: item.product.product_id },
+                    data: {
+                        quantity_in_stock: {
+                            decrement: item.quantity_in_stock,
+                        },
+                    },
+                });
+            })
+        );
+
+        return NextResponse.json({ order: salesOrder, orderItems }, { status: 201 });
+    } catch (error) {
+        return NextResponse.json({ error: (error as Error) }, { status: 500 });
     }
 }

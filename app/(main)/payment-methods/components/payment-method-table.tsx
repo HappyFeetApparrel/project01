@@ -188,7 +188,7 @@ export default function PaymentMethodTable<TData, TValue>({
                       colSpan={columns.length}
                       className="h-24 text-center"
                     >
-                      No results.
+                      No payment methods found.
                     </TableCell>
                   </TableRow>
                 )}

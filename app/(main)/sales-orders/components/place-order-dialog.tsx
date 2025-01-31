@@ -22,30 +22,20 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-// import { SuccessPopup } from "./success-popup";
-// import { FailPopup } from "./fail-popup";
-// import { PrintInvoiceDialog } from "./print-invoice-dialog";
+
+import PaymentMethodSearch from "./payment-method-search";
+import { SuccessPopup } from "./success-popup";
+import { FailPopup } from "./fail-popup";
+import { PrintInvoiceDialog } from "./print-invoice-dialog";
 // import { getInventory, updateInventory } from "../utils/inventory";
 
-// import types
-// import { Product } from "@/data/product";
-
-// import OrderData from "../types/order-data";
+import { useLayout } from "@/components/context/LayoutProvider";
 
 const orderSchema = z.object({
-  paymentMethod: z.enum(["credit_card", "bank_transfer", "cash"], {
-    required_error: "Payment method is required",
-  }),
+  paymentMethod: z.number().int().positive("Payment Method is required."),
   amountGiven: z.number().min(0, "Amount must be 0 or greater"),
 });
 
@@ -56,24 +46,33 @@ interface PlaceOrderDialogProps {
 
 import { Product } from "@/prisma/type";
 
-interface OrderItem {
+export interface OrderItem {
   product: Product;
   quantity_in_stock: number;
+}
+
+export interface OrderData {
+  user_id: number;
+  items: OrderItem[];
+  totalAmount: number;
+  change: number;
+  orderDate: Date;
 }
 
 import ProductSearch from "./product-search";
 
 export function PlaceOrderDialog({ open, setOpen }: PlaceOrderDialogProps) {
-  // const [showSuccessPopup, setShowSuccessPopup] = useState(false);
-  // const [showFailPopup, setShowFailPopup] = useState(false);
-  // const [showPrintInvoice, setShowPrintInvoice] = useState(false);
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+  const [showFailPopup, setShowFailPopup] = useState(false);
+  const [showPrintInvoice, setShowPrintInvoice] = useState(false);
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
   const [change, setChange] = useState(0);
-  // const [isProcessing, setIsProcessing] = useState(false);
-  // const [currentOrderData, setCurrentOrderData] = useState<OrderData | null>(
-  //   null
-  // );
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [currentOrderData, setCurrentOrderData] = useState<OrderData | null>(
+    null
+  );
 
+  const { user } = useLayout();
   // const [inventory, setInventory] = useState<Product[]>([]);
 
   const [products, setProducts] = useState<Product[]>([]);
@@ -104,15 +103,6 @@ export function PlaceOrderDialog({ open, setOpen }: PlaceOrderDialogProps) {
       amountGiven: 0,
     },
   });
-
-  // useEffect(() => {
-  //   setInventory(getInventory());
-  // }, []);
-
-  // const filteredProducts = inventory.filter(
-  //   (product) =>
-  //     product.name.toLowerCase().includes(searchTerm.toLowerCase())
-  // );
 
   const addToOrder = (product: Product) => {
     const existingItem = orderItems.find(
@@ -172,59 +162,60 @@ export function PlaceOrderDialog({ open, setOpen }: PlaceOrderDialogProps) {
 
   async function onSubmit(values: z.infer<typeof orderSchema>) {
     console.log(values);
-    // try {
-    //   if (orderItems.length === 0) {
-    //     throw new Error("No products in order");
-    //   }
+    try {
+      if (orderItems.length === 0) {
+        throw new Error("No products in order");
+      }
 
-    //   const total = calculateTotal();
-    //   if (values.amountGiven < total) {
-    //     throw new Error("Insufficient payment amount");
-    //   }
+      const total = calculateTotal();
+      if (values.amountGiven < total) {
+        throw new Error("Insufficient payment amount");
+      }
 
-    //   setIsProcessing(true);
+      setIsProcessing(true);
 
-    //   const orderData: OrderData = {
-    //     ...values,
-    //     items: orderItems,
-    //     totalAmount: total,
-    //     change: values.amountGiven - total,
-    //     orderDate: new Date(),
-    //   };
+      const orderData: OrderData = {
+        ...values,
+        user_id: Number(user?.user.id ?? 0),
+        items: orderItems,
+        totalAmount: total,
+        change: values.amountGiven - total,
+        orderDate: new Date(),
+      };
 
-    //   // Simulate API call
-    //   await new Promise((resolve) => setTimeout(resolve, 2000));
-    //   console.log(orderData);
+      // Simulate API call
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      console.log(orderData);
 
-    //   // Update inventory
-    //   updateInventory(
-    //     orderItems.map((item) => ({
-    //       product_id: item.product.product_id,
-    //       quantity_in_stock: item.quantity_in_stock,
-    //     }))
-    //   );
-    //   setInventory(getInventory());
+      // Update inventory
+      // updateInventory(
+      //   orderItems.map((item) => ({
+      //     product_id: item.product.product_id,
+      //     quantity_in_stock: item.quantity_in_stock,
+      //   }))
+      // );
+      // setInventory(getInventory());
 
-    //   setCurrentOrderData(orderData);
-    //   setIsProcessing(false);
-    //   setShowPrintInvoice(true);
-    // } catch (error) {
-    //   console.error(error);
-    //   setIsProcessing(false);
-    //   setShowFailPopup(true);
-    // }
+      setCurrentOrderData(orderData);
+      setIsProcessing(false);
+      setShowPrintInvoice(true);
+    } catch (error) {
+      console.error(error);
+      setIsProcessing(false);
+      setShowFailPopup(true);
+    }
   }
 
-  // const handlePrintInvoiceClose = () => {
-  //   setShowPrintInvoice(false);
-  //   setShowSuccessPopup(true);
-  //   setTimeout(() => {
-  //     setShowSuccessPopup(false);
-  //     setOpen(false);
-  //     setOrderItems([]);
-  //     form.reset();
-  //   }, 3000);
-  // };
+  const handlePrintInvoiceClose = () => {
+    setShowPrintInvoice(false);
+    setShowSuccessPopup(true);
+    setTimeout(() => {
+      setShowSuccessPopup(false);
+      setOpen(false);
+      setOrderItems([]);
+      form.reset();
+    }, 3000);
+  };
 
   return (
     <>
@@ -296,7 +287,7 @@ export function PlaceOrderDialog({ open, setOpen }: PlaceOrderDialogProps) {
                         </div>
                         <span className="flex-1 mx-2">{item.product.name}</span>
                         <span>
-                          $
+                          ₱
                           {(
                             item.product.unit_price * item.quantity_in_stock
                           ).toFixed(2)}
@@ -315,7 +306,7 @@ export function PlaceOrderDialog({ open, setOpen }: PlaceOrderDialogProps) {
                     ))}
                     <div className="flex justify-between font-bold text-lg pt-2 border-t">
                       <span>Total:</span>
-                      <span>${calculateTotal().toFixed(2)}</span>
+                      <span>₱{calculateTotal().toFixed(2)}</span>
                     </div>
                   </div>
                 )}
@@ -328,6 +319,23 @@ export function PlaceOrderDialog({ open, setOpen }: PlaceOrderDialogProps) {
                   className="space-y-4"
                 >
                   <FormField
+                    control={form.control}
+                    name="paymentMethod"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Payment Method</FormLabel>
+                        <FormControl>
+                          {/* <Input type="number" {...field} /> */}
+                          <PaymentMethodSearch
+                            value={field.value}
+                            onChange={(brandId) => field.onChange(brandId)}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  {/* <FormField
                     control={form.control}
                     name="paymentMethod"
                     render={({ field }) => (
@@ -355,7 +363,7 @@ export function PlaceOrderDialog({ open, setOpen }: PlaceOrderDialogProps) {
                         <FormMessage />
                       </FormItem>
                     )}
-                  />
+                  /> */}
                   <FormField
                     control={form.control}
                     name="amountGiven"
@@ -379,7 +387,7 @@ export function PlaceOrderDialog({ open, setOpen }: PlaceOrderDialogProps) {
                   <div className="flex justify-between items-center">
                     <span className="font-medium">Change:</span>
                     <span className="text-lg font-bold">
-                      ${change.toFixed(2)}
+                      ₱{change > 0 ? change.toFixed(2) : 0}
                     </span>
                   </div>
                   <div className="flex justify-end space-x-4 pt-4">
@@ -392,12 +400,11 @@ export function PlaceOrderDialog({ open, setOpen }: PlaceOrderDialogProps) {
                     </Button>
                     <Button
                       type="submit"
-                      // disabled={
-                      //   orderItems.length === 0 || change < 0 || isProcessing
-                      // }
+                      disabled={
+                        orderItems.length === 0 || change < 0 || isProcessing
+                      }
                     >
-                      {/* {isProcessing ? "Processing..." : "Place Order"} */}
-                      Place Order
+                      {isProcessing ? "Processing..." : "Place Order"}
                     </Button>
                   </div>
                 </form>
@@ -406,7 +413,7 @@ export function PlaceOrderDialog({ open, setOpen }: PlaceOrderDialogProps) {
           </div>
         </DialogContent>
       </Dialog>
-      {/* {showPrintInvoice && (
+      {showPrintInvoice && (
         <PrintInvoiceDialog
           isOpen={showPrintInvoice}
           onClose={handlePrintInvoiceClose}
@@ -424,7 +431,7 @@ export function PlaceOrderDialog({ open, setOpen }: PlaceOrderDialogProps) {
           message="Failed to place order. Please try again."
           onClose={() => setShowFailPopup(false)}
         />
-      )} */}
+      )}
     </>
   );
 }

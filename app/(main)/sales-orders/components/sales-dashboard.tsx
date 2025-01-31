@@ -64,9 +64,13 @@ export default function SalesDashboard() {
   useEffect(() => {
     const fetchOrderData = async () => {
       try {
+        setLoadingOrders(true);
         const { data } = await api.get(`/order-data?period=${period}`);
         setOrdersData(data.data);
+        setLoadingOrders(false);
       } catch {
+        setLoadingOrders(false);
+
         setErrorOrders("Failed to fetch order data");
       } finally {
         setLoadingOrders(false);

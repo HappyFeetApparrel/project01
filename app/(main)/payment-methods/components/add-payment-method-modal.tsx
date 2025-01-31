@@ -79,7 +79,7 @@ export function AddPaymentMethodModal({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>Add New PaymentMethod</DialogTitle>
+          <DialogTitle>Add New Payment Method</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
@@ -92,7 +92,7 @@ export function AddPaymentMethodModal({
                   <FormItem>
                     <FormLabel>Name</FormLabel>
                     <FormControl>
-                      <Input placeholder="PaymentMethod Name" {...field} />
+                      <Input placeholder="Payment Method Name" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -106,7 +106,7 @@ export function AddPaymentMethodModal({
                     <FormLabel>Description</FormLabel>
                     <FormControl>
                       <Textarea
-                        placeholder="PaymentMethod Description"
+                        placeholder="Payment Method Description"
                         {...field}
                         className="h-[200px]"
                       />
