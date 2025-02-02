@@ -37,6 +37,12 @@ export interface FormattedOrder {
   totalPrice: number;
 }
 
+import { SuccessPopup } from "./success-popup";
+import { FailPopup } from "./fail-popup";
+import { PrintInvoiceDialog } from "./print-invoice-dialog";
+
+import { OrderData } from "./place-order-dialog";
+
 export default function SalesDashboard() {
   const [open, setOpen] = useState(false);
   const [salesData, setSalesData] = useState([]);
@@ -46,6 +52,15 @@ export default function SalesDashboard() {
   const [errorSales, setErrorSales] = useState("");
   const [errorOrders, setErrorOrders] = useState("");
   const [period, setPeriod] = useState("7days");
+  const [newOrder, setNewOrder] = useState("");
+
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+  const [showFailPopup, setShowFailPopup] = useState(false);
+  const [showPrintInvoice, setShowPrintInvoice] = useState(false);
+
+  const [currentOrderData, setCurrentOrderData] = useState<OrderData | null>(
+    null
+  );
 
   useEffect(() => {
     const fetchSalesReport = async () => {
@@ -78,7 +93,20 @@ export default function SalesDashboard() {
     };
 
     fetchOrderData();
-  }, [period]);
+  }, [period, newOrder]);
+
+  const handlePrintInvoiceClose = () => {
+    setShowPrintInvoice(false);
+    setShowSuccessPopup(true);
+    // setTimeout(() => {
+    //   setShowSuccessPopup(false);
+    //   setOpen(false);
+    //   setOrderItems([]);
+    //   form.reset();
+    // }, 3000);
+    setShowSuccessPopup(false);
+    setOpen(false);
+  };
 
   return (
     <>
@@ -195,7 +223,33 @@ export default function SalesDashboard() {
           </div>
         </div>
       </div>
-      <PlaceOrderDialog open={open} setOpen={setOpen} />
+      <PlaceOrderDialog
+        open={open}
+        setOpen={setOpen}
+        setNewOrder={setNewOrder}
+        setCurrentOrderData={setCurrentOrderData}
+        setShowFailPopup={setShowFailPopup}
+        setShowPrintInvoice={setShowPrintInvoice}
+      />
+      {showPrintInvoice && (
+        <PrintInvoiceDialog
+          isOpen={showPrintInvoice}
+          onClose={handlePrintInvoiceClose}
+          orderData={currentOrderData}
+        />
+      )}
+      {showSuccessPopup && (
+        <SuccessPopup
+          message="Order placed successfully!"
+          onClose={() => setShowSuccessPopup(false)}
+        />
+      )}
+      {showFailPopup && (
+        <FailPopup
+          message="Failed to place order. Please try again."
+          onClose={() => setShowFailPopup(false)}
+        />
+      )}
     </>
   );
 }

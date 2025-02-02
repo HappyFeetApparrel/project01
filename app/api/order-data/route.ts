@@ -52,6 +52,9 @@ const getOrdersData = async (period: string) => {
                 },
             },
         },
+        orderBy: {
+            order_id: 'desc', // Sort by id in descending order
+        },
     });
 
     const formattedOrders = orders.flatMap((order) =>
@@ -108,7 +111,7 @@ export async function POST(req: Request): Promise<NextResponse> {
 
 
         // Insert Order Items
-        const orderItems = await Promise.all(
+        await Promise.all(
             data.items.map(async (item: OrderItem) => {
                 return prisma.orderItem.create({
                     data: {
@@ -146,7 +149,7 @@ export async function POST(req: Request): Promise<NextResponse> {
             })
         );
 
-        return NextResponse.json({ order: salesOrder, orderItems }, { status: 201 });
+        return NextResponse.json({ order: salesOrder, orderCode: orderCode }, { status: 201 });
     } catch (error) {
         return NextResponse.json({ error: (error as Error) }, { status: 500 });
     }

@@ -21,15 +21,15 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { Dispatch, SetStateAction } from "react";
+
 import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 
 import PaymentMethodSearch from "./payment-method-search";
-import { SuccessPopup } from "./success-popup";
-import { FailPopup } from "./fail-popup";
-import { PrintInvoiceDialog } from "./print-invoice-dialog";
+
 // import { getInventory, updateInventory } from "../utils/inventory";
 
 import { useLayout } from "@/components/context/LayoutProvider";
@@ -42,6 +42,10 @@ const orderSchema = z.object({
 interface PlaceOrderDialogProps {
   open: boolean;
   setOpen: (open: boolean) => void;
+  setNewOrder: Dispatch<SetStateAction<string>>;
+  setCurrentOrderData: Dispatch<SetStateAction<OrderData | null>>;
+  setShowPrintInvoice: Dispatch<SetStateAction<boolean>>;
+  setShowFailPopup: Dispatch<SetStateAction<boolean>>;
 }
 
 import { Product } from "@/prisma/type";
@@ -61,16 +65,17 @@ export interface OrderData {
 
 import ProductSearch from "./product-search";
 
-export function PlaceOrderDialog({ open, setOpen }: PlaceOrderDialogProps) {
-  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
-  const [showFailPopup, setShowFailPopup] = useState(false);
-  const [showPrintInvoice, setShowPrintInvoice] = useState(false);
+export function PlaceOrderDialog({
+  open,
+  setOpen,
+  setNewOrder,
+  setCurrentOrderData,
+  setShowPrintInvoice,
+  setShowFailPopup,
+}: PlaceOrderDialogProps) {
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
   const [change, setChange] = useState(0);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [currentOrderData, setCurrentOrderData] = useState<OrderData | null>(
-    null
-  );
 
   const { user } = useLayout();
   // const [inventory, setInventory] = useState<Product[]>([]);
@@ -184,8 +189,8 @@ export function PlaceOrderDialog({ open, setOpen }: PlaceOrderDialogProps) {
       };
 
       // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      console.log(orderData);
+      // await new Promise((resolve) => setTimeout(resolve, 2000));
+      // console.log(orderData);
 
       // Update inventory
       // updateInventory(
@@ -196,26 +201,31 @@ export function PlaceOrderDialog({ open, setOpen }: PlaceOrderDialogProps) {
       // );
       // setInventory(getInventory());
 
+      const response = await api.post("/order-data", orderData);
+      setIsProcessing(false);
+
+      if (response.status === 201) {
+        setNewOrder(response.data.orderCode);
+        console.log("Brand added:");
+      } else {
+        console.error("Unexpected response:", response);
+      }
+
       setCurrentOrderData(orderData);
       setIsProcessing(false);
       setShowPrintInvoice(true);
+      setOrderItems([]);
+      form.reset();
+      setOpen(false);
     } catch (error) {
       console.error(error);
       setIsProcessing(false);
       setShowFailPopup(true);
+      setShowPrintInvoice(true);
+      setOrderItems([]);
+      setOpen(false);
     }
   }
-
-  const handlePrintInvoiceClose = () => {
-    setShowPrintInvoice(false);
-    setShowSuccessPopup(true);
-    setTimeout(() => {
-      setShowSuccessPopup(false);
-      setOpen(false);
-      setOrderItems([]);
-      form.reset();
-    }, 3000);
-  };
 
   return (
     <>
@@ -413,25 +423,6 @@ export function PlaceOrderDialog({ open, setOpen }: PlaceOrderDialogProps) {
           </div>
         </DialogContent>
       </Dialog>
-      {showPrintInvoice && (
-        <PrintInvoiceDialog
-          isOpen={showPrintInvoice}
-          onClose={handlePrintInvoiceClose}
-          orderData={currentOrderData}
-        />
-      )}
-      {showSuccessPopup && (
-        <SuccessPopup
-          message="Order placed successfully!"
-          onClose={() => setShowSuccessPopup(false)}
-        />
-      )}
-      {showFailPopup && (
-        <FailPopup
-          message="Failed to place order. Please try again."
-          onClose={() => setShowFailPopup(false)}
-        />
-      )}
     </>
   );
 }

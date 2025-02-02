@@ -54,7 +54,7 @@ export function PrintInvoiceDialog({
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={onClose}>
-            Cancel
+            No, Thanks!
           </Button>
           <Button onClick={handlePrint} disabled={isPrinting}>
             {isPrinting ? "Printing..." : "Print Invoice"}
