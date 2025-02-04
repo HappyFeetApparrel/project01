@@ -34,14 +34,14 @@ export async function GET(): Promise<NextResponse> {
         });
 
         // Ensure each month has non-zero data
-        for (let i = 0; i < monthlyData.length; i++) {
-            if (monthlyData[i].stockIn === 0) {
-                monthlyData[i].stockIn = Math.floor(Math.random() * (500000 - 100000 + 1)) + 100000; // Random value between 100000 and 500000
-            }
-            if (monthlyData[i].stockOut === 0) {
-                monthlyData[i].stockOut = Math.floor(Math.random() * (500000 - 100000 + 1)) + 100000; // Random value between 100000 and 500000
-            }
-        }
+        // for (let i = 0; i < monthlyData.length; i++) {
+        //     if (monthlyData[i].stockIn === 0) {
+        //         monthlyData[i].stockIn = Math.floor(Math.random() * (500000 - 100000 + 1)) + 100000; // Random value between 100000 and 500000
+        //     }
+        //     if (monthlyData[i].stockOut === 0) {
+        //         monthlyData[i].stockOut = Math.floor(Math.random() * (500000 - 100000 + 1)) + 100000; // Random value between 100000 and 500000
+        //     }
+        // }
 
 
 

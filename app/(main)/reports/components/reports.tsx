@@ -7,7 +7,10 @@ import { ChevronLeft, ChevronRight, Printer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 
 import { format, startOfWeek, endOfWeek, subWeeks, addWeeks } from "date-fns";
 
@@ -30,6 +33,96 @@ interface WeeklySalesData {
 // ];
 
 const weeklyDataLoading: WeeklySalesData[] = [
+  {
+    time: "00:00",
+    mon: 0,
+    tue: 0,
+    wed: 0,
+    thu: 0,
+    fri: 0,
+    sat: 0,
+    sun: 0,
+  },
+  {
+    time: "01:00",
+    mon: 0,
+    tue: 0,
+    wed: 0,
+    thu: 0,
+    fri: 0,
+    sat: 0,
+    sun: 0,
+  },
+  {
+    time: "02:00",
+    mon: 0,
+    tue: 0,
+    wed: 0,
+    thu: 0,
+    fri: 0,
+    sat: 0,
+    sun: 0,
+  },
+  {
+    time: "03:00",
+    mon: 0,
+    tue: 0,
+    wed: 0,
+    thu: 0,
+    fri: 0,
+    sat: 0,
+    sun: 0,
+  },
+  {
+    time: "04:00",
+    mon: 0,
+    tue: 0,
+    wed: 0,
+    thu: 0,
+    fri: 0,
+    sat: 0,
+    sun: 0,
+  },
+  {
+    time: "05:00",
+    mon: 0,
+    tue: 0,
+    wed: 0,
+    thu: 0,
+    fri: 0,
+    sat: 0,
+    sun: 0,
+  },
+  {
+    time: "06:00",
+    mon: 0,
+    tue: 0,
+    wed: 0,
+    thu: 0,
+    fri: 0,
+    sat: 0,
+    sun: 0,
+  },
+  {
+    time: "07:00",
+    mon: 0,
+    tue: 0,
+    wed: 0,
+    thu: 0,
+    fri: 0,
+    sat: 0,
+    sun: 0,
+  },
+  {
+    time: "08:00",
+    mon: 0,
+    tue: 0,
+    wed: 0,
+    thu: 0,
+    fri: 0,
+    sat: 0,
+    sun: 0,
+  },
   {
     time: "09:00",
     mon: 0,
@@ -110,6 +203,76 @@ const weeklyDataLoading: WeeklySalesData[] = [
     sat: 0,
     sun: 0,
   },
+  {
+    time: "17:00",
+    mon: 0,
+    tue: 0,
+    wed: 0,
+    thu: 0,
+    fri: 0,
+    sat: 0,
+    sun: 0,
+  },
+  {
+    time: "18:00",
+    mon: 0,
+    tue: 0,
+    wed: 0,
+    thu: 0,
+    fri: 0,
+    sat: 0,
+    sun: 0,
+  },
+  {
+    time: "19:00",
+    mon: 0,
+    tue: 0,
+    wed: 0,
+    thu: 0,
+    fri: 0,
+    sat: 0,
+    sun: 0,
+  },
+  {
+    time: "20:00",
+    mon: 0,
+    tue: 0,
+    wed: 0,
+    thu: 0,
+    fri: 0,
+    sat: 0,
+    sun: 0,
+  },
+  {
+    time: "21:00",
+    mon: 0,
+    tue: 0,
+    wed: 0,
+    thu: 0,
+    fri: 0,
+    sat: 0,
+    sun: 0,
+  },
+  {
+    time: "22:00",
+    mon: 0,
+    tue: 0,
+    wed: 0,
+    thu: 0,
+    fri: 0,
+    sat: 0,
+    sun: 0,
+  },
+  {
+    time: "23:00",
+    mon: 0,
+    tue: 0,
+    wed: 0,
+    thu: 0,
+    fri: 0,
+    sat: 0,
+    sun: 0,
+  },
 ];
 
 function getColorForValue(value: number): string {
@@ -173,12 +336,32 @@ export default function Reports() {
     fetchWeeklySales();
   }, [weekRange]);
 
+  const reportRef = useRef(null);
+
+  const handlePrint = () => {
+    if (!reportRef.current) return;
+
+    html2canvas(reportRef.current, { scale: 2 }).then((canvas) => {
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF("p", "mm", "a4");
+      const imgWidth = 210;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+      pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
+      pdf.autoPrint();
+      window.open(pdf.output("bloburl"), "_blank");
+    });
+  };
+
   return (
     <div className="w-full space-y-8">
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-7">
           <CardTitle className="text-2xl font-bold">Reports</CardTitle>
-          <Button className="bg-[#00A3FF] hover:bg-[#00A3FF]/90">
+          <Button
+            className="bg-[#00A3FF] hover:bg-[#00A3FF]/90"
+            onClick={handlePrint}
+          >
             <Printer className="mr-2 h-4 w-4" />
             Print Reports
           </Button>
@@ -186,7 +369,7 @@ export default function Reports() {
         <CardContent className="space-y-8">
           {/* Weekly Sales Section */}
 
-          <div className="space-y-4">
+          <div className="space-y-4 p-6" ref={reportRef}>
             <div className="flex items-center justify-between">
               <h3 className="text-xl font-semibold">Weekly Sales</h3>
               <div className="flex items-center gap-4">
@@ -213,7 +396,7 @@ export default function Reports() {
                   <p>{errorWeeklySales}</p>
                 </div>
               ) : (
-                <div className="space-y-2">
+                <div className="space-y-2 h-[500px] overflow-y-auto">
                   <div className="grid grid-cols-[80px_repeat(7,1fr)] gap-1">
                     <div className="text-sm text-muted-foreground"></div>
                     <div className="text-center text-sm text-muted-foreground">

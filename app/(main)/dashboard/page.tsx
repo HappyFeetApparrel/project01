@@ -2,7 +2,7 @@
 
 import SalesSummary from "@/app/(main)/dashboard/components/SalesSummary";
 import StockReports from "./components/StockReports";
-import SalesOrder from "./components/SalesOrder";
+// import SalesOrder from "./components/SalesOrder";
 
 // Rigth Sidebar
 import QuickActions from "./components/QuickActions";
@@ -14,7 +14,7 @@ const Home = () => {
       <div className="col-span-1 xl:col-span-2 space-y-8">
         <SalesSummary />
         <StockReports />
-        <SalesOrder />
+        {/* <SalesOrder /> */}
       </div>
       <div className="col-span-1 p-4 mx:p-8 flex xl:block items-start gap-8 flex-col-reverse sm:flex-row">
         <QuickActions />

@@ -7,6 +7,8 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Legend } from "recharts";
 import { Download } from "lucide-react";
 import { api } from "@/lib/axios";
 
+import { ThreeDots } from "react-loader-spinner";
+
 interface LabelConfig {
   cx: number;
   cy: number;
@@ -47,6 +49,7 @@ export default function SupplierAnalytics() {
     { name: string; value: number; color: string }[]
   >([]);
   const [loading, setLoading] = useState(true);
+  const [loadingDownload, setLoadingDownload] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -62,6 +65,23 @@ export default function SupplierAnalytics() {
 
     fetchData();
   }, []);
+
+  const baseUrl = "/api/reports/last-month";
+
+  const handleDownload = async () => {
+    setLoadingDownload(true);
+    const response = await fetch(`${baseUrl}?mode=download`);
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "Sales_Report_July.pdf";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+    setLoadingDownload(false);
+  };
 
   return (
     <div className="w-full xl:max-w-sm max-w-full space-y-8">
@@ -118,24 +138,56 @@ export default function SupplierAnalytics() {
           <h3 className="text-xl font-semibold">Reports for Last Month</h3>
           <p className="text-sm text-muted-foreground">From 01 Jul - 31 Jul</p>
           <div className="mt-4 flex items-center gap-4">
-            <Button className="bg-[#00A3FF] hover:bg-[#00A3FF]/90">
+            {/* <Button
+              className="bg-[#00A3FF] hover:bg-[#00A3FF]/90"
+              onClick={handleDownload}
+            >
               <Download className="mr-2 h-4 w-4" />
               Download PDF
+            </Button> */}
+            <Button
+              type="submit"
+              disabled={loadingDownload}
+              className="bg-[#00A3FF] hover:bg-[#00A3FF]/90 w-[150px]"
+              onClick={handleDownload}
+            >
+              <span className={`${loadingDownload ? "hidden" : "flex"}`}>
+                <Download className="mr-2 h-4 w-4" />
+                Download PDF
+              </span>
+              <ThreeDots
+                visible={true}
+                height="50"
+                width="50"
+                color="#fff"
+                radius="9"
+                ariaLabel="three-dots-loading"
+                wrapperStyle={{}}
+                wrapperClass={`${loadingDownload ? "block" : "!hidden"}`}
+              />
             </Button>
-            <Button variant="link" className="text-[#00A3FF]">
-              View
+            <Button variant="link" className="text-[#00A3FF]" asChild>
+              <a
+                href={`${baseUrl}?mode=view`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                View
+              </a>
             </Button>
           </div>
         </CardContent>
       </Card>
 
       {/* Defect Rate Report */}
-      <Card>
+      {/* <Card>
         <CardContent className="flex flex-col items-center p-6 text-center">
           <h3 className="text-xl font-semibold">Defect Rate Report</h3>
           <p className="text-sm text-muted-foreground">
             Product Defects & Supplier Origin
           </p>
+          <p className="text-sm text-muted-foreground">From 01 Jul - 31 Jul</p>
+
           <div className="mt-4 flex items-center gap-4">
             <Button className="bg-[#9C27B0] hover:bg-[#9C27B0]/90">
               <Download className="mr-2 h-4 w-4" />
@@ -146,7 +198,7 @@ export default function SupplierAnalytics() {
             </Button>
           </div>
         </CardContent>
-      </Card>
+      </Card> */}
     </div>
   );
 }
