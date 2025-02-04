@@ -68,7 +68,7 @@ async function generateSalesReportPDF(sales: SalesOrder[], reportMonth: string, 
     sales.forEach((sale) => {
         page.drawText(sale.order_code, { x: colX[0], y, size: 10, font });
         page.drawText(sale.user?.name || "Guest", { x: colX[1], y, size: 10, font });
-        page.drawText(`₱${sale.total_price.toFixed(2)}`, { x: colX[2], y, size: 10, font });
+        page.drawText(`PHP${sale.total_price.toFixed(2)}`, { x: colX[2], y, size: 10, font });
         page.drawText(format(sale.created_at, "yyyy-MM-dd"), { x: colX[3], y, size: 10, font });
         y -= 20;
     });
