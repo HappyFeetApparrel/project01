@@ -141,3 +141,9 @@ export type Setting = {
     name: string;
     value: string; // Store JSON or simple values
 };
+
+export type UserActivityLogFormatted = Omit<UserActivityLog, "created_at" | "user"> & {
+    name: string;
+    avatar: string;
+    timeAgo: string;
+};

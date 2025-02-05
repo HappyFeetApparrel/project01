@@ -7,6 +7,8 @@ import { api } from "@/lib/axios";
 import { Button } from "@/components/ui/button";
 import { MoreHorizontal } from "lucide-react";
 
+import { useLayout } from "@/components/context/LayoutProvider";
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -34,6 +36,7 @@ interface OptionsProps {
 }
 
 const Options = ({ row }: OptionsProps) => {
+  const { saveActivity } = useLayout();
   const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] =
     useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
@@ -71,6 +74,7 @@ const Options = ({ row }: OptionsProps) => {
 
       if (response.status === 200) {
         fetchPaymentMethods();
+        saveActivity("Deleted paymentMethod", "paymentMethod");
         // Update the local paymentMethods state
         showStatusPopup("PaymentMethod deleted successfully", "success");
       }
@@ -94,6 +98,7 @@ const Options = ({ row }: OptionsProps) => {
 
       if (response.status === 200) {
         fetchPaymentMethods();
+        saveActivity("Updated paymentMethod", "paymentMethod");
         showStatusPopup("PaymentMethod updated successfully", "success");
       }
     } catch (error) {

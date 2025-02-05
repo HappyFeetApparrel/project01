@@ -1,66 +1,76 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { formatDistanceToNow } from "date-fns";
 
-// Helper function to get user activity data
+// Helper function to fetch user activity data
 const getUserActivityData = async () => {
-    const users = await prisma.user.findMany({
+    const activities = await prisma.userActivityLog.findMany({
         include: {
-            orders: {
-                include: {
-                    order_items: true, // Include order items for each order
-                },
-            },
-            adjustments: true,
-            logs: true,
+            user: true, // Fetch user details
         },
+        orderBy: {
+            created_at: "desc", // Get the latest activities first
+        },
+        take: 5, // Limit to 5 recent activities
     });
 
-    // Format the data into ActivityItem array
-    const activities = users.map((user, index) => {
-        // Calculate how long ago the user last performed an activity (for simplicity, using logs' created_at)
-        const latestLog = user.logs.length > 0 ? user.logs[0].created_at : user.created_at;
-        const timeAgo = calculateTimeAgo(latestLog);
+    // Format the data into an ActivityItem array
+    return activities.map((activity, index) => {
+        const timeAgo = formatDistanceToNow(new Date(activity.created_at), { addSuffix: true });
 
-        // Generate a random image URL using the Picsum API
+        // Generate a random avatar image using Picsum
         const randomSeed = Math.random().toString(36).substring(2, 8);
         const avatar = `https://picsum.photos/seed/${randomSeed}/40/40`;
 
         return {
             id: index + 1,
-            name: user.name,
-            avatar: avatar, // Random avatar image from Picsum
-            products: user.orders.reduce((total, order) => total + order.order_items.length, 0), // Sum of products across all orders
+            user_id: activity.user_id,
+            name: activity.user?.name || "Unknown User",
+            avatar,
+            action: activity.action,
+            details: activity.details,
             timeAgo,
-            latestLog, // Add the latestLog for sorting purposes
         };
     });
-
-    // Sort by latest activity
-    const sortedActivities = activities.sort((a, b) => b.latestLog.getTime() - a.latestLog.getTime());
-
-    // Return only the first 5 activities
-    return sortedActivities.slice(0, 5);
 };
 
-// Helper function to calculate the time ago
-const calculateTimeAgo = (date: Date) => {
-    const now = new Date();
-    const diff = now.getTime() - new Date(date).getTime();
-    const minutes = Math.floor(diff / (1000 * 60));
-    const hours = Math.floor(diff / (1000 * 60 * 60));
-
-    if (minutes < 60) return `${minutes}m ago`;
-    if (hours < 24) return `${hours}h ago`;
-    return `${Math.floor(hours / 24)}d ago`;
-};
-
-// API handler
+// API handler to get recent activities
 export async function GET(): Promise<NextResponse> {
     try {
         const activities = await getUserActivityData();
-        return NextResponse.json({ data: activities }, { status: 200 });
+        return NextResponse.json({ data: activities }, { status: 201 });
     } catch (error) {
-        console.log('Error:', error);
-        return NextResponse.json({ error: (error as Error).message }, { status: 500 });
+        console.error("Error fetching activities:", error);
+        return NextResponse.json({ error: "Error fetching activities." }, { status: 500 });
+    }
+}
+
+
+
+// API handler to save activity
+export async function POST(request: Request): Promise<NextResponse> {
+    try {
+        // Extract data from the request body
+        const { user_id, action, details } = await request.json();
+
+        // Check if the required data is provided
+        if (!user_id || !action || !details) {
+            return NextResponse.json({ error: "Missing required fields." }, { status: 400 });
+        }
+
+        // Save the activity log to the database
+        await prisma.userActivityLog.create({
+            data: {
+                user_id: user_id,
+                action,
+                details,
+            },
+        });
+
+        // Return a success response
+        return NextResponse.json({ message: "Activity saved successfully" }, { status: 201 });
+    } catch (error) {
+        console.error("Error saving activity:", error);
+        return NextResponse.json({ error: "Error saving activity." }, { status: 500 });
     }
 }

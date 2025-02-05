@@ -8,6 +8,8 @@ import { useState } from "react";
 import { AddProductModal } from "./add-product-modal";
 import { StatusPopup } from "@/components/global/status-popup";
 
+import { useLayout } from "@/components/context/LayoutProvider";
+
 // types
 import { Product } from "@/prisma/type";
 
@@ -21,6 +23,7 @@ import { useProductContext } from "../provider/product-provider";
 export default function Products() {
   const { products, loading, error, fetchProducts } = useProductContext();
 
+  const { saveActivity } = useLayout();
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isStatusPopupOpen, setIsStatusPopupOpen] = useState(false);
   const [statusPopupMessage, setStatusPopupMessage] = useState("");
@@ -45,6 +48,7 @@ export default function Products() {
       setLoadingAddProduct(false);
 
       if (response.status === 201) {
+        saveActivity("Add Product", "Product added successfully");
         console.log("Product added:", response.data.data);
         showStatusPopup("Product added successfully", "success");
       } else {

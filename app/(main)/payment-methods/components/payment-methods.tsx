@@ -11,6 +11,8 @@ import { StatusPopup } from "@/components/global/status-popup";
 // types
 import { PaymentMethod } from "@/prisma/type";
 
+import { useLayout } from "@/components/context/LayoutProvider";
+
 // components
 import PaymentMethodTable from "./payment-method-table";
 
@@ -57,6 +59,7 @@ export default function PaymentMethods() {
     setIsStatusPopupOpen(true);
   };
 
+  const { saveActivity } = useLayout();
   const handleAddPaymentMethod = async (
     newPaymentMethod: Pick<PaymentMethod, "name" | "description">
   ) => {
@@ -67,6 +70,7 @@ export default function PaymentMethods() {
 
       if (response.status === 201) {
         console.log("PaymentMethod added:", response.data.data);
+        saveActivity("Added paymentMethod", "paymentMethod");
         showStatusPopup("PaymentMethod added successfully", "success");
       } else {
         console.error("Unexpected response:", response);

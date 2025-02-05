@@ -1,40 +1,41 @@
 "use client";
 
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import Image from "next/image";
 import { useEffect, useState } from "react";
-import { api } from "@/lib/axios";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
-// Define the structure of ActivityItem
-interface ActivityItem {
-  id: number;
-  name: string;
-  avatar: string;
-  products: number;
-  timeAgo: string;
-}
+import { useLayout } from "../context/LayoutProvider";
+
+import { UserActivityLogFormatted } from "@/prisma/type";
 
 export default function RecentActivity() {
-  const [activities, setActivities] = useState<ActivityItem[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [recentActivities, setRecentActivities] = useState<
+    UserActivityLogFormatted[]
+  >([]);
+
+  const { activities } = useLayout();
 
   // Fetch user activity data
   useEffect(() => {
     const fetchActivities = async () => {
       try {
-        const response = await api.get("/recent-activity"); // Replace with actual endpoint
-        setActivities(response.data.data);
+        setLoading(true);
+        setRecentActivities(activities);
+        setLoading(false);
       } catch {
         setError("Failed to fetch activities.");
+        setLoading(false);
       } finally {
         setLoading(false);
       }
     };
 
     fetchActivities();
-  }, []);
+    console.log(activities);
+  }, [activities]);
 
   if (error) return <div>{error}</div>;
 
@@ -44,26 +45,21 @@ export default function RecentActivity() {
         <CardTitle className="text-2xl font-bold">Recent Activity</CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
-        {!loading && activities.length > 0
-          ? activities.map((activity) => (
-              <div key={activity.id} className="flex items-center gap-4">
-                <Image
-                  src={activity.avatar}
-                  alt={`${activity.name}'s avatar`}
-                  width={40}
-                  height={40}
-                  className="rounded-full"
-                />
+        {!loading && recentActivities.length > 0
+          ? activities.map((activity, index) => (
+              <div key={index} className="flex items-center gap-4">
+                <Avatar>
+                  <AvatarImage src="https://github.com/shadcn.png" />
+                  <AvatarFallback>CN</AvatarFallback>
+                </Avatar>
                 <div className="flex flex-col">
                   <div className="flex items-center gap-1">
-                    <span className="font-medium text-gray-700">Ordered</span>
-                    <span className="font-semibold text-[#00A3FF]">
-                      {activity.products}
+                    <span className="font-medium text-gray-700">
+                      {activity.name}
                     </span>
-                    <span className="font-medium text-gray-700">Products</span>
                   </div>
-                  <div className="flex items-center gap-2 text-gray-600">
-                    <span className="text-sm">{activity.name}</span>
+                  <div className="flex items-center gap-2 text-gray-600 flex-wrap">
+                    <span className="text-sm">{activity.action}</span>
                     <span className="text-sm text-muted-foreground">-</span>
                     <span className="text-sm text-[#00A3FF]">
                       {activity.timeAgo}

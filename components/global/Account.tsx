@@ -19,10 +19,8 @@ const Account = () => {
     <div className="flex justify-between items-center">
       <div className="flex gap-2 items-center">
         <Avatar>
-          <AvatarImage
-            src={`https://api.dicebear.com/7.x/initials/svg?seed=${user.user.name}`}
-          />
-          <AvatarFallback>{user.user.name.charAt(0)}</AvatarFallback>
+          <AvatarImage src="https://github.com/shadcn.png" />
+          <AvatarFallback>CN</AvatarFallback>
         </Avatar>
 
         <div className="flex flex-col">
