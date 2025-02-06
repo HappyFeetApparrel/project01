@@ -40,14 +40,14 @@ export default function RecentActivity() {
   if (error) return <div>{error}</div>;
 
   return (
-    <Card className="w-full m-0 xl:my-8 xl:max-w-sm max-w-full">
+    <Card className="w-full m-0 xl:my-8 xl:max-w-sm max-w-full items-start">
       <CardHeader>
         <CardTitle className="text-2xl font-bold">Recent Activity</CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
         {!loading && recentActivities.length > 0
           ? activities.map((activity, index) => (
-              <div key={index} className="flex items-center gap-4">
+              <div key={index} className="flex items-start gap-4 ">
                 <Avatar>
                   <AvatarImage src="https://github.com/shadcn.png" />
                   <AvatarFallback>CN</AvatarFallback>

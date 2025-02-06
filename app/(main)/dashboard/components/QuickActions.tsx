@@ -81,11 +81,13 @@ export default function QuickActions() {
             <button
               key={index}
               onClick={action.action}
-              className="flex w-full items-center justify-between px-4 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted"
+              className="flex w-full items-center justify-between px-4 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted flex-wrap"
             >
               <div className="flex items-center gap-3">
                 {action.icon}
-                <span>{action.label}</span>
+                <span className="text-left whitespace-nowrap">
+                  {action.label}
+                </span>
               </div>
               <span className="text-xs">{action.shortcut}</span>
             </button>
