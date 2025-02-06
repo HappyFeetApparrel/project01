@@ -29,11 +29,15 @@ import { Pencil, Trash2, Eye } from "lucide-react";
 
 import { useBrandContext } from "../provider/brand-provider";
 
+import { useLayout } from "@/components/context/LayoutProvider";
+
 interface OptionsProps {
   row: Brand;
 }
 
 const Options = ({ row }: OptionsProps) => {
+  const { saveActivity } = useLayout();
+
   const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] =
     useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
@@ -70,6 +74,8 @@ const Options = ({ row }: OptionsProps) => {
       if (response.status === 200) {
         fetchBrands();
         // Update the local brands state
+        saveActivity(`Deleted brand: ${brand.name}`, "deleted");
+
         showStatusPopup("Brand deleted successfully", "success");
       }
     } catch (error) {
@@ -90,6 +96,8 @@ const Options = ({ row }: OptionsProps) => {
 
       if (response.status === 200) {
         fetchBrands();
+        saveActivity(`Updated brand: ${brand.name}`, "updated");
+
         showStatusPopup("Brand updated successfully", "success");
       }
     } catch (error) {

@@ -1,6 +1,6 @@
 "use client";
 
-import { FileText, Package, Truck, Upload } from "lucide-react";
+import { FileText, Package, Truck /**Upload*/ } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { useEffect, useMemo } from "react";
 
@@ -32,12 +32,12 @@ export default function QuickActions() {
         shortcut: "ctrl + k",
         action: () => console.log("Add Supplier clicked"),
       },
-      {
-        icon: <Upload className="h-5 w-5 text-muted-foreground" />,
-        label: "Export",
-        shortcut: "ctrl + s",
-        action: () => console.log("Export clicked"),
-      },
+      // {
+      //   icon: <Upload className="h-5 w-5 text-muted-foreground" />,
+      //   label: "Export",
+      //   shortcut: "ctrl + s",
+      //   action: () => console.log("Export clicked"),
+      // },
     ],
     []
   );
@@ -58,10 +58,10 @@ export default function QuickActions() {
             e.preventDefault();
             actions[2].action();
             break;
-          case "s":
-            e.preventDefault();
-            actions[3].action();
-            break;
+          // case "s":
+          //   e.preventDefault();
+          //   actions[3].action();
+          //   break;
         }
       }
     };

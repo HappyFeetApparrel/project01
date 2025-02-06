@@ -41,6 +41,8 @@ import { SuccessPopup } from "./success-popup";
 import { FailPopup } from "./fail-popup";
 import { PrintInvoiceDialog } from "./print-invoice-dialog";
 
+import { useLayout } from "@/components/context/LayoutProvider";
+
 import { OrderData } from "./place-order-dialog";
 
 export default function SalesDashboard() {
@@ -62,6 +64,8 @@ export default function SalesDashboard() {
     null
   );
 
+  const { order, setCreateOrder } = useLayout();
+
   useEffect(() => {
     const fetchSalesReport = async () => {
       try {
@@ -75,6 +79,13 @@ export default function SalesDashboard() {
     };
     fetchSalesReport();
   }, []);
+
+  useEffect(() => {
+    if (order) {
+      setOpen(true);
+      setCreateOrder(false);
+    }
+  }, [order]);
 
   useEffect(() => {
     const fetchOrderData = async () => {

@@ -18,25 +18,10 @@ import { columns } from "./columns";
 
 import { useBrandContext } from "../provider/brand-provider";
 
+import { useLayout } from "@/components/context/LayoutProvider";
+
 export default function Brands() {
-  // const [brands, setBrands] = useState<Brand[]>([]);
-  // const [loading, setLoading] = useState(true);
-  // const [error, setError] = useState("");
-  // const fetchBrands = async () => {
-  //   setLoading(true);
-  //   try {
-  //     const { data } = await api.get("/brands");
-  //     setBrands(data.data);
-  //   } catch (err) {
-  //     setError("Failed to load brands. Please try again.");
-  //     console.error("Error fetching brands:", err);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-  // useEffect(() => {
-  //   fetchBrands();
-  // }, []);
+  const { saveActivity } = useLayout();
 
   const { brands, loading, error, fetchBrands } = useBrandContext();
 
@@ -65,6 +50,8 @@ export default function Brands() {
 
       if (response.status === 201) {
         console.log("Brand added:", response.data.data);
+        saveActivity(`Added brand: ${newBrand.name}`, "added");
+
         showStatusPopup("Brand added successfully", "success");
       } else {
         console.error("Unexpected response:", response);

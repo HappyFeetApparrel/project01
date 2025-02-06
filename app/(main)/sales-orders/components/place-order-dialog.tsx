@@ -165,6 +165,8 @@ export function PlaceOrderDialog({
     setChange(amountGiven - total);
   }, [orderItems, form.watch("amountGiven")]);
 
+  const { saveActivity } = useLayout();
+
   async function onSubmit(values: z.infer<typeof orderSchema>) {
     console.log(values);
     try {
@@ -188,24 +190,13 @@ export function PlaceOrderDialog({
         orderDate: new Date(),
       };
 
-      // Simulate API call
-      // await new Promise((resolve) => setTimeout(resolve, 2000));
-      // console.log(orderData);
-
-      // Update inventory
-      // updateInventory(
-      //   orderItems.map((item) => ({
-      //     product_id: item.product.product_id,
-      //     quantity_in_stock: item.quantity_in_stock,
-      //   }))
-      // );
-      // setInventory(getInventory());
-
       const response = await api.post("/order-data", orderData);
       setIsProcessing(false);
 
       if (response.status === 201) {
         setNewOrder(response.data.orderCode);
+        saveActivity(`Added new order`, "added");
+
         console.log("Brand added:");
       } else {
         console.error("Unexpected response:", response);

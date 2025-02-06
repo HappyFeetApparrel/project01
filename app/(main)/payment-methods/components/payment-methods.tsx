@@ -70,7 +70,7 @@ export default function PaymentMethods() {
 
       if (response.status === 201) {
         console.log("PaymentMethod added:", response.data.data);
-        saveActivity("Added paymentMethod", "paymentMethod");
+        saveActivity(`Added payment method: ${newPaymentMethod.name}`, "added");
         showStatusPopup("PaymentMethod added successfully", "success");
       } else {
         console.error("Unexpected response:", response);

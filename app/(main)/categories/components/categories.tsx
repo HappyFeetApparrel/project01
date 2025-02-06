@@ -18,25 +18,10 @@ import { columns } from "./columns";
 
 import { useCategoryContext } from "../provider/category-provider";
 
+import { useLayout } from "@/components/context/LayoutProvider";
+
 export default function Categories() {
-  // const [categories, setCategories] = useState<Category[]>([]);
-  // const [loading, setLoading] = useState(true);
-  // const [error, setError] = useState("");
-  // const fetchCategories = async () => {
-  //   setLoading(true);
-  //   try {
-  //     const { data } = await api.get("/categories");
-  //     setCategories(data.data);
-  //   } catch (err) {
-  //     setError("Failed to load categories. Please try again.");
-  //     console.error("Error fetching categories:", err);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-  // useEffect(() => {
-  //   fetchCategories();
-  // }, []);
+  const { saveActivity } = useLayout();
 
   const { categories, loading, error, fetchCategories } = useCategoryContext();
 
@@ -65,6 +50,8 @@ export default function Categories() {
 
       if (response.status === 201) {
         console.log("Category added:", response.data.data);
+        saveActivity(`Added category: ${newCategory.name}`, "added");
+
         showStatusPopup("Category added successfully", "success");
       } else {
         console.error("Unexpected response:", response);

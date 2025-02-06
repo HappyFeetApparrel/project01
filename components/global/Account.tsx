@@ -2,8 +2,9 @@
 
 import React from "react";
 import { signOut } from "next-auth/react";
-import { BsThreeDotsVertical } from "react-icons/bs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+
+import { IoMdLogOut } from "react-icons/io";
 
 import { useLayout } from "../context/LayoutProvider";
 import nProgress from "nprogress";
@@ -32,21 +33,17 @@ const Account = () => {
       </div>
 
       <div className="relative group">
-        <div className="border rounded-sm py-0 px-3 flex items-center justify-center cursor-pointer">
-          <BsThreeDotsVertical className="w-4 h-4" />
-        </div>
-
-        {/* Dropdown Menu */}
-        <div className="absolute right-0 mt-2 w-32 bg-white shadow-md rounded-md hidden group-hover:block">
-          <button
+        <div
+          className=" rounded-sm py-0 px-3 flex items-center justify-center cursor-pointer"
+          title="Logout"
+        >
+          <IoMdLogOut
+            className="w-6 h-6 hover:fill-red-500"
             onClick={() => {
               nProgress.start();
               signOut({ callbackUrl: "/" });
             }}
-            className="w-full px-4 py-2 text-sm text-left hover:bg-gray-100"
-          >
-            Logout
-          </button>
+          />
         </div>
       </div>
     </div>

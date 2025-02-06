@@ -29,6 +29,8 @@ import { Pencil, Trash2, Eye } from "lucide-react";
 
 import { useUserContext } from "../provider/user-provider";
 
+import { useLayout } from "@/components/context/LayoutProvider";
+
 interface OptionsProps {
   row: User;
 }
@@ -50,6 +52,8 @@ const Options = ({ row }: OptionsProps) => {
 
   const user = row;
 
+  const { saveActivity } = useLayout();
+
   const { fetchUsers } = useUserContext();
 
   const showStatusPopup = (message: string, status: "success" | "error") => {
@@ -69,6 +73,9 @@ const Options = ({ row }: OptionsProps) => {
 
       if (response.status === 200) {
         fetchUsers();
+
+        saveActivity(`Deleted user: ${user.name}`, "deleted");
+
         // Update the local users state
         showStatusPopup("User deleted successfully", "success");
       }
@@ -90,6 +97,8 @@ const Options = ({ row }: OptionsProps) => {
 
       if (response.status === 200) {
         fetchUsers();
+        saveActivity(`Updated user: ${user.name}`, "updated");
+
         showStatusPopup("User updated successfully", "success");
       }
     } catch (error) {

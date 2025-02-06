@@ -2,7 +2,7 @@
 // import axios
 import { api } from "@/lib/axios";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 // components
 import { AddProductModal } from "./add-product-modal";
@@ -23,7 +23,7 @@ import { useProductContext } from "../provider/product-provider";
 export default function Products() {
   const { products, loading, error, fetchProducts } = useProductContext();
 
-  const { saveActivity } = useLayout();
+  const { saveActivity, product, setCreateProduct } = useLayout();
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isStatusPopupOpen, setIsStatusPopupOpen] = useState(false);
   const [statusPopupMessage, setStatusPopupMessage] = useState("");
@@ -66,6 +66,13 @@ export default function Products() {
       showStatusPopup("An unexpected error occurred", "error");
     }
   };
+
+  useEffect(() => {
+    if (product) {
+      setIsAddModalOpen(true);
+      setCreateProduct(false);
+    }
+  }, [product]);
 
   return (
     <>

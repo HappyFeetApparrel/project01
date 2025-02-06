@@ -29,11 +29,15 @@ import { Pencil, Trash2, Eye } from "lucide-react";
 
 import { useCategoryContext } from "../provider/category-provider";
 
+import { useLayout } from "@/components/context/LayoutProvider";
+
 interface OptionsProps {
   row: Category;
 }
 
 const Options = ({ row }: OptionsProps) => {
+  const { saveActivity } = useLayout();
+
   const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] =
     useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
@@ -72,6 +76,8 @@ const Options = ({ row }: OptionsProps) => {
       if (response.status === 200) {
         fetchCategories();
         // Update the local categories state
+        saveActivity(`Deleted category: ${category.name}`, "deleted");
+
         showStatusPopup("Category deleted successfully", "success");
       }
     } catch (error) {
@@ -94,6 +100,8 @@ const Options = ({ row }: OptionsProps) => {
 
       if (response.status === 200) {
         fetchCategories();
+        saveActivity(`Updated category: ${category.name}`, "updated");
+
         showStatusPopup("Category updated successfully", "success");
       }
     } catch (error) {

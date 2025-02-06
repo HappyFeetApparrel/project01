@@ -18,25 +18,10 @@ import { columns } from "./columns";
 
 import { useUserContext } from "../provider/user-provider";
 
+import { useLayout } from "@/components/context/LayoutProvider";
+
 export default function Users() {
-  // const [users, setUsers] = useState<User[]>([]);
-  // const [loading, setLoading] = useState(true);
-  // const [error, setError] = useState("");
-  // const fetchUsers = async () => {
-  //   setLoading(true);
-  //   try {
-  //     const { data } = await api.get("/users");
-  //     setUsers(data.data);
-  //   } catch (err) {
-  //     setError("Failed to load users. Please try again.");
-  //     console.error("Error fetching users:", err);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-  // useEffect(() => {
-  //   fetchUsers();
-  // }, []);
+  const { saveActivity } = useLayout();
 
   const { users, loading, error, fetchUsers } = useUserContext();
 
@@ -73,6 +58,8 @@ export default function Users() {
 
       if (response.status === 200) {
         console.log("User added:", response.data.data);
+        saveActivity(`Added user: ${newUser.name}`, "added");
+
         showStatusPopup("User added successfully", "success");
       } else {
         console.error("Unexpected response:", response);

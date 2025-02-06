@@ -29,6 +29,8 @@ import { Pencil, Trash2, Eye } from "lucide-react";
 
 import { useSupplierContext } from "../provider/supplier-provider";
 
+import { useLayout } from "@/components/context/LayoutProvider";
+
 interface OptionsProps {
   row: Supplier;
 }
@@ -54,6 +56,8 @@ const Options = ({ row }: OptionsProps) => {
 
   const { fetchSuppliers } = useSupplierContext();
 
+  const { saveActivity } = useLayout();
+
   const showStatusPopup = (message: string, status: "success" | "error") => {
     setStatusPopupMessage(message);
     setStatusPopupStatus(status);
@@ -71,6 +75,9 @@ const Options = ({ row }: OptionsProps) => {
 
       if (response.status === 200) {
         fetchSuppliers();
+
+        saveActivity(`Deleted supplier: ${supplier.name}`, "deleted");
+
         // Update the local suppliers state
         showStatusPopup("Supplier deleted successfully", "success");
       }
@@ -94,6 +101,8 @@ const Options = ({ row }: OptionsProps) => {
 
       if (response.status === 200) {
         fetchSuppliers();
+        saveActivity(`Updated supplier: ${supplier.name}`, "updated");
+
         showStatusPopup("Supplier updated successfully", "success");
       }
     } catch (error) {

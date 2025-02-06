@@ -74,7 +74,8 @@ const Options = ({ row }: OptionsProps) => {
 
       if (response.status === 200) {
         fetchPaymentMethods();
-        saveActivity("Deleted paymentMethod", "paymentMethod");
+        saveActivity(`Deleted payment method: ${paymentMethod.name}`, "delete");
+
         // Update the local paymentMethods state
         showStatusPopup("PaymentMethod deleted successfully", "success");
       }
@@ -98,7 +99,11 @@ const Options = ({ row }: OptionsProps) => {
 
       if (response.status === 200) {
         fetchPaymentMethods();
-        saveActivity("Updated paymentMethod", "paymentMethod");
+        saveActivity(
+          `Updated payment method: ${paymentMethod.name}`,
+          "updated"
+        );
+
         showStatusPopup("PaymentMethod updated successfully", "success");
       }
     } catch (error) {

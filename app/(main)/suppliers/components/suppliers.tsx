@@ -2,7 +2,7 @@
 // import axios
 import { api } from "@/lib/axios";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 // components
 import { AddSupplierModal } from "./add-supplier-modal";
@@ -18,25 +18,10 @@ import { columns } from "./columns";
 
 import { useSupplierContext } from "../provider/supplier-provider";
 
+import { useLayout } from "@/components/context/LayoutProvider";
+
 export default function Suppliers() {
-  // const [suppliers, setSuppliers] = useState<Supplier[]>([]);
-  // const [loading, setLoading] = useState(true);
-  // const [error, setError] = useState("");
-  // const fetchSuppliers = async () => {
-  //   setLoading(true);
-  //   try {
-  //     const { data } = await api.get("/suppliers");
-  //     setSuppliers(data.data);
-  //   } catch (err) {
-  //     setError("Failed to load suppliers. Please try again.");
-  //     console.error("Error fetching suppliers:", err);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-  // useEffect(() => {
-  //   fetchSuppliers();
-  // }, []);
+  const { saveActivity, supplier, setCreateSupplier } = useLayout();
 
   const { suppliers, loading, error, fetchSuppliers } = useSupplierContext();
 
@@ -65,6 +50,8 @@ export default function Suppliers() {
 
       if (response.status === 200) {
         console.log("Supplier added:", response.data.data);
+        saveActivity(`Added supplier: ${newSupplier.name}`, "added");
+
         showStatusPopup("Supplier added successfully", "success");
       } else {
         console.error("Unexpected response:", response);
@@ -81,6 +68,13 @@ export default function Suppliers() {
       showStatusPopup("An unexpected error occurred", "error");
     }
   };
+
+  useEffect(() => {
+    if (supplier) {
+      setIsAddModalOpen(true);
+      setCreateSupplier(false);
+    }
+  }, [supplier]);
 
   return (
     <>

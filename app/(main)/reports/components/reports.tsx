@@ -12,9 +12,13 @@ import { useState, useEffect, useRef } from "react";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 
+import { weeklyDataLoading } from "./weekly-data-loading";
+
 import { format, startOfWeek, endOfWeek, subWeeks, addWeeks } from "date-fns";
 
-interface WeeklySalesData {
+import { useLayout } from "@/components/context/LayoutProvider";
+
+export interface WeeklySalesData {
   time: string;
   mon: number;
   tue: number;
@@ -32,249 +36,6 @@ interface WeeklySalesData {
 //   { name: "Logitech", early: 62, onTime: 28, late: 10 },
 // ];
 
-const weeklyDataLoading: WeeklySalesData[] = [
-  {
-    time: "00:00",
-    mon: 0,
-    tue: 0,
-    wed: 0,
-    thu: 0,
-    fri: 0,
-    sat: 0,
-    sun: 0,
-  },
-  {
-    time: "01:00",
-    mon: 0,
-    tue: 0,
-    wed: 0,
-    thu: 0,
-    fri: 0,
-    sat: 0,
-    sun: 0,
-  },
-  {
-    time: "02:00",
-    mon: 0,
-    tue: 0,
-    wed: 0,
-    thu: 0,
-    fri: 0,
-    sat: 0,
-    sun: 0,
-  },
-  {
-    time: "03:00",
-    mon: 0,
-    tue: 0,
-    wed: 0,
-    thu: 0,
-    fri: 0,
-    sat: 0,
-    sun: 0,
-  },
-  {
-    time: "04:00",
-    mon: 0,
-    tue: 0,
-    wed: 0,
-    thu: 0,
-    fri: 0,
-    sat: 0,
-    sun: 0,
-  },
-  {
-    time: "05:00",
-    mon: 0,
-    tue: 0,
-    wed: 0,
-    thu: 0,
-    fri: 0,
-    sat: 0,
-    sun: 0,
-  },
-  {
-    time: "06:00",
-    mon: 0,
-    tue: 0,
-    wed: 0,
-    thu: 0,
-    fri: 0,
-    sat: 0,
-    sun: 0,
-  },
-  {
-    time: "07:00",
-    mon: 0,
-    tue: 0,
-    wed: 0,
-    thu: 0,
-    fri: 0,
-    sat: 0,
-    sun: 0,
-  },
-  {
-    time: "08:00",
-    mon: 0,
-    tue: 0,
-    wed: 0,
-    thu: 0,
-    fri: 0,
-    sat: 0,
-    sun: 0,
-  },
-  {
-    time: "09:00",
-    mon: 0,
-    tue: 0,
-    wed: 0,
-    thu: 0,
-    fri: 0,
-    sat: 0,
-    sun: 0,
-  },
-  {
-    time: "10:00",
-    mon: 0,
-    tue: 0,
-    wed: 0,
-    thu: 0,
-    fri: 0,
-    sat: 0,
-    sun: 0,
-  },
-  {
-    time: "11:00",
-    mon: 0,
-    tue: 0,
-    wed: 0,
-    thu: 0,
-    fri: 0,
-    sat: 0,
-    sun: 0,
-  },
-  {
-    time: "12:00",
-    mon: 0,
-    tue: 0,
-    wed: 0,
-    thu: 0,
-    fri: 0,
-    sat: 0,
-    sun: 0,
-  },
-  {
-    time: "13:00",
-    mon: 0,
-    tue: 0,
-    wed: 0,
-    thu: 0,
-    fri: 0,
-    sat: 0,
-    sun: 0,
-  },
-  {
-    time: "14:00",
-    mon: 0,
-    tue: 0,
-    wed: 0,
-    thu: 0,
-    fri: 0,
-    sat: 0,
-    sun: 0,
-  },
-  {
-    time: "15:00",
-    mon: 0,
-    tue: 0,
-    wed: 0,
-    thu: 0,
-    fri: 0,
-    sat: 0,
-    sun: 0,
-  },
-  {
-    time: "16:00",
-    mon: 0,
-    tue: 0,
-    wed: 0,
-    thu: 0,
-    fri: 0,
-    sat: 0,
-    sun: 0,
-  },
-  {
-    time: "17:00",
-    mon: 0,
-    tue: 0,
-    wed: 0,
-    thu: 0,
-    fri: 0,
-    sat: 0,
-    sun: 0,
-  },
-  {
-    time: "18:00",
-    mon: 0,
-    tue: 0,
-    wed: 0,
-    thu: 0,
-    fri: 0,
-    sat: 0,
-    sun: 0,
-  },
-  {
-    time: "19:00",
-    mon: 0,
-    tue: 0,
-    wed: 0,
-    thu: 0,
-    fri: 0,
-    sat: 0,
-    sun: 0,
-  },
-  {
-    time: "20:00",
-    mon: 0,
-    tue: 0,
-    wed: 0,
-    thu: 0,
-    fri: 0,
-    sat: 0,
-    sun: 0,
-  },
-  {
-    time: "21:00",
-    mon: 0,
-    tue: 0,
-    wed: 0,
-    thu: 0,
-    fri: 0,
-    sat: 0,
-    sun: 0,
-  },
-  {
-    time: "22:00",
-    mon: 0,
-    tue: 0,
-    wed: 0,
-    thu: 0,
-    fri: 0,
-    sat: 0,
-    sun: 0,
-  },
-  {
-    time: "23:00",
-    mon: 0,
-    tue: 0,
-    wed: 0,
-    thu: 0,
-    fri: 0,
-    sat: 0,
-    sun: 0,
-  },
-];
-
 function getColorForValue(value: number): string {
   if (value <= 500) return "bg-[#E3F2FD]";
   if (value <= 1000) return "bg-[#29B6F6]";
@@ -291,6 +52,8 @@ const getCurrentWeekRange = () => {
 };
 
 export default function Reports() {
+  const { saveActivity } = useLayout();
+
   const [weeklySales, setWeeklySales] = useState<WeeklySalesData[]>([]);
   const [loadingWeeklySales, setLoadingWeeklySales] = useState(true);
   const [errorWeeklySales, setErrorWeeklySales] = useState("");
@@ -349,6 +112,8 @@ export default function Reports() {
 
       pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
       pdf.autoPrint();
+      saveActivity(`Downloaded PDF`, "download");
+
       window.open(pdf.output("bloburl"), "_blank");
     });
   };
