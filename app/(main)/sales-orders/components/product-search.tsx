@@ -66,7 +66,7 @@ export default function ProductSearch({
       <div className="relative">
         <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
         <Input
-          placeholder="Search products by name, SKU, or barcode..."
+          placeholder="Search products"
           className="pl-8"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
@@ -117,7 +117,7 @@ export default function ProductSearch({
                 <h4 className="font-medium">{product.name}</h4>
               </div>
               <div className="text-right">
-                <p className="font-medium">${product.unit_price.toFixed(2)}</p>
+                <p className="font-medium">₱{product.unit_price.toFixed(2)}</p>
                 <p className="text-sm text-muted-foreground">
                   Stock: {product.quantity_in_stock}
                 </p>
