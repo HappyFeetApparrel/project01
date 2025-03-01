@@ -39,7 +39,7 @@ export default function ProductSearch({
   const fetchProducts = async () => {
     setLoading(true);
     try {
-      const { data } = await api.get("/products");
+      const { data } = await api.get("/sales-orders");
       setProducts(data.data);
     } catch (err) {
       setError("Failed to load products. Please try again.");

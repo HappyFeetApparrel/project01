@@ -56,7 +56,7 @@ export default function Users() {
       const response = await api.post("/users", newUser);
       setLoadingAddUser(false);
 
-      if (response.status === 200) {
+      if (response.status === 201) {
         console.log("User added:", response.data.data);
         saveActivity(`Added user: ${newUser.name}`, "added");
 

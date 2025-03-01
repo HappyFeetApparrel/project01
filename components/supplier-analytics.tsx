@@ -83,6 +83,18 @@ export default function SupplierAnalytics() {
     setLoadingDownload(false);
   };
 
+  const currentMonth = new Date().getMonth();
+  const currentYear = new Date().getFullYear();
+  const lastMonth = currentMonth - 1;
+  const lastMonthYear = lastMonth < 0 ? currentYear - 1 : currentYear;
+
+  const startDate = new Date(lastMonthYear, lastMonth, 1);
+  const endDate = new Date(lastMonthYear, lastMonth + 1, 0);
+
+  const startMonth = startDate.toLocaleString("default", { month: "long" });
+  const startDay = startDate.getDate();
+  const endDay = endDate.getDate();
+
   return (
     <div className="w-full xl:max-w-sm max-w-full space-y-8">
       {/* Top Suppliers Chart */}
@@ -136,7 +148,9 @@ export default function SupplierAnalytics() {
       <Card>
         <CardContent className="flex flex-col items-center p-6 text-center">
           <h3 className="text-xl font-semibold">Reports for Last Month</h3>
-          <p className="text-sm text-muted-foreground">From 01 Jul - 31 Jul</p>
+          <p className="text-sm text-muted-foreground">
+            From {startDay} {startMonth} - {endDay} {startMonth}
+          </p>
           <div className="mt-4 flex items-center gap-4">
             {/* <Button
               className="bg-[#00A3FF] hover:bg-[#00A3FF]/90"

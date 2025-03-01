@@ -55,6 +55,7 @@ export default function SalesDashboard() {
   const [errorOrders, setErrorOrders] = useState("");
   const [period, setPeriod] = useState("7days");
   const [newOrder, setNewOrder] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
 
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
   const [showFailPopup, setShowFailPopup] = useState(false);
@@ -109,15 +110,18 @@ export default function SalesDashboard() {
   const handlePrintInvoiceClose = () => {
     setShowPrintInvoice(false);
     setShowSuccessPopup(true);
-    // setTimeout(() => {
-    //   setShowSuccessPopup(false);
-    //   setOpen(false);
-    //   setOrderItems([]);
-    //   form.reset();
-    // }, 3000);
     setShowSuccessPopup(false);
     setOpen(false);
   };
+
+  const filteredOrders = ordersData.filter((order) => {
+    const query = searchQuery.toLowerCase();
+    return (
+      order.productName.toLowerCase().includes(query) ||
+      order.orderCode.toLowerCase().includes(query) ||
+      order.category.toLowerCase().includes(query)
+    );
+  });
 
   return (
     <>
@@ -130,7 +134,13 @@ export default function SalesDashboard() {
               <div className="flex items-center gap-4 flex-1 max-w-xl flex-nowrap flex-grow">
                 <div className="relative flex-1">
                   <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                  <Input type="search" placeholder="Search" className="pl-8" />
+                  <Input
+                    type="search"
+                    placeholder="Search"
+                    className="pl-8"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
                 </div>
               </div>
               <Button
@@ -144,7 +154,7 @@ export default function SalesDashboard() {
           </div>
 
           <SalesTable
-            data={ordersData}
+            data={filteredOrders}
             loading={loadingOrders}
             error={errorOrders}
             columns={columns}

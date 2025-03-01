@@ -113,6 +113,8 @@ export function PlaceOrderDialog({
     const existingItem = orderItems.find(
       (item) => item.product.product_id === product.product_id
     );
+    console.log(existingItem);
+
     if (existingItem) {
       if (existingItem.quantity_in_stock < product.quantity_in_stock) {
         setOrderItems(
@@ -153,9 +155,7 @@ export function PlaceOrderDialog({
 
   const calculateTotal = () => {
     return orderItems.reduce((total, item) => {
-      const priceAfterDiscount =
-        item.product.unit_price * (1 - (item.product.discount ?? 0) / 100);
-      return total + priceAfterDiscount * item.quantity_in_stock;
+      return total + item.product.unit_price * item.quantity_in_stock;
     }, 0);
   };
 

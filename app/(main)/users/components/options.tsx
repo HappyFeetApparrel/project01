@@ -71,7 +71,7 @@ const Options = ({ row }: OptionsProps) => {
       });
       setLoadingDeleteUser(false);
 
-      if (response.status === 200) {
+      if (response.status === 201) {
         fetchUsers();
 
         saveActivity(`Deleted user: ${user.name}`, "deleted");
@@ -95,7 +95,7 @@ const Options = ({ row }: OptionsProps) => {
       const response = await api.put("/users", updatedUser);
       setLoadingUpdateUser(false);
 
-      if (response.status === 200) {
+      if (response.status === 201) {
         fetchUsers();
         saveActivity(`Updated user: ${user.name}`, "updated");
 

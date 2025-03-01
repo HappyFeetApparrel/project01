@@ -21,8 +21,8 @@ import { LuShoppingCart } from "react-icons/lu";
 import { CiDeliveryTruck } from "react-icons/ci";
 import { AiOutlineStock } from "react-icons/ai";
 import { HiUsers } from "react-icons/hi2";
-import { CiCircleInfo } from "react-icons/ci";
-import { IoSettingsOutline } from "react-icons/io5";
+// import { CiCircleInfo } from "react-icons/ci";
+// import { IoSettingsOutline } from "react-icons/io5";
 import { TbCategoryPlus } from "react-icons/tb";
 import { MdOutlineBrandingWatermark } from "react-icons/md";
 import { MdOutlinePayment } from "react-icons/md";
@@ -106,22 +106,22 @@ const sidebarMenuItemsGeneral: SidebarMenuItem[] = [
   },
 ];
 
-const sidebarMenuItemsSupport: SidebarMenuItem[] = [
-  {
-    id: 1,
-    icon: CiCircleInfo,
-    label: "Help",
-    link: "/help",
-    rolesAllowed: ["Admin", "Manager", "Staff"],
-  },
-  {
-    id: 2,
-    icon: IoSettingsOutline,
-    label: "Settings",
-    link: "/settings",
-    rolesAllowed: ["Admin"],
-  },
-];
+// const sidebarMenuItemsSupport: SidebarMenuItem[] = [
+//   {
+//     id: 1,
+//     icon: CiCircleInfo,
+//     label: "Help",
+//     link: "/help",
+//     rolesAllowed: ["Admin", "Manager", "Staff"],
+//   },
+//   {
+//     id: 2,
+//     icon: IoSettingsOutline,
+//     label: "Settings",
+//     link: "/settings",
+//     rolesAllowed: ["Admin"],
+//   },
+// ];
 
 export function AppSidebar() {
   const pathname = usePathname();
@@ -167,7 +167,7 @@ export function AppSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
-        <SidebarGroup className="flex gap-2 flex-col">
+        {/* <SidebarGroup className="flex gap-2 flex-col">
           <SidebarGroupLabel className="font-semibold uppercase text-gray-500 text-sm">
             Support
           </SidebarGroupLabel>
@@ -191,7 +191,7 @@ export function AppSidebar() {
               )}
             </SidebarMenu>
           </SidebarGroupContent>
-        </SidebarGroup>
+        </SidebarGroup> */}
       </SidebarContent>
       <SidebarFooter className="p-8">
         <Account />

@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { RxHamburgerMenu } from "react-icons/rx";
 import { RiCloseLargeFill } from "react-icons/ri";
-import Search from "./Search";
+// import Search from "./Search";
 import { useLayout } from "../context/LayoutProvider";
 
 const Header = () => {
@@ -20,7 +20,7 @@ const Header = () => {
           </Link>
         </div>
         <div className="left-header flex justify-end items-stretch gap-x-4">
-          <Search />
+          {/* <Search /> */}
           <div
             className="p-1.5 shadow-md text-gray-500 transition-all border rounded-sm xl:hidden hover:bg-primary/80 hover:text-white cursor-pointer"
             onClick={toggleSideBar}

@@ -6,7 +6,7 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import LayoutProvider from "@/components/context/LayoutProvider";
 import { AppSidebar } from "@/components/app-sidebar";
 import Footer from "@/components/global/Footer";
-import Search from "@/components/global/Search";
+// import Search from "@/components/global/Search";
 
 import { getSession } from "next-auth/react"; // ✅ Correct import for client-side session
 import { signOut } from "next-auth/react";
@@ -70,8 +70,8 @@ const Layout = ({ children }: Readonly<{ children: React.ReactNode }>) => {
       <SidebarProvider>
         <AppSidebar />
         <div className="flex flex-col flex-grow ">
-          <header className="flex items-center justify-between px-4 py-2 flex-row gap-8 md:flex-row-reverse bg-white border-b sticky top-0 z-10">
-            <Search />
+          <header className="flex items-center justify-start px-4 py-2 flex-row gap-8 md:flex-row bg-white border-b sticky top-0 z-10">
+            {/* <Search /> */}
             <SidebarTrigger className="flex" />
           </header>
 
