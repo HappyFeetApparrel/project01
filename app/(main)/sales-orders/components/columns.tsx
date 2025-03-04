@@ -102,7 +102,7 @@ export const columns: ColumnDef<FormattedOrder>[] = [
         </Button>
       );
     },
-    cell: ({ row }) => <div>${row.getValue("totalPrice")}</div>,
+    cell: ({ row }) => <div>₱{row.getValue("totalPrice")}</div>,
     minSize: 100,
     maxSize: 200,
     size: 150,

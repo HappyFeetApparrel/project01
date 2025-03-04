@@ -19,7 +19,7 @@ export default function FastMovingItems() {
   useEffect(() => {
     const fetchFastMovingItems = async () => {
       try {
-        const { data } = await api.get("/fast-moving-items"); // Replace with actual API endpoint
+        const { data } = await api.get("/latest-purchased-items"); // Replace with actual API endpoint
         if (data?.data?.length > 0) {
           setFastMovingItems(data.data);
         } else {
@@ -44,7 +44,7 @@ export default function FastMovingItems() {
   return (
     <Card className="w-full xl:max-w-sm max-w-full">
       <CardHeader>
-        <CardTitle>Fast Moving Items</CardTitle>
+        <CardTitle>Latest Purchased Items</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
