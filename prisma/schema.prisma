@@ -2,13 +2,11 @@ generator client {
   provider = "prisma-client-js"
 }
 
-// prisma/schema.prisma
 datasource db {
   provider  = "postgres"
   url  	    = env("POSTGRES_PRISMA_URL")
   directUrl = env("POSTGRES_URL_NON_POOLING")
 }
-
 
 model User {
   user_id     Int      @id @default(autoincrement())
@@ -18,11 +16,15 @@ model User {
   role        String   // e.g., Admin, Manager, Staff
   created_at  DateTime @default(now())
   updated_at  DateTime @updatedAt
+  password_reset_token String?   @unique
+  password_reset_expires DateTime?
 
   // Relations
   orders      SalesOrder[]
   adjustments InventoryAdjustment[]
   logs        UserActivityLog[]
+  returns     ProductReturn[]
+  processed_returns ProductReturn[] @relation(name: "ProcessedByUser")
 }
 
 model Product {
@@ -42,6 +44,8 @@ model Product {
   expiration_date DateTime?
   status         String   // e.g., Active, Discontinued, Out of Stock
   discount       Float?   // Optional discount percentage
+  quantity_damaged  Int  @default(0)  // Track damaged products
+  quantity_returned Int  @default(0)  // Track returned products
 
   // Relations
   brand          Brand?          @relation(fields: [brand_id], references: [brand_id])
@@ -49,6 +53,7 @@ model Product {
   supplier       Supplier?       @relation(fields: [supplier_id], references: [supplier_id])
   order_items    OrderItem[]
   adjustments    InventoryAdjustment[]
+  returns        ProductReturn[]
 }
 
 model Supplier {
@@ -91,6 +96,7 @@ model OrderItem {
   // Relations
   order         SalesOrder @relation(fields: [order_id], references: [order_id])
   product       Product    @relation(fields: [product_id], references: [product_id])
+  returns       ProductReturn[]
 }
 
 model PaymentMethod {
@@ -106,13 +112,30 @@ model InventoryAdjustment {
   adjustment_id     Int      @id @default(autoincrement())
   product_id        Int
   quantity_changed  Int
-  reason            String
+  reason            String   // "Loss", "Damage", "Stock Correction"
   adjusted_by       Int
   created_at        DateTime @default(now())
 
   // Relations
   product           Product @relation(fields: [product_id], references: [product_id])
   adjusted_by_user  User    @relation(fields: [adjusted_by], references: [user_id])
+}
+
+model ProductReturn {
+  return_id     Int      @id @default(autoincrement())
+  order_item_id Int
+  user_id       Int
+  product_id    Int
+  quantity      Int
+  reason        String   // "Defective", "Wrong Item", "Customer Changed Mind"
+  processed_by  Int
+  created_at    DateTime @default(now())
+
+  // Relations
+  order_item    OrderItem @relation(fields: [order_item_id], references: [order_item_id])
+  user          User @relation(fields: [user_id], references: [user_id])
+  product       Product @relation(fields: [product_id], references: [product_id])
+  processed_by_user User @relation(fields: [processed_by], references: [user_id], name: "ProcessedByUser")
 }
 
 model Category {

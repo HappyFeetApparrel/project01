@@ -194,7 +194,7 @@ export default function SupplierAnalytics() {
       </Card>
 
       {/* Defect Rate Report */}
-      {/* <Card>
+      <Card>
         <CardContent className="flex flex-col items-center p-6 text-center">
           <h3 className="text-xl font-semibold">Defect Rate Report</h3>
           <p className="text-sm text-muted-foreground">
@@ -212,7 +212,7 @@ export default function SupplierAnalytics() {
             </Button>
           </div>
         </CardContent>
-      </Card> */}
+      </Card>
     </div>
   );
 }

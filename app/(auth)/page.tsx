@@ -22,6 +22,7 @@ import { AlertCircle } from "lucide-react";
 import nProgress from "nprogress";
 import { ThreeDots } from "react-loader-spinner";
 import Image from "next/image";
+import ForgotPassword from "./forgot-password";
 
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 
@@ -40,8 +41,8 @@ export default function LoginPage() {
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      email: "admin@test.com",
-      password: "Test123!",
+      email: "",
+      password: "",
     },
   });
 
@@ -142,6 +143,7 @@ export default function LoginPage() {
                 </p>
               )}
             </div>
+            <ForgotPassword />
           </CardContent>
           <CardFooter>
             <Button type="submit" disabled={isSubmitting} className="w-full">

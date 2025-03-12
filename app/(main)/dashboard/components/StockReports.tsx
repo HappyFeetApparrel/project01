@@ -11,6 +11,9 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
+import InventoryReportPDF from "./InventoryReportPDF";
+
+import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { api } from "@/lib/axios"; // Import the api from your axios configuration
 
@@ -37,6 +40,7 @@ export default function StockReports() {
       <Card className="w-full ">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-7 flex-wrap">
           <CardTitle className="text-2xl font-bold">Stock Report</CardTitle>
+          <div className="flex items-center gap-4">
           <div className="flex items-center space-x-4">
             <div className="flex items-center">
               <div className="h-3 w-3 rounded-full bg-[#2196F3] mr-2" />
@@ -46,7 +50,8 @@ export default function StockReports() {
               <div className="h-3 w-3 rounded-full bg-[#9C27B0] mr-2" />
               <span className="text-sm text-muted-foreground">Stock Out</span>
             </div>
-          </div>
+          </div><InventoryReportPDF /></div>
+          
         </CardHeader>
         <CardContent>
           <div className="h-[400px] w-full">

@@ -6,6 +6,8 @@ export type User = {
     role: string; // e.g., Admin, Manager, Staff
     created_at: Date;
     updated_at: Date;
+    password_reset_token :String
+    password_reset_expires: Date
 
     // Relations
     orders: SalesOrder[];
@@ -30,6 +32,8 @@ export type Product = {
     expiration_date?: Date;
     status: string; // e.g., Active, Discontinued, Out of Stock
     discount?: number; // Optional discount percentage
+    quantity_damaged: number;
+    quantity_returned: number;
 
     // Relations
     category?: Category;
@@ -37,6 +41,7 @@ export type Product = {
     supplier?: Supplier;
     order_items: OrderItem[];
     adjustments: InventoryAdjustment[];
+    returns: ProductReturn[];
 };
 
 export type Supplier = {
@@ -147,3 +152,21 @@ export type UserActivityLogFormatted = Omit<UserActivityLog, "created_at" | "use
     avatar: string;
     timeAgo: string;
 };
+
+export interface ProductReturn {
+    return_id: number;
+    order_item_id: number;
+    user_id: number;
+    product_id: number;
+    quantity: number;
+    reason: string; // "Defective", "Wrong Item", "Customer Changed Mind"
+    processed_by: number;
+    created_at: Date;
+  
+    // Relations
+    order_item: OrderItem;
+    user: User;
+    product: Product;
+    processed_by_user: User;
+  }
+  

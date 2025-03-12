@@ -4,6 +4,8 @@ import React from "react";
 import LayoutProvider from "@/components/context/LayoutProvider";
 import { Next13ProgressBar } from "next13-progressbar";
 
+import { Toaster } from "@/components/ui/toaster"
+
 const Layout = ({
   children,
 }: Readonly<{
@@ -22,6 +24,7 @@ const Layout = ({
         options={{ showSpinner: false }}
         showOnShallow={true}
       />
+      <Toaster />
     </LayoutProvider>
   );
 };
