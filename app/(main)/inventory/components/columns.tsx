@@ -83,19 +83,24 @@ export const columns: ColumnDef<Product>[] = [
         </Button>
       );
     },
-    cell: ({ row }) => (
-      <div className="text-right">
-        ₱
-        {new Intl.NumberFormat("en-PH", {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        }).format(row.getValue("unit_price"))}
-      </div>
-    ),
+    cell: ({ row }) => {
+      const value = row.getValue("unit_price");
+      const formattedValue = typeof value === "number" && !isNaN(value) ? value : 0;
+  
+      return (
+        <div className="text-right">
+          ₱
+          {new Intl.NumberFormat("en-PH", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          }).format(formattedValue)}
+        </div>
+      );
+    },
     minSize: 100,
     maxSize: 200,
     size: 150,
-  },
+  },  
   {
     accessorKey: "status",
     header: ({ column }) => {

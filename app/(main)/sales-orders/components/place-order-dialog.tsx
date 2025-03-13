@@ -113,7 +113,6 @@ export function PlaceOrderDialog({
     const existingItem = orderItems.find(
       (item) => item.product.product_id === product.product_id
     );
-    console.log(existingItem);
 
     if (existingItem) {
       if (existingItem.quantity_in_stock < product.quantity_in_stock) {
@@ -168,7 +167,6 @@ export function PlaceOrderDialog({
   const { saveActivity } = useLayout();
 
   async function onSubmit(values: z.infer<typeof orderSchema>) {
-    console.log(values);
     try {
       if (orderItems.length === 0) {
         throw new Error("No products in order");
@@ -197,7 +195,6 @@ export function PlaceOrderDialog({
         setNewOrder(response.data.orderCode);
         saveActivity(`Added new order`, "added");
 
-        console.log("Brand added:");
       } else {
         console.error("Unexpected response:", response);
       }
@@ -209,7 +206,6 @@ export function PlaceOrderDialog({
       form.reset();
       setOpen(false);
     } catch (error) {
-      console.error(error);
       setIsProcessing(false);
       setShowFailPopup(true);
       setShowPrintInvoice(true);

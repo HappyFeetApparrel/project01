@@ -15,7 +15,7 @@ const page = () => {
       <div className="p-0 lg:p-6 space-y-6 col-span-1 xl:col-span-2">
         <Reports />
         <DefectSalesReport />
-        <ReportPerCategory />
+        <SalesReport />
 
       </div>
       <div className="col-span-1 p-0 lg:px-4 mx:px-8">

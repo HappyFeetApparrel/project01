@@ -52,7 +52,7 @@ export async function GET() {
                 iconColorBG: "bg-red-50",
                 iconColor: "text-red-500",
                 amount: formatAmount(totalCustomers),
-                title: "New Customers",
+                title: "New Suppliers",
             },
         ];
 

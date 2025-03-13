@@ -32,8 +32,8 @@ export type Product = {
     expiration_date?: Date;
     status: string; // e.g., Active, Discontinued, Out of Stock
     discount?: number; // Optional discount percentage
-    quantity_damaged: number;
-    quantity_returned: number;
+    quantity_damaged?: number;
+    quantity_returned?: number;
 
     // Relations
     category?: Category;
@@ -41,7 +41,7 @@ export type Product = {
     supplier?: Supplier;
     order_items: OrderItem[];
     adjustments: InventoryAdjustment[];
-    returns: ProductReturn[];
+    returns?: ProductReturn[];
 };
 
 export type Supplier = {
