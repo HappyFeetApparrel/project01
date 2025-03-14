@@ -11,7 +11,6 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { format, parse, eachMonthOfInterval, startOfYear, endOfYear } from "date-fns";
-
 import SalesReportByCategoryPDF from "./sales-report-category";
 
 const SalesReport = () => {
@@ -25,17 +24,16 @@ const SalesReport = () => {
       try {
         const { data } = await api.get("/category-report");
 
-        // Generate all months (Jan - Dec) dynamically
+        // Generate all months (Jan - Dec)
         const fullYearMonths = eachMonthOfInterval({
           start: startOfYear(new Date()),
           end: endOfYear(new Date()),
-        }).map((date) => format(date, "MMM yyyy")); // Convert to "Jan 2025" format
-        console.log(fullYearMonths);
+        }).map((date) => format(date, "MMM yyyy"));
 
-        // Format sales data for each category with all months (fill missing months with 0 sales)
+        // Format sales data for each category
         // @ts-ignore
         const formattedData = data.data.map((item) => ({
-          ...item,
+          category: item.category, // ✅ Ensure categories are properly assigned
           salesData: fullYearMonths.map((month) => {
             const existingSale = item.salesData.find(
               // @ts-ignore
@@ -59,20 +57,29 @@ const SalesReport = () => {
     fetchSalesReport();
   }, []);
 
-  // **Data processing based on selection**
+  // **Processing Chart Data**
   let chartData;
   if (selectedCategory === "All") {
-    // Aggregate total sales per category and ensure distinct categories
-    chartData = salesData.map((item) => ({
+    // Aggregate sales per category and remove duplicates
+    const distinctCategories = new Set();
+    chartData = salesData
+      .filter((item) => {
         // @ts-ignore
-      category: item.category,
+        if (distinctCategories.has(item.category)) return false;
         // @ts-ignore
-      totalSales: item.totalSales,
-    }));
+        distinctCategories.add(item.category);
+        return true;
+      })
+      .map((item) => ({
+        // @ts-ignore
+        category: item.category,
+        // @ts-ignore
+        totalSales: item.salesData.reduce((sum, entry) => sum + entry.totalSales, 0),
+      }));
   } else {
-    // Show all months (Jan - Dec) in X-axis with data for the selected category
+    // Show monthly sales data for the selected category
     chartData =
-        // @ts-ignore
+    // @ts-ignore
       salesData.find((item) => item.category === selectedCategory)?.salesData || [];
   }
 
@@ -82,19 +89,19 @@ const SalesReport = () => {
         <h2 className="text-2xl font-semibold">Sales Report</h2>
         <div className="flex gap-4 items-center">
           <select
-          className="border rounded-md px-4 py-2"
-          value={selectedCategory}
-          onChange={(e) => setSelectedCategory(e.target.value)}
-        >
-          <option value="All">All Categories</option>
-          {/* @ts-ignore */}
-          {[...new Set(salesData.map((item) => item.category))].map((category) => (
-            <option key={category} value={category}>
-              {category}
-            </option>
-          ))}
-        </select>
-        <SalesReportByCategoryPDF />
+            className="border rounded-md px-4 py-2"
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value)}
+          >
+            <option value="All">All Categories</option>
+            {/* @ts-ignore */}
+            {[...new Set(salesData.map((item) => item.category))].map((category) => (
+              <option key={category} value={category}>
+                {category}
+              </option>
+            ))}
+          </select>
+          <SalesReportByCategoryPDF />
         </div>
       </div>
 
@@ -107,13 +114,20 @@ const SalesReport = () => {
           <p className="text-red-500">{errorSales}</p>
         ) : (
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={chartData}>
+            <BarChart data={chartData} margin={{ bottom: 50 }}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} />
               <XAxis
                 dataKey={selectedCategory === "All" ? "category" : "monthFormatted"}
                 axisLine={false}
                 tickLine={false}
-                tick={{ fill: "hsl(var(--muted-foreground))" }}
+                tick={{
+                  fill: "hsl(var(--muted-foreground))",
+                  // @ts-ignore
+                  angle: -30, // ✅ Slant labels
+                  textAnchor: "end", // ✅ Align text properly
+                }}
+                interval={0} // ✅ Ensure all labels show
+                dy={10} // ✅ Prevent label cutoff
               />
               <YAxis
                 axisLine={false}

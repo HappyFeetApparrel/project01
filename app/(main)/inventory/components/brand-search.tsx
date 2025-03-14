@@ -148,7 +148,6 @@ export default function BrandSearch({
                 key={index}
                 className="block w-full px-4 py-2 text-left text-gray-700 hover:bg-blue-100 focus:bg-blue-100 focus:outline-none"
                 onClick={() => handleBrandClick(brand.brand_id, brand.name)}
-                role="option"
               >
                 {brand.name}
               </button>

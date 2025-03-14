@@ -17,7 +17,7 @@ export async function GET(): Promise<NextResponse> {
             },
         });
 
-        return NextResponse.json({ data: latestOrders }, { status: 200 });
+        // return NextResponse.json({ data: latestOrders }, { status: 200 });
 
         // Extract unique product IDs from these latest orders
         const productIds = [

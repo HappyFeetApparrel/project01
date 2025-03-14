@@ -73,7 +73,7 @@ export function AddCategoryModal({
       form.reset();
       onClose();
     }
-  }, [loadingAddCategory]);
+  }, [loadingAddCategory, form, onClose]);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>

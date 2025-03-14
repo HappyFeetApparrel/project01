@@ -61,6 +61,7 @@ export interface OrderData {
   totalAmount: number;
   change: number;
   orderDate: Date;
+  name: String;
 }
 
 import ProductSearch from "./product-search";
@@ -152,28 +153,36 @@ export function PlaceOrderDialog({
     }
   };
 
+  const VAT_RATE = 0.12;
   const calculateTotal = () => {
-    return orderItems.reduce((total, item) => {
+    const subtotal = orderItems.reduce((total, item) => {
       return total + item.product.unit_price * item.quantity_in_stock;
     }, 0);
+  
+    const vatAmount = subtotal * VAT_RATE;
+    const totalWithVAT = subtotal + vatAmount;
+  
+    return { subtotal, vatAmount, totalWithVAT };
   };
 
   useEffect(() => {
-    const total = calculateTotal();
+    const { totalWithVAT } = calculateTotal();
     const amountGiven = form.getValues("amountGiven");
-    setChange(amountGiven - total);
+    setChange(amountGiven - totalWithVAT);
   }, [orderItems, form.watch("amountGiven")]);
+  
 
   const { saveActivity } = useLayout();
 
+  const { subtotal, vatAmount, totalWithVAT } = calculateTotal();
   async function onSubmit(values: z.infer<typeof orderSchema>) {
     try {
       if (orderItems.length === 0) {
         throw new Error("No products in order");
       }
 
-      const total = calculateTotal();
-      if (values.amountGiven < total) {
+      const { subtotal, vatAmount, totalWithVAT } = calculateTotal();
+      if (values.amountGiven < totalWithVAT) {
         throw new Error("Insufficient payment amount");
       }
 
@@ -182,9 +191,10 @@ export function PlaceOrderDialog({
       const orderData: OrderData = {
         ...values,
         user_id: Number(user?.user.id ?? 0),
+        name: user?.user.name ?? "",
         items: orderItems,
-        totalAmount: total,
-        change: values.amountGiven - total,
+        totalAmount: totalWithVAT,
+        change: values.amountGiven - totalWithVAT,
         orderDate: new Date(),
       };
 
@@ -301,9 +311,17 @@ export function PlaceOrderDialog({
                         </Button>
                       </div>
                     ))}
-                    <div className="flex justify-between font-bold text-lg pt-2 border-t">
+                    <div className="flex justify-between text-lg pt-2 border-t">
+                      <span>Subtotal:</span>
+                      <span>₱{subtotal.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between text-lg pt-2">
+                      <span>VAT (12%):</span>
+                      <span>₱{vatAmount.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between font-bold text-lg pt-2">
                       <span>Total:</span>
-                      <span>₱{calculateTotal().toFixed(2)}</span>
+                      <span>₱{totalWithVAT.toFixed(2)}</span>
                     </div>
                   </div>
                 )}

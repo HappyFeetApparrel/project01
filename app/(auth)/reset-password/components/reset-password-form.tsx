@@ -16,6 +16,8 @@ import { api } from "@/lib/axios";
 
 import { ThreeDots } from "react-loader-spinner";
 
+import { AxiosError } from "axios";
+
 
 export function ResetPasswordForm() {
   const [password, setPassword] = useState("")
@@ -86,14 +88,19 @@ export function ResetPasswordForm() {
 
 
     } catch (error) {
-      // @ts-ignore
-      const error_message = error.response.data.error;
-      console.log();
-      toast({
-        title: "Something went wrong",//
-        description: `${error && error_message ? error_message : "There was an error resetting your password"}. Please try again.`,
-        variant: "destructive",
-      })
+
+      if (error instanceof AxiosError) {
+        console.log(error.response?.data as string); // ✅ Ensures response exists before accessing `data`
+        
+        const error_message = error.response?.data.error;
+        toast({
+          title: "Something went wrong",//
+          description: `${error && error_message ? error_message : "There was an error resetting your password"}. Please try again.`,
+          variant: "destructive",
+        })
+      
+      }
+     
     } finally {
       setIsLoading(false)
     }
@@ -186,7 +193,7 @@ export function ResetPasswordForm() {
           </div>
 
           <Button type="submit" form="forgot-password-form" disabled={!isValidPassword || !passwordsMatch || isLoading} className="w-full">
-            {isLoading ? <ThreeDots width="30" color="#fff" /> : "Reset Password"}
+            {isLoading ? <ThreeDots width="30" color="#fff" /> : <>Reset Password</>}
           </Button>
         </form>
       </CardContent>

@@ -73,7 +73,7 @@ export function AddBrandModal({
       form.reset();
       onClose();
     }
-  }, [loadingAddBrand]);
+  }, [loadingAddBrand, form, onClose]);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>

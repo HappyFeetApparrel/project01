@@ -10,7 +10,6 @@ import SalesReport from "./sales-report";
 
 // import component
 import { PlaceOrderDialog } from "./place-order-dialog";
-
 import SalesTable from "./sales-table";
 
 import { api } from "@/lib/axios";
@@ -51,7 +50,7 @@ export default function SalesDashboard() {
   const [currentOrderData, setCurrentOrderData] = useState<OrderData | null>(
     null
   );
-
+  
   const { order, setCreateOrder } = useLayout();
 
 
@@ -97,6 +96,7 @@ export default function SalesDashboard() {
       order.category.toLowerCase().includes(query)
     );
   });
+
 
   return (
     <>
@@ -150,11 +150,12 @@ export default function SalesDashboard() {
         setShowPrintInvoice={setShowPrintInvoice}
       />
       {showPrintInvoice && (
-        <PrintInvoiceDialog
-          isOpen={showPrintInvoice}
-          onClose={handlePrintInvoiceClose}
-          orderData={currentOrderData}
-        />
+        // <PrintInvoiceDialog
+        //   isOpen={showPrintInvoice}
+        //   onClose={handlePrintInvoiceClose}
+        //   orderData={currentOrderData}
+        // />
+        <PrintInvoiceDialog isOpen={showPrintInvoice} onClose={ handlePrintInvoiceClose} orderData={currentOrderData} />
       )}
       {showSuccessPopup && (
         <SuccessPopup

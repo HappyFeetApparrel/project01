@@ -19,7 +19,7 @@ export async function GET() {
                 total_price: true,
             },
         });
-        const totalCustomers = await prisma.user.count();
+        const totalSuppliers = await prisma.supplier.count();
 
         // Random value for page views (if you don't have a pageView model)
         const randomPageViews = Math.floor(Math.random() * (100000 - 50000 + 1)) + 50000; // Random value between 50,000 and 100,000
@@ -51,8 +51,8 @@ export async function GET() {
                 icon: IoBagOutline,
                 iconColorBG: "bg-red-50",
                 iconColor: "text-red-500",
-                amount: formatAmount(totalCustomers),
-                title: "New Suppliers",
+                amount: formatAmount(totalSuppliers),
+                title: "Total Suppliers",
             },
         ];
 

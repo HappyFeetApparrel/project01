@@ -74,7 +74,7 @@ export function UpdateBrandModal({
       form.reset();
       onClose();
     }
-  }, [loadingUpdateBrand]);
+  }, [loadingUpdateBrand, form, onClose]);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>

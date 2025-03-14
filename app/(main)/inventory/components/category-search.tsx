@@ -152,7 +152,6 @@ export default function CategorySearch({
                 onClick={() =>
                   handleCategoryClick(category.category_id, category.name)
                 }
-                role="option"
               >
                 {category.name}
               </button>

@@ -23,7 +23,6 @@ import {
 } from "@/components/ui/dialog"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { useToast } from "@/hooks/use-toast"
 
 // Define the form schema with Zod
 const forgotPasswordSchema = z.object({
@@ -40,7 +39,6 @@ interface Message {
 export default function ForgotPassword() {
   const [isOpen, setIsOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-  const { toast } = useToast()
   const [error, setError] = useState<Message>()
 
   // Initialize the form with React Hook Form and Zod resolver
@@ -73,7 +71,7 @@ export default function ForgotPassword() {
         }
       
 
-    } catch (error) {
+    } catch {
       setIsLoading(false);
       // setIsOpen(false);
       setError({

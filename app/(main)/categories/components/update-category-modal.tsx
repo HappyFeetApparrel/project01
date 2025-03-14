@@ -74,7 +74,7 @@ export function UpdateCategoryModal({
       form.reset();
       onClose();
     }
-  }, [loadingUpdateCategory]);
+  }, [loadingUpdateCategory, form, onClose]);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>

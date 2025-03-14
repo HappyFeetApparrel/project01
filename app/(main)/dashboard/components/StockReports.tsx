@@ -13,7 +13,6 @@ import {
 
 import InventoryReportPDF from "./InventoryReportPDF";
 
-import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { api } from "@/lib/axios"; // Import the api from your axios configuration
 

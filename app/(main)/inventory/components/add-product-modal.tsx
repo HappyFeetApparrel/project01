@@ -157,7 +157,7 @@ export function AddProductModal({
       form.reset();
       onClose();
     }
-  }, [loadingAddProduct]);
+  }, [loadingAddProduct, form, onClose]);
 
   const { edgestore } = useEdgeStore();
   const [progress, setProgress] = useState(0);
