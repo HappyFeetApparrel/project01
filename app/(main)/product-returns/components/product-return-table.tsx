@@ -34,7 +34,7 @@ import { Input } from "@/components/ui/input";
 
 import Pagination from "@/components/global/pagination";
 
-interface BrandTableProps<TData, TValue> {
+interface ProductReturnTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   loading: boolean;
@@ -42,13 +42,13 @@ interface BrandTableProps<TData, TValue> {
   setIsAddModalOpen: () => void;
 }
 
-export default function BrandTable<TData, TValue>({
+export default function ProductReturnTable<TData, TValue>({
   columns,
   data,
   loading,
   error,
   setIsAddModalOpen,
-}: BrandTableProps<TData, TValue>) {
+}: ProductReturnTableProps<TData, TValue>) {
   const [page, setPage] = React.useState(1);
   const itemsPerPage = 10; // Update to 10 items per page
   const totalPages = Math.ceil(data.length / itemsPerPage);
@@ -90,7 +90,7 @@ export default function BrandTable<TData, TValue>({
   return (
     <div className="w-full space-y-6">
       <div className="flex items-center justify-between flex-wrap lg:flex-nowrap gap-4">
-        <h2 className="text-2xl font-semibold">Brands</h2>
+        <h2 className="text-2xl font-semibold">ProductReturns</h2>
         <div className="flex gap-4 flex-wrap flex-col w-full sm:flex-row justify-between">
           <div className="flex items-center gap-4 flex-1 max-w-xl flex-nowrap flex-grow">
             <div className="relative flex-1">
@@ -109,7 +109,7 @@ export default function BrandTable<TData, TValue>({
             onClick={() => setIsAddModalOpen()}
           >
             <Plus className="mr-2 h-4 w-4" />
-            Add New Brand
+            Add New ProductReturn
           </Button>
         </div>
       </div>

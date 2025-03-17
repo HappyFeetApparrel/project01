@@ -11,21 +11,21 @@ import { Button } from "@/components/ui/button";
 
 import { ThreeDots } from "react-loader-spinner";
 
-interface DeleteBrandConfirmationProps {
+interface DeleteProductReturnConfirmationProps {
   isOpen: boolean;
   onClose: () => void;
   onConfirm: () => void;
-  brandName: string;
-  loadingDeleteBrand: boolean;
+  productReturnName: string;
+  loadingDeleteProductReturn: boolean;
 }
 
-export function DeleteBrandConfirmation({
+export function DeleteProductReturnConfirmation({
   isOpen,
   onClose,
   onConfirm,
-  brandName,
-  loadingDeleteBrand,
-}: DeleteBrandConfirmationProps) {
+  productReturnName,
+  loadingDeleteProductReturn,
+}: DeleteProductReturnConfirmationProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px]">
@@ -34,7 +34,7 @@ export function DeleteBrandConfirmation({
         </DialogHeader>
         <div className="py-4">
           <p>
-            Are you sure you want to delete the brand {brandName}? This action
+            Are you sure you want to delete the productReturn {productReturnName}? This action
             cannot be undone.
           </p>
         </div>
@@ -43,12 +43,12 @@ export function DeleteBrandConfirmation({
             Cancel
           </Button>
           <Button
-            disabled={loadingDeleteBrand}
+            disabled={loadingDeleteProductReturn}
             className="flex-1"
             variant="destructive"
             onClick={onConfirm}
           >
-            <span className={`${loadingDeleteBrand ? "hidden" : "block"}`}>
+            <span className={`${loadingDeleteProductReturn ? "hidden" : "block"}`}>
               Delete
             </span>
             <ThreeDots
@@ -59,7 +59,7 @@ export function DeleteBrandConfirmation({
               radius="9"
               ariaLabel="three-dots-loading"
               wrapperStyle={{}}
-              wrapperClass={`${loadingDeleteBrand ? "block" : "!hidden"}`}
+              wrapperClass={`${loadingDeleteProductReturn ? "block" : "!hidden"}`}
             />
           </Button>
         </DialogFooter>

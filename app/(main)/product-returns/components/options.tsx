@@ -16,23 +16,23 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 // types
-import { Brand } from "@/prisma/type";
+import { ProductReturn } from "@/prisma/type";
 
 // components
-import { DeleteBrandConfirmation } from "./delete-brand-confirmation";
-import { ViewBrandModal } from "./view-brand-modal";
-import { UpdateBrandModal } from "./update-brand-modal";
+import { DeleteProductReturnConfirmation } from "./delete-product-return-confirmation";
+import { ViewProductReturnModal } from "./view-product-return-modal";
+import { UpdateProductReturnModal } from "./update-product-return-modal";
 import { StatusPopup } from "@/components/global/status-popup";
 
 // icons
 import { Pencil, Trash2, Eye } from "lucide-react";
 
-import { useBrandContext } from "../provider/brand-provider";
+import { useProductReturnContext } from "../provider/product-return-provider";
 
 import { useLayout } from "@/components/context/LayoutProvider";
 
 interface OptionsProps {
-  row: Brand;
+  row: ProductReturn;
 }
 
 const Options = ({ row }: OptionsProps) => {
@@ -48,13 +48,13 @@ const Options = ({ row }: OptionsProps) => {
     "success" | "error"
   >("success");
 
-  const [loadingUpdateBrand, setLoadingUpdateBrand] = useState<boolean>(false);
+  const [loadingUpdateProductReturn, setLoadingUpdateProductReturn] = useState<boolean>(false);
 
-  const [loadingDeleteBrand, setLoadingDeleteBrand] = useState<boolean>(false);
+  const [loadingDeleteProductReturn, setLoadingDeleteProductReturn] = useState<boolean>(false);
 
-  const brand = row;
+  const productReturn = row;
 
-  const { fetchBrands } = useBrandContext();
+  const { fetchProductReturns } = useProductReturnContext();
 
   const showStatusPopup = (message: string, status: "success" | "error") => {
     setStatusPopupMessage(message);
@@ -62,56 +62,56 @@ const Options = ({ row }: OptionsProps) => {
     setIsStatusPopupOpen(true);
   };
 
-  const handleDeleteBrand = async () => {
+  const handleDeleteProductReturn = async () => {
     try {
-      setLoadingDeleteBrand(true);
+      setLoadingDeleteProductReturn(true);
       // Call the delete API
-      const response = await api.delete("/brands", {
-        data: { brand_id: brand.brand_id },
+      const response = await api.delete("/productReturns", {
+        data: { return_id: productReturn.return_id },
       });
-      setLoadingDeleteBrand(false);
+      setLoadingDeleteProductReturn(false);
 
       if (response.status === 200) {
-        fetchBrands();
-        // Update the local brands state
-        saveActivity(`Deleted brand: ${brand.name}`, "deleted");
+        fetchProductReturns();
+        // Update the local productReturns state
+        saveActivity(`Deleted productReturn: ${productReturn.name}`, "deleted");
 
-        showStatusPopup("Brand deleted successfully", "success");
+        showStatusPopup("ProductReturn deleted successfully", "success");
       }
     } catch (error) {
-      setLoadingDeleteBrand(false);
+      setLoadingDeleteProductReturn(false);
 
-      console.error("Error deleting brand:", error);
-      showStatusPopup("Failed to delete brand", "error");
+      console.error("Error deleting productReturn:", error);
+      showStatusPopup("Failed to delete productReturn", "error");
     }
   };
 
-  const handleUpdateBrand = async (updatedBrand: Omit<Brand, "brands">) => {
+  const handleUpdateProductReturn = async (updatedProductReturn: Omit<ProductReturn, "productReturns">) => {
     try {
-      setLoadingUpdateBrand(true);
+      setLoadingUpdateProductReturn(true);
       // Call the update API
-      updatedBrand.brand_id = brand.brand_id;
-      const response = await api.put("/brands", updatedBrand);
-      setLoadingUpdateBrand(false);
+      updatedProductReturn.return_id = productReturn.return_id;
+      const response = await api.put("/productReturns", updatedProductReturn);
+      setLoadingUpdateProductReturn(false);
 
       if (response.status === 200) {
-        fetchBrands();
-        saveActivity(`Updated brand: ${brand.name}`, "updated");
+        fetchProductReturns();
+        saveActivity(`Updated productReturn: ${productReturn.name}`, "updated");
 
-        showStatusPopup("Brand updated successfully", "success");
+        showStatusPopup("ProductReturn updated successfully", "success");
       }
     } catch (error) {
-      setLoadingUpdateBrand(false);
-      console.error("Error updating brand:", error);
-      showStatusPopup("Failed to update brand", "error");
+      setLoadingUpdateProductReturn(false);
+      console.error("Error updating productReturn:", error);
+      showStatusPopup("Failed to update productReturn", "error");
     }
   };
 
   useEffect(() => {
-    if (!loadingDeleteBrand) {
+    if (!loadingDeleteProductReturn) {
       setIsDeleteConfirmationOpen(false);
     }
-  }, [loadingDeleteBrand]);
+  }, [loadingDeleteProductReturn]);
 
   return (
     <>
@@ -155,26 +155,26 @@ const Options = ({ row }: OptionsProps) => {
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-      <ViewBrandModal
+      <ViewProductReturnModal
         isOpen={isViewModalOpen}
         onClose={() => setIsViewModalOpen(false)}
-        brand={brand}
+        productReturn={productReturn}
       />
-      <UpdateBrandModal
+      <UpdateProductReturnModal
         isOpen={isUpdateModalOpen}
         onClose={() => setIsUpdateModalOpen(false)}
-        onUpdate={(updatedBrand) => handleUpdateBrand(updatedBrand)}
-        brand={brand}
-        loadingUpdateBrand={loadingUpdateBrand}
+        onUpdate={(updatedProductReturn) => handleUpdateProductReturn(updatedProductReturn)}
+        productReturn={productReturn}
+        loadingUpdateProductReturn={loadingUpdateProductReturn}
       />
-      <DeleteBrandConfirmation
+      <DeleteProductReturnConfirmation
         isOpen={isDeleteConfirmationOpen}
         onClose={() => setIsDeleteConfirmationOpen(false)}
         onConfirm={() => {
-          handleDeleteBrand();
+          handleDeleteProductReturn();
         }}
-        brandName={brand.name}
-        loadingDeleteBrand={loadingDeleteBrand}
+        productReturnName={productReturn.name}
+        loadingDeleteProductReturn={loadingDeleteProductReturn}
       />
       <StatusPopup
         isOpen={isStatusPopupOpen}

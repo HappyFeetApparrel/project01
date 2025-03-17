@@ -23,20 +23,20 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Brand } from "@/prisma/type";
+import { ProductReturn } from "@/prisma/type";
 
 import { ThreeDots } from "react-loader-spinner";
 
-interface UpdateBrandModalProps {
+interface UpdateProductReturnModalProps {
   isOpen: boolean;
   onClose: () => void;
-  brand: Brand;
-  onUpdate: (brand: Omit<Brand, "brands">) => void;
-  loadingUpdateBrand: boolean;
+  productReturn: ProductReturn;
+  onUpdate: (productReturn: Omit<ProductReturn, "productReturns">) => void;
+  loadingUpdateProductReturn: boolean;
 }
 
 // Validation schema using Zod
-const brandSchema = z.object({
+const productReturnSchema = z.object({
   name: z.string().min(1, "Name is required."),
   description: z
     .string()
@@ -44,43 +44,43 @@ const brandSchema = z.object({
     .optional(),
 });
 
-type BrandFormValues = z.infer<typeof brandSchema>;
+type ProductReturnFormValues = z.infer<typeof productReturnSchema>;
 
-export function UpdateBrandModal({
+export function UpdateProductReturnModal({
   isOpen,
   onClose,
-  brand,
+  productReturn,
   onUpdate,
-  loadingUpdateBrand,
-}: UpdateBrandModalProps) {
-  const form = useForm<BrandFormValues>({
-    resolver: zodResolver(brandSchema),
+  loadingUpdateProductReturn,
+}: UpdateProductReturnModalProps) {
+  const form = useForm<ProductReturnFormValues>({
+    resolver: zodResolver(productReturnSchema),
     defaultValues: {
-      name: brand.name ?? "",
-      description: brand.description ?? "",
+      name: productReturn.name ?? "",
+      description: productReturn.description ?? "",
     },
   });
 
-  const onSubmit = (data: BrandFormValues) => {
-    const updatedBrand: Omit<Brand, "brands"> = {
-      ...brand, // spread the brand object to include brand_id and products
+  const onSubmit = (data: ProductReturnFormValues) => {
+    const updatedProductReturn: Omit<ProductReturn, "productReturns"> = {
+      ...productReturn, // spread the productReturn object to include productReturn_id and products
       ...data, // spread the updated data
     };
-    onUpdate(updatedBrand);
+    onUpdate(updatedProductReturn);
   };
 
   useEffect(() => {
-    if (!loadingUpdateBrand) {
+    if (!loadingUpdateProductReturn) {
       form.reset();
       onClose();
     }
-  }, [loadingUpdateBrand]);
+  }, [loadingUpdateProductReturn]);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
-          <DialogTitle>Update Brand</DialogTitle>
+          <DialogTitle>Update ProductReturn</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
@@ -93,7 +93,7 @@ export function UpdateBrandModal({
                   <FormItem>
                     <FormLabel>Name</FormLabel>
                     <FormControl>
-                      <Input placeholder="Brand Name" {...field} />
+                      <Input placeholder="ProductReturn Name" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -107,7 +107,7 @@ export function UpdateBrandModal({
                     <FormLabel>Description</FormLabel>
                     <FormControl>
                       <Textarea
-                        placeholder="Brand Description"
+                        placeholder="ProductReturn Description"
                         {...field}
                         className="h-[200px]"
                       />
@@ -120,11 +120,11 @@ export function UpdateBrandModal({
             <DialogFooter>
               <Button
                 type="submit"
-                disabled={loadingUpdateBrand}
+                disabled={loadingUpdateProductReturn}
                 className="min-w-[50%]"
               >
-                <span className={`${loadingUpdateBrand ? "hidden" : "block"}`}>
-                  Update Brand
+                <span className={`${loadingUpdateProductReturn ? "hidden" : "block"}`}>
+                  Update ProductReturn
                 </span>
                 <ThreeDots
                   visible={true}
@@ -134,7 +134,7 @@ export function UpdateBrandModal({
                   radius="9"
                   ariaLabel="three-dots-loading"
                   wrapperStyle={{}}
-                  wrapperClass={`${loadingUpdateBrand ? "block" : "!hidden"}`}
+                  wrapperClass={`${loadingUpdateProductReturn ? "block" : "!hidden"}`}
                 />
               </Button>
             </DialogFooter>

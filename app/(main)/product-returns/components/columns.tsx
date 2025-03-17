@@ -5,12 +5,12 @@ import { Button } from "@/components/ui/button";
 import { ArrowUpDown } from "lucide-react";
 
 // types
-import { Brand } from "@/prisma/type";
+import { ProductReturn } from "@/prisma/type";
 
 // components
 import Options from "./options";
 
-export const columns: ColumnDef<Brand>[] = [
+export const columns: ColumnDef<ProductReturn>[] = [
   // {
   //   id: "select",
   //   header: ({ table }) => (

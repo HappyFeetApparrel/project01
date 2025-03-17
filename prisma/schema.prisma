@@ -46,6 +46,8 @@ model Product {
   discount       Float?   // Optional discount percentage
   quantity_damaged  Int  @default(0)  // Track damaged products
   quantity_returned Int  @default(0)  // Track returned products
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
 
   // Relations
   brand          Brand?          @relation(fields: [brand_id], references: [brand_id])
@@ -64,6 +66,8 @@ model Supplier {
   email_address String?
   address       String?
   supplied_products String? // Category or product type
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
 
   // Relations
   products      Product[]
@@ -77,7 +81,8 @@ model SalesOrder {
   amount_given  Float
   change        Float
   total_price   Float
-  created_at    DateTime @default(now())
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
 
   // Relations
   user          User      @relation(fields: [user_id], references: [user_id])
@@ -92,6 +97,8 @@ model OrderItem {
   quantity      Int
   unit_price    Float
   total_price   Float
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
 
   // Relations
   order         SalesOrder @relation(fields: [order_id], references: [order_id])
@@ -103,6 +110,8 @@ model PaymentMethod {
   payment_method_id Int    @id @default(autoincrement())
   name              String
   description       String?
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
 
   // Relations
   sales_orders      SalesOrder[]
@@ -114,7 +123,8 @@ model InventoryAdjustment {
   quantity_changed  Int
   reason            String   // "Loss", "Damage", "Stock Correction"
   adjusted_by       Int
-  created_at        DateTime @default(now())
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
 
   // Relations
   product           Product @relation(fields: [product_id], references: [product_id])
@@ -123,13 +133,13 @@ model InventoryAdjustment {
 
 model ProductReturn {
   return_id     Int      @id @default(autoincrement())
-  order_item_id Int
+  order_item_id Int?
   user_id       Int
-  product_id    Int
+  product_id    Int?
   quantity      Int
   reason        String   // "Defective", "Wrong Item", "Customer Changed Mind"
-  processed_by  Int
-  created_at    DateTime @default(now())
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
 
   // Relations
   order_item    OrderItem @relation(fields: [order_item_id], references: [order_item_id])
@@ -166,6 +176,7 @@ model UserActivityLog {
   action      String
   details     String?  // Optional JSON for extra info
   created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
 
   // Relations
   user        User @relation(fields: [user_id], references: [user_id])

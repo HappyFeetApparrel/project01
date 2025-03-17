@@ -21,6 +21,8 @@ import { LuShoppingCart } from "react-icons/lu";
 import { CiDeliveryTruck } from "react-icons/ci";
 import { AiOutlineStock } from "react-icons/ai";
 import { HiUsers } from "react-icons/hi2";
+import { TbTruckReturn } from "react-icons/tb";
+
 // import { CiCircleInfo } from "react-icons/ci";
 // import { IoSettingsOutline } from "react-icons/io5";
 import { TbCategoryPlus } from "react-icons/tb";
@@ -64,41 +66,48 @@ const sidebarMenuItemsGeneral: SidebarMenuItem[] = [
   },
   {
     id: 4,
+    icon: TbTruckReturn,
+    label: "Product Returns",
+    link: "/product-returns",
+    rolesAllowed: ["Admin", "Manager"],
+  },
+  {
+    id: 5,
     icon: CiDeliveryTruck,
     label: "Suppliers",
     link: "/suppliers",
     rolesAllowed: ["Admin", "Manager"],
   },
   {
-    id: 5,
+    id: 6,
     icon: TbCategoryPlus,
     label: "Categories",
     link: "/categories",
     rolesAllowed: ["Admin", "Manager"],
   },
   {
-    id: 6,
+    id: 7,
     icon: MdOutlineBrandingWatermark,
     label: "Brands",
     link: "/brands",
     rolesAllowed: ["Admin", "Manager"],
   },
   {
-    id: 6,
+    id: 8,
     icon: MdOutlinePayment,
     label: "Payment Methods",
     link: "/payment-methods",
     rolesAllowed: ["Admin", "Manager"],
   },
   {
-    id: 7,
+    id: 9,
     icon: AiOutlineStock,
     label: "Reports",
     link: "/reports",
     rolesAllowed: ["Admin"],
   },
   {
-    id: 8,
+    id: 10,
     icon: HiUsers,
     label: "Users",
     link: "/users",

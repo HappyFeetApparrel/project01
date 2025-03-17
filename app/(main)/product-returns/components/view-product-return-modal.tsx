@@ -8,34 +8,34 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Brand } from "@/prisma/type";
+import { ProductReturn } from "@/prisma/type";
 
-interface ViewBrandModalProps {
+interface ViewProductReturnModalProps {
   isOpen: boolean;
   onClose: () => void;
-  brand: Brand;
+  productReturn: ProductReturn;
 }
 
-export function ViewBrandModal({
+export function ViewProductReturnModal({
   isOpen,
   onClose,
-  brand,
-}: ViewBrandModalProps) {
+  productReturn,
+}: ViewProductReturnModalProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>Brand Details</DialogTitle>
+          <DialogTitle>ProductReturn Details</DialogTitle>
         </DialogHeader>
         <div className="py-4">
           <dl className="grid grid-cols-1 gap-4">
             <div className="col-span-1 span-y-4">
               <dt className="font-semibold">Name:</dt>
-              <dd>{brand.name}</dd>
+              <dd>{productReturn.name}</dd>
             </div>
             <div className="col-span-1 span-y-4">
               <dt className="font-semibold">Contact Person:</dt>
-              <dd>{brand.description || "N/A"}</dd>
+              <dd>{productReturn.description || "N/A"}</dd>
             </div>
           </dl>
         </div>

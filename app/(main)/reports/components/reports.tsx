@@ -3,7 +3,7 @@
 import { Skeleton } from "@/components/ui/skeleton";
 import { api } from "@/lib/axios";
 
-import { ChevronLeft, ChevronRight, Printer } from "lucide-react";
+import { ChevronLeft, ChevronRight, Printer, CalendarIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
@@ -12,11 +12,13 @@ import { useState, useEffect, useRef } from "react";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 
-import { weeklyDataLoading } from "./weekly-data-loading";
-
-import { format, startOfWeek, endOfWeek, subWeeks, addWeeks } from "date-fns";
-
+import { format, startOfWeek, endOfWeek, addDays, subWeeks, addWeeks } from "date-fns";
 import { useLayout } from "@/components/context/LayoutProvider";
+import { isAfter, isBefore, isSameDay } from "date-fns";
+
+
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
 
 export interface WeeklySalesData {
   time: string;
@@ -28,13 +30,6 @@ export interface WeeklySalesData {
   sat: number;
   sun: number;
 }
-// const supplierData = [
-//   { name: "Apple", early: 74, onTime: 18, late: 8 },
-//   { name: "Samsung", early: 73, onTime: 13, late: 14 },
-//   { name: "Asus", early: 47, onTime: 18, late: 35 },
-//   { name: "Xiaomi", early: 67, onTime: 12, late: 21 },
-//   { name: "Logitech", early: 62, onTime: 28, late: 10 },
-// ];
 
 function getColorForValue(value: number): string {
   if (value <= 500) return "bg-[#E3F2FD]";
@@ -42,68 +37,62 @@ function getColorForValue(value: number): string {
   return "bg-[#0277BD]";
 }
 
-// Function to get the current week's date range
+// Get current week's range
 const getCurrentWeekRange = () => {
   const today = new Date();
-  const start = startOfWeek(today, { weekStartsOn: 1 }); // Monday start
-  const end = endOfWeek(today, { weekStartsOn: 1 }); // Sunday end
-
-  return { start, end };
+  return {
+    start: startOfWeek(today, { weekStartsOn: 1 }),
+    end: endOfWeek(today, { weekStartsOn: 1 }),
+  };
 };
 
 export default function Reports() {
   const { saveActivity } = useLayout();
 
+  const [dateRange, setDateRange] = useState<{ start: Date; end: Date }>(getCurrentWeekRange);
   const [weeklySales, setWeeklySales] = useState<WeeklySalesData[]>([]);
-  const [loadingWeeklySales, setLoadingWeeklySales] = useState(true);
-  const [errorWeeklySales, setErrorWeeklySales] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 
-  const [weekRange, setWeekRange] = useState(getCurrentWeekRange());
 
-  // Format the date range for display (e.g., "Aug 19-25")
-  const formattedRange = `${format(weekRange.start, "MMM d")} - ${format(
-    weekRange.end,
-    "d"
-  )}`;
-
-  // Function to move to the previous week
-  const goToPreviousWeek = () => {
-    const prevStart = subWeeks(weekRange.start, 1);
-    const prevEnd = subWeeks(weekRange.end, 1);
-    setWeekRange({ start: prevStart, end: prevEnd });
-  };
-
-  // Function to move to the next week
-  const goToNextWeek = () => {
-    const nextStart = addWeeks(weekRange.start, 1);
-    const nextEnd = addWeeks(weekRange.end, 1);
-    setWeekRange({ start: nextStart, end: nextEnd });
-  };
+  const formattedRange = `${format(dateRange.start, "MMM d")} - ${format(dateRange.end, "d")}`;
+  const reportRef = useRef<HTMLDivElement>(null);
 
   const fetchWeeklySales = async () => {
-    setLoadingWeeklySales(true);
+    setLoading(true);
     try {
+      const range = `${format(dateRange.start, "MMM d")} - ${format(
+        dateRange.end,
+        "d"
+      )}`;
       const { data } = await api.get(
-        `/weekly-sales?dateRange=${formattedRange}`
+        `/weekly-sales?dateRange=${range}&start=${format(dateRange.start, "yyyy-MM-dd")}&end=${format(dateRange.end, "yyyy-MM-dd")}`
       );
       setWeeklySales(data.data);
     } catch (err) {
-      setErrorWeeklySales("Failed to load weekly sales. Please try again.");
+      setError("Failed to load weekly sales. Please try again.");
       console.error("Error fetching weekly sales:", err);
     } finally {
-      setLoadingWeeklySales(false);
+      setLoading(false);
     }
   };
 
   useEffect(() => {
     fetchWeeklySales();
-  }, [weekRange]);
+  }, [dateRange]);
 
-  const reportRef = useRef(null);
+  const handleDateSelect = (selectedDate: Date | undefined) => {
+    if (selectedDate) {
+      const start = selectedDate;
+      const end = addDays(selectedDate, 6);
+      setDateRange({ start, end });
+      setIsPopoverOpen(false); // Close the popover when a date is selected
+    }
+  };
 
   const handlePrint = () => {
     if (!reportRef.current) return;
-
     html2canvas(reportRef.current, { scale: 2 }).then((canvas) => {
       const imgData = canvas.toDataURL("image/png");
       const pdf = new jsPDF("p", "mm", "a4");
@@ -118,141 +107,118 @@ export default function Reports() {
     });
   };
 
+  const [hoveredDate, setHoveredDate] = useState<Date | null>(null);
+
+  // const handleDateSelect = (date: Date | undefined) => {
+  //   if (!date) return;
+  //   setDateRange({ start: date });
+  // };
+
+  // Function to check if a date is in the hovered range
+  const isInHoveredRange = (date: Date) => {
+    if (!dateRange.start || !hoveredDate) return false;
+    return (
+      (isAfter(date, dateRange.start) && isBefore(date, hoveredDate)) ||
+      isSameDay(date, dateRange.start) ||
+      isSameDay(date, hoveredDate)
+    );
+  };
+
   return (
     <div className="w-full space-y-8">
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-7">
+        <CardHeader className="flex flex-row items-center justify-between pb-7">
           <CardTitle className="text-2xl font-bold">Reports</CardTitle>
-          <Button
-            className="bg-[#00A3FF] hover:bg-[#00A3FF]/90"
-            onClick={handlePrint}
-          >
+          <Button className="bg-[#00A3FF] hover:bg-[#00A3FF]/90" onClick={handlePrint}>
             <Printer className="mr-2 h-4 w-4" />
             Print Reports
           </Button>
         </CardHeader>
+
         <CardContent className="space-y-8">
           {/* Weekly Sales Section */}
-
           <div className="space-y-4 p-6" ref={reportRef}>
             <div className="flex items-center justify-between">
               <h3 className="text-xl font-semibold">Weekly Sales</h3>
-              <div className="flex items-center gap-4">
-                <Button variant="ghost" size="icon" onClick={goToPreviousWeek}>
-                  <ChevronLeft className="h-4 w-4" />
-                </Button>
-                <span className="text-[#00A3FF]">{formattedRange}</span>
-                <Button variant="ghost" size="icon" onClick={goToNextWeek}>
-                  <ChevronRight className="h-4 w-4" />
-                </Button>
-              </div>
+              <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
+              <PopoverTrigger asChild>
+                  <Button variant="outline" className="text-[#00A3FF]">
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {formattedRange}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0">
+                <Calendar
+                    mode="single"
+                    selected={dateRange.start}
+                    onSelect={handleDateSelect}
+                    modifiers={{
+                      start: dateRange.start,
+                      end: addDays(dateRange.start ?? new Date(), 6),
+                      // @ts-ignore
+                      hovered: hoveredDate && ((date) => isInHoveredRange(date)), // ✅ Fix
+                    }}
+                    modifiersClassNames={{
+                      start: "bg-blue-500 text-white", // Start date style
+                      end: "bg-blue-500 text-white", // End date style
+                      hovered: "bg-blue-200", // Hovered range style
+                    }}
+                    onDayMouseEnter={(date) => setHoveredDate(date)}
+                    onDayMouseLeave={() => setHoveredDate(null)}
+                  />
+                {/* <Calendar
+                    mode="single"
+                    selected={dateRange.start}
+                    onSelect={handleDateSelect}
+                    modifiers={{
+                      start: dateRange.start,
+                      end: addDays(dateRange.start, 6),
+                    }}
+                    modifiersStyles={{
+                      start: { backgroundColor: 'blue', color: 'white' },
+                      end: { backgroundColor: 'blue', color: 'white' },
+                    }}
+                  /> */}
+                </PopoverContent>
+              </Popover>
             </div>
-            {
-              // loadingWeeklySales ? (
-              // // Render skeleton loading
-              // <div className="space-y-2">
-              //   <Skeleton className="w-full h-[500px]" />
-              // </div>
-              // ) :
-              errorWeeklySales ? (
-                // Render error message
-                <div className="text-red-500 text-center">
-                  <h3>Error loading weekly sales data</h3>
-                  <p>{errorWeeklySales}</p>
+
+            {error ? (
+              <div className="text-red-500 text-center">
+                <h3>Error loading weekly sales data</h3>
+                <p>{error}</p>
+              </div>
+            ) : (
+              <div className="space-y-2 h-[500px] overflow-y-auto">
+                <div className="grid grid-cols-[80px_repeat(7,1fr)] gap-1">
+                  <div className="text-sm text-muted-foreground"></div>
+                  {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day) => (
+                    <div key={day} className="text-center text-sm text-muted-foreground">
+                      {day}
+                    </div>
+                  ))}
                 </div>
-              ) : (
-                <div className="space-y-2 h-[500px] overflow-y-auto">
-                  <div className="grid grid-cols-[80px_repeat(7,1fr)] gap-1">
-                    <div className="text-sm text-muted-foreground"></div>
-                    <div className="text-center text-sm text-muted-foreground">
-                      Mon
-                    </div>
-                    <div className="text-center text-sm text-muted-foreground">
-                      Tue
-                    </div>
-                    <div className="text-center text-sm text-muted-foreground">
-                      Wed
-                    </div>
-                    <div className="text-center text-sm text-muted-foreground">
-                      Thu
-                    </div>
-                    <div className="text-center text-sm text-muted-foreground">
-                      Fri
-                    </div>
-                    <div className="text-center text-sm text-muted-foreground">
-                      Sat
-                    </div>
-                    <div className="text-center text-sm text-muted-foreground">
-                      Sun
-                    </div>
-                  </div>
 
-                  {loadingWeeklySales
-                    ? weeklyDataLoading.map((row) => (
-                        <div
-                          key={row.time}
-                          className="grid grid-cols-[80px_repeat(7,1fr)] gap-1"
-                        >
-                          <div className="text-sm text-muted-foreground">
-                            {row.time}
-                          </div>
-
-                          <Skeleton className={`h-12 rounded bg-primary/30`} />
-                          <Skeleton className={`h-12 rounded bg-primary/30`} />
-                          <Skeleton className={`h-12 rounded bg-primary/30`} />
-                          <Skeleton className={`h-12 rounded bg-primary/30`} />
-                          <Skeleton className={`h-12 rounded bg-primary/30`} />
-                          <Skeleton className={`h-12 rounded bg-primary/30`} />
-                          <Skeleton className={`h-12 rounded bg-primary/30`} />
-                        </div>
-                      ))
-                    : weeklySales.map((row) => (
-                        <div
-                          key={row.time}
-                          className="grid grid-cols-[80px_repeat(7,1fr)] gap-1"
-                        >
-                          <div className="text-sm text-muted-foreground">
-                            {row.time}
-                          </div>
-                          <div
-                            className={`h-12 rounded ${getColorForValue(
-                              row.mon
-                            )}`}
-                          />
-                          <div
-                            className={`h-12 rounded ${getColorForValue(
-                              row.tue
-                            )}`}
-                          />
-                          <div
-                            className={`h-12 rounded ${getColorForValue(
-                              row.wed
-                            )}`}
-                          />
-                          <div
-                            className={`h-12 rounded ${getColorForValue(
-                              row.thu
-                            )}`}
-                          />
-                          <div
-                            className={`h-12 rounded ${getColorForValue(
-                              row.fri
-                            )}`}
-                          />
-                          <div
-                            className={`h-12 rounded ${getColorForValue(
-                              row.sat
-                            )}`}
-                          />
-                          <div
-                            className={`h-12 rounded ${getColorForValue(
-                              row.sun
-                            )}`}
-                          />
-                        </div>
-                      ))}
-
-                  <div className="mt-4 flex items-center gap-4">
+                {loading
+                  ? Array.from({ length: 10 }).map((_, idx) => (
+                      <div key={idx} className="grid grid-cols-[80px_repeat(7,1fr)] gap-1">
+                        <div className="text-sm text-muted-foreground">--:--</div>
+                        {Array.from({ length: 7 }).map((_, i) => (
+                          <Skeleton key={i} className="h-12 rounded bg-primary/30" />
+                        ))}
+                      </div>
+                    ))
+                  : weeklySales.map((row) => (
+                      <div key={row.time} className="grid grid-cols-[80px_repeat(7,1fr)] gap-1">
+                        <div className="text-sm text-muted-foreground">{row.time}</div>
+                        {[row.mon, row.tue, row.wed, row.thu, row.fri, row.sat, row.sun].map((value, i) => (
+                          <div key={i} className={`h-12 rounded ${getColorForValue(value)}`} />
+                        ))}
+                      </div>
+                    ))}
+              </div>
+            )}
+            <div className="mt-4 flex items-center gap-4">
                     <div className="flex items-center gap-2">
                       <div className="h-3 w-3 rounded bg-[#E3F2FD]" />
                       <span className="text-sm text-muted-foreground">
@@ -272,66 +238,7 @@ export default function Reports() {
                       </span>
                     </div>
                   </div>
-                </div>
-              )
-            }
           </div>
-
-          {/* Supplier Performance Report Section */}
-          {/* <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="text-xl font-semibold">
-                Supplier Performance Report
-                <span className="ml-2 text-sm text-muted-foreground">
-                  (Top 5 Suppliers)
-                </span>
-              </h3>
-            </div>
-
-            <div className="space-y-4">
-              {supplierData.map((supplier) => (
-                <div key={supplier.name} className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span>{supplier.name}</span>
-                  </div>
-                  <div className="flex h-4 w-full overflow-hidden rounded">
-                    <div
-                      className="bg-[#00A3FF]"
-                      style={{ width: `${supplier.early}%` }}
-                    />
-                    <div
-                      className="bg-[#FFA726]"
-                      style={{ width: `${supplier.onTime}%` }}
-                    />
-                    <div
-                      className="bg-[#E91E63]"
-                      style={{ width: `${supplier.late}%` }}
-                    />
-                  </div>
-                  <div className="flex justify-between text-xs text-muted-foreground">
-                    <span>{supplier.early}% Early</span>
-                    <span>{supplier.onTime}% On Time</span>
-                    <span>{supplier.late}% Late</span>
-                  </div>
-                </div>
-              ))}
-
-              <div className="mt-4 flex items-center gap-6">
-                <div className="flex items-center gap-2">
-                  <div className="h-3 w-3 rounded bg-[#00A3FF]" />
-                  <span className="text-sm text-muted-foreground">Early</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="h-3 w-3 rounded bg-[#FFA726]" />
-                  <span className="text-sm text-muted-foreground">On Time</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="h-3 w-3 rounded bg-[#E91E63]" />
-                  <span className="text-sm text-muted-foreground">Late</span>
-                </div>
-              </div>
-            </div>
-          </div> */}
         </CardContent>
       </Card>
     </div>
