@@ -66,7 +66,7 @@ const Options = ({ row }: OptionsProps) => {
     try {
       setLoadingDeleteProductReturn(true);
       // Call the delete API
-      const response = await api.delete("/productReturns", {
+      const response = await api.delete("/product-returns", {
         data: { return_id: productReturn.return_id },
       });
       setLoadingDeleteProductReturn(false);
@@ -74,7 +74,7 @@ const Options = ({ row }: OptionsProps) => {
       if (response.status === 200) {
         fetchProductReturns();
         // Update the local productReturns state
-        saveActivity(`Deleted productReturn: ${productReturn.name}`, "deleted");
+        saveActivity(`Deleted productReturn: ${productReturn.reason}`, "deleted");
 
         showStatusPopup("ProductReturn deleted successfully", "success");
       }
@@ -91,12 +91,12 @@ const Options = ({ row }: OptionsProps) => {
       setLoadingUpdateProductReturn(true);
       // Call the update API
       updatedProductReturn.return_id = productReturn.return_id;
-      const response = await api.put("/productReturns", updatedProductReturn);
+      const response = await api.put("/product-returns", updatedProductReturn);
       setLoadingUpdateProductReturn(false);
 
       if (response.status === 200) {
         fetchProductReturns();
-        saveActivity(`Updated productReturn: ${productReturn.name}`, "updated");
+        saveActivity(`Updated productReturn: ${productReturn.reason}`, "updated");
 
         showStatusPopup("ProductReturn updated successfully", "success");
       }
@@ -173,7 +173,7 @@ const Options = ({ row }: OptionsProps) => {
         onConfirm={() => {
           handleDeleteProductReturn();
         }}
-        productReturnName={productReturn.name}
+        productReturnName={productReturn.reason}
         loadingDeleteProductReturn={loadingDeleteProductReturn}
       />
       <StatusPopup

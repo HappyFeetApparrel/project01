@@ -54,9 +54,9 @@ enum FormType {
 }
 
 enum ProductReturnReason {
-  DEFECTIVE = "Defective",
-  WRONG_ITEM = "Wrong Item",
-  CUSTOMER_CHANGED_MIND = "Customer Changed Mind",
+  LOST = "Lost",
+  RETURN = "Return",
+  REFUND = "Refund",
   OTHER = "Other",
 }
 
@@ -65,12 +65,20 @@ const productReturnSchema = z.object({
   id: z.number().int().positive("Product/Order ID is required."),
   type: z.enum([FormType.PRODUCT, FormType.ORDER]),
   reason: z.enum([
-    ProductReturnReason.DEFECTIVE,
-    ProductReturnReason.WRONG_ITEM,
-    ProductReturnReason.CUSTOMER_CHANGED_MIND,
+    ProductReturnReason.LOST,
+    ProductReturnReason.RETURN,
+    ProductReturnReason.REFUND,
     ProductReturnReason.OTHER,
   ]),
   otherReason: z.string().max(500, "Description cannot exceed 500 characters").optional(),
+}).refine((data) => {
+  if (data.reason === ProductReturnReason.OTHER) {
+    return data.otherReason !== undefined && data.otherReason !== "";
+  }
+  return true;
+}, {
+  message: "Please provide a reason when selecting 'Other'",
+  path: ["otherReason"],
 });
 
 type ProductReturnFormValues = z.infer<typeof productReturnSchema>;
@@ -96,7 +104,6 @@ export function AddProductReturnModal({
     },
   });
 
-
   const handleTabChange = (value: string) => {
     form.reset();
     console.log("Switched to tab:", value);
@@ -106,6 +113,7 @@ export function AddProductReturnModal({
 
   const onSubmit = (data: ProductReturnFormValues) => {
     if (onAdd) {
+      data.user_id = Number(user?.user.id ?? 0);
       const productReturnData: Pick<ProductReturn, "reason">  = {
         ...data,
       };
@@ -173,9 +181,9 @@ export function AddProductReturnModal({
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value={ProductReturnReason.DEFECTIVE}>{ProductReturnReason.DEFECTIVE}</SelectItem>
-                        <SelectItem value={ProductReturnReason.WRONG_ITEM}>{ProductReturnReason.WRONG_ITEM}</SelectItem>
-                        <SelectItem value={ProductReturnReason.CUSTOMER_CHANGED_MIND}>{ProductReturnReason.CUSTOMER_CHANGED_MIND}</SelectItem>
+                        <SelectItem value={ProductReturnReason.LOST}>{ProductReturnReason.LOST}</SelectItem>
+                        <SelectItem value={ProductReturnReason.RETURN}>{ProductReturnReason.RETURN}</SelectItem>
+                        <SelectItem value={ProductReturnReason.REFUND}>{ProductReturnReason.REFUND}</SelectItem>
                         <SelectItem value={ProductReturnReason.OTHER}>{ProductReturnReason.OTHER}</SelectItem>
                       </SelectContent>
                     </Select>
@@ -264,9 +272,9 @@ export function AddProductReturnModal({
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value={ProductReturnReason.DEFECTIVE}>{ProductReturnReason.DEFECTIVE}</SelectItem>
-                        <SelectItem value={ProductReturnReason.WRONG_ITEM}>{ProductReturnReason.WRONG_ITEM}</SelectItem>
-                        <SelectItem value={ProductReturnReason.CUSTOMER_CHANGED_MIND}>{ProductReturnReason.CUSTOMER_CHANGED_MIND}</SelectItem>
+                        <SelectItem value={ProductReturnReason.LOST}>{ProductReturnReason.LOST}</SelectItem>
+                        <SelectItem value={ProductReturnReason.RETURN}>{ProductReturnReason.RETURN}</SelectItem>
+                        <SelectItem value={ProductReturnReason.REFUND}>{ProductReturnReason.REFUND}</SelectItem>
                         <SelectItem value={ProductReturnReason.OTHER}>{ProductReturnReason.OTHER}</SelectItem>
                       </SelectContent>
                     </Select>

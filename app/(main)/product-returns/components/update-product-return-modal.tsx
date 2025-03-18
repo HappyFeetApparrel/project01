@@ -56,7 +56,7 @@ export function UpdateProductReturnModal({
   const form = useForm<ProductReturnFormValues>({
     resolver: zodResolver(productReturnSchema),
     defaultValues: {
-      name: productReturn.name ?? "",
+      name: productReturn.reason ?? "",
       description: productReturn.description ?? "",
     },
   });

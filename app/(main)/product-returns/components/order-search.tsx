@@ -4,6 +4,7 @@ import type React from "react";
 import { useState, useEffect, useRef } from "react";
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 // import axios
 import { api } from "@/lib/axios";
@@ -20,6 +21,9 @@ interface SalesOrderSearchProps {
 
 interface SalesOrderWithCode extends SalesOrder {
     orderCode: string;
+    id: number;
+    productName: string;
+    productImage: string;
   }
 
 export default function SalesOrderSearch({
@@ -55,15 +59,15 @@ export default function SalesOrderSearch({
 
   useEffect(() => {
     const filtered: SalesOrderWithCode[] = salesOrders.filter((salesOrder) =>
-      salesOrder.orderCode.toLowerCase().includes(searchTerm.toLowerCase())
+      salesOrderInfo(salesOrder).toLowerCase().includes(searchTerm.toLowerCase())
     );
     setFilteredSalesOrders(filtered);
   }, [searchTerm, salesOrders]);
 
   useEffect(() => {
-    const selectedSalesOrder = salesOrders.find((salesOrder) => salesOrder.order_id === value);
+    const selectedSalesOrder = salesOrders.find((salesOrder) => salesOrder.id === value);
     if (selectedSalesOrder) {
-      setSearchTerm(selectedSalesOrder.orderCode);
+      setSearchTerm(salesOrderInfo(selectedSalesOrder));
     } else {
       setSearchTerm("");
     }
@@ -94,12 +98,16 @@ export default function SalesOrderSearch({
     setIsOpen(true);
   };
 
-  const handleSalesOrderClick = (salesOrderId: number, salesOrderName: string) => {
-    onChange(salesOrderId);
+  const handleSalesOrderClick = (id: number, salesOrderName: string) => {
+    onChange(id);
     setSearchTerm(salesOrderName);
     setIsOpen(false);
     inputRef.current?.focus();
   };
+
+  const salesOrderInfo = (salesOrder: SalesOrderWithCode) => {
+    return `${salesOrder.orderCode} - ${salesOrder.productName}`;
+  }
 
   return (
     <div className="relative w-full" ref={dropdownRef}>
@@ -148,13 +156,14 @@ export default function SalesOrderSearch({
             <p>Error loading data: {error}</p>
           ) : filteredSalesOrders.length > 0 ? (
             filteredSalesOrders.map((salesOrder: SalesOrderWithCode, index: number) => (
-              <button
+              <Button
                 key={index}
-                className="block w-full px-4 py-2 text-left text-gray-700 hover:bg-blue-100 focus:bg-blue-100 focus:outline-none"
-                onClick={() => handleSalesOrderClick(salesOrder.order_id, salesOrder.orderCode)}
+                className="block w-full px-4 py-2 text-left text-gray-700 hover:bg-blue-100 focus:bg-blue-100 focus:outline-none bg-white "
+                onClick={() => handleSalesOrderClick(salesOrder.id, salesOrderInfo(salesOrder))}
+                type="button"
               >
-                {salesOrder.orderCode}
-              </button>
+                {`${salesOrderInfo(salesOrder)}`}
+              </Button>
             ))
           ) : (
             <div className="px-4 py-2 text-gray-500">No sales orders found</div>

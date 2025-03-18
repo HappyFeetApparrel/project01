@@ -30,7 +30,7 @@ export const ProductReturnProvider = ({ children }: { children: ReactNode }) => 
   const fetchProductReturns = async () => {
     setLoading(true);
     try {
-      const { data } = await api.get("/productReturns");
+      const { data } = await api.get("/product-returns");
       setProductReturns(data.data);
     } catch (err) {
       setError("Failed to load productReturns. Please try again.");

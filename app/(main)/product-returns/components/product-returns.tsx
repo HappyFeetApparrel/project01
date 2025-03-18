@@ -43,31 +43,30 @@ export default function ProductReturns() {
   const handleAddProductReturn = async (
     newProductReturn: Pick<ProductReturn, "reason">
   ) => {
-    console.log(newProductReturn);
-    // try {
-    //   setLoadingAddProductReturn(true);
-    //   const response = await api.post("/productReturns", newProductReturn);
-    //   setLoadingAddProductReturn(false);
+    try {
+      setLoadingAddProductReturn(true);
+      const response = await api.post("/product-returns", newProductReturn);
+      setLoadingAddProductReturn(false);
 
-    //   if (response.status === 201) {
-    //     console.log("ProductReturn added:", response.data.data);
-    //     saveActivity(`Added productReturn: ${newProductReturn.name}`, "added");
+      if (response.status === 201) {
+        console.log("ProductReturn added:", response.data.data);
+        saveActivity(`Added productReturn: ${newProductReturn.reason}`, "added");
 
-    //     showStatusPopup("ProductReturn added successfully", "success");
-    //   } else {
-    //     console.error("Unexpected response:", response);
-    //     showStatusPopup("Unexpected response while adding productReturn", "error");
-    //   }
-    //   await fetchProductReturns(); // Refresh data after addition
-    // } catch (error: unknown) {
-    //   setLoadingAddProductReturn(false);
-    //   if (error instanceof Error) {
-    //     console.error("Error adding productReturn:", error.message);
-    //   } else {
-    //     console.error("An unknown error occurred:", error);
-    //   }
-    //   showStatusPopup("An unexpected error occurred", "error");
-    // }
+        showStatusPopup("ProductReturn added successfully", "success");
+      } else {
+        console.error("Unexpected response:", response);
+        showStatusPopup("Unexpected response while adding productReturn", "error");
+      }
+      await fetchProductReturns(); // Refresh data after addition
+    } catch (error: unknown) {
+      setLoadingAddProductReturn(false);
+      if (error instanceof Error) {
+        console.error("Error adding productReturn:", error.message);
+      } else {
+        console.error("An unknown error occurred:", error);
+      }
+      showStatusPopup("An unexpected error occurred", "error");
+    }
   };
 
   return (

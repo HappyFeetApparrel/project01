@@ -15,7 +15,7 @@ model User {
   password    String
   role        String   // e.g., Admin, Manager, Staff
   created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
+  updated_at  DateTime? @updatedAt
   password_reset_token String?   @unique
   password_reset_expires DateTime?
 
@@ -23,7 +23,6 @@ model User {
   orders      SalesOrder[]
   adjustments InventoryAdjustment[]
   logs        UserActivityLog[]
-  returns     ProductReturn[]
   processed_returns ProductReturn[] @relation(name: "ProcessedByUser")
 }
 
@@ -37,22 +36,22 @@ model Product {
   cost_price     Float
   supplier_id    Int?
   date_of_entry  DateTime @default(now())
-  size           String?  // e.g., S, M, L, XL
+  size           String?  
   color          String?
-  product_image  String?  // URL or path to image
+  product_image  String?  
   brand_id       Int?
   expiration_date DateTime?
-  status         String   // e.g., Active, Discontinued, Out of Stock
-  discount       Float?   // Optional discount percentage
-  quantity_damaged  Int  @default(0)  // Track damaged products
-  quantity_returned Int  @default(0)  // Track returned products
+  status         String   
+  discount       Float?   
+  quantity_damaged  Int  @default(0)  
+  quantity_returned Int  @default(0)  
   created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
+  updated_at  DateTime? @default(dbgenerated()) // Fix
 
   // Relations
-  brand          Brand?          @relation(fields: [brand_id], references: [brand_id])
-  category       Category?       @relation(fields: [category_id], references: [category_id])
-  supplier       Supplier?       @relation(fields: [supplier_id], references: [supplier_id])
+  brand          Brand? @relation(fields: [brand_id], references: [brand_id])
+  category       Category? @relation(fields: [category_id], references: [category_id])
+  supplier       Supplier? @relation(fields: [supplier_id], references: [supplier_id])
   order_items    OrderItem[]
   adjustments    InventoryAdjustment[]
   returns        ProductReturn[]
@@ -65,9 +64,9 @@ model Supplier {
   phone_number  String?
   email_address String?
   address       String?
-  supplied_products String? // Category or product type
+  supplied_products String? 
   created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
+  updated_at  DateTime? @default(dbgenerated()) // Fix
 
   // Relations
   products      Product[]
@@ -82,12 +81,13 @@ model SalesOrder {
   change        Float
   total_price   Float
   created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
+  updated_at  DateTime? @default(dbgenerated()) // Fix
 
   // Relations
-  user          User      @relation(fields: [user_id], references: [user_id])
+  user          User @relation(fields: [user_id], references: [user_id])
   payment_method PaymentMethod? @relation(fields: [payment_method_id], references: [payment_method_id])
   order_items   OrderItem[]
+  productReturns ProductReturn[]
 }
 
 model OrderItem {
@@ -98,12 +98,11 @@ model OrderItem {
   unit_price    Float
   total_price   Float
   created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
+  updated_at  DateTime? @default(dbgenerated()) // Fix
 
   // Relations
   order         SalesOrder @relation(fields: [order_id], references: [order_id])
   product       Product    @relation(fields: [product_id], references: [product_id])
-  returns       ProductReturn[]
 }
 
 model PaymentMethod {
@@ -111,7 +110,7 @@ model PaymentMethod {
   name              String
   description       String?
   created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
+  updated_at  DateTime? @default(dbgenerated()) // Fix
 
   // Relations
   sales_orders      SalesOrder[]
@@ -121,31 +120,30 @@ model InventoryAdjustment {
   adjustment_id     Int      @id @default(autoincrement())
   product_id        Int
   quantity_changed  Int
-  reason            String   // "Loss", "Damage", "Stock Correction"
+  reason            String  
   adjusted_by       Int
   created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
+  updated_at  DateTime? @default(dbgenerated()) // Fix
 
   // Relations
   product           Product @relation(fields: [product_id], references: [product_id])
-  adjusted_by_user  User    @relation(fields: [adjusted_by], references: [user_id])
+  adjusted_by_user  User @relation(fields: [adjusted_by], references: [user_id])
 }
 
 model ProductReturn {
-  return_id     Int      @id @default(autoincrement())
-  order_item_id Int?
-  user_id       Int
-  product_id    Int?
-  quantity      Int
-  reason        String   // "Defective", "Wrong Item", "Customer Changed Mind"
-  created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
+  return_id           Int      @id @default(autoincrement())
+  order_id           Int?
+  product_id         Int?
+  quantity           Int
+  reason             String   
+  processed_by_user_id Int?  // Now optional
+  created_at        DateTime @default(now())
+  updated_at        DateTime @default(dbgenerated()) // Fix
 
   // Relations
-  order_item    OrderItem @relation(fields: [order_item_id], references: [order_item_id])
-  user          User @relation(fields: [user_id], references: [user_id])
-  product       Product @relation(fields: [product_id], references: [product_id])
-  processed_by_user User @relation(fields: [processed_by], references: [user_id], name: "ProcessedByUser")
+  order         SalesOrder? @relation(fields: [order_id], references: [order_id])
+  product       Product? @relation(fields: [product_id], references: [product_id])
+  processed_by_user User? @relation(fields: [processed_by_user_id], references: [user_id], name: "ProcessedByUser")
 }
 
 model Category {
@@ -153,7 +151,7 @@ model Category {
   name        String
   description String?
   created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
+  updated_at  DateTime? @default(dbgenerated()) // Fix
 
   // Relations
   products    Product[]
@@ -164,7 +162,7 @@ model Brand {
   name        String
   description String?
   created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
+  updated_at  DateTime? @default(dbgenerated()) // Fix
 
   // Relations
   products    Product[]
@@ -174,9 +172,9 @@ model UserActivityLog {
   log_id      Int      @id @default(autoincrement())
   user_id     Int
   action      String
-  details     String?  // Optional JSON for extra info
+  details     String?  
   created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
+  updated_at  DateTime? @default(dbgenerated()) // Fix
 
   // Relations
   user        User @relation(fields: [user_id], references: [user_id])
@@ -185,5 +183,5 @@ model UserActivityLog {
 model Setting {
   setting_id  Int      @id @default(autoincrement())
   name        String   @unique
-  value       String   // Store JSON or simple values
+  value       String   
 }
