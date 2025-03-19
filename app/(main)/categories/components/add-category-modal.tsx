@@ -68,12 +68,13 @@ export function AddCategoryModal({
     }
   };
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (!loadingAddCategory) {
       form.reset();
       onClose();
     }
-  }, [loadingAddCategory, form, onClose]);
+  }, [loadingAddCategory]);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>

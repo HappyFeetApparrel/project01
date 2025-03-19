@@ -2,6 +2,7 @@ import { ColumnDef } from "@tanstack/react-table";
 
 import { Button } from "@/components/ui/button";
 import { ArrowUpDown } from "lucide-react";
+import Image from 'next/image';
 
 // types
 import { Product } from "@/prisma/type";
@@ -24,11 +25,7 @@ export const columns: ColumnDef<Product>[] = [
       );
     },
     cell: ({ row }) => (
-      <img
-        src={row.getValue("product_image")}
-        alt="Product"
-        className="w-16 h-16 object-cover"
-      />
+      <Image src={row.getValue("product_image")} alt="Product" width={400} height={300} className="w-16 h-16 object-cover" />
     ),
     minSize: 200,
     maxSize: 400,

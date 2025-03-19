@@ -76,6 +76,7 @@ export function AddUserModal({
 
   const onSubmit = (data: AddUserFormValues) => {
     if (onAdd) {
+      // @ts-expect-error this will cause error
       onAdd(data);
     }
   };

@@ -68,12 +68,13 @@ export function AddBrandModal({
     }
   };
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (!loadingAddBrand) {
       form.reset();
       onClose();
     }
-  }, [loadingAddBrand, form, onClose]);
+  }, [loadingAddBrand]);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>

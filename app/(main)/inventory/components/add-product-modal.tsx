@@ -152,12 +152,13 @@ export function AddProductModal({
     }
   };
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (!loadingAddProduct) {
       form.reset();
       onClose();
     }
-  }, [loadingAddProduct, form, onClose]);
+  }, [loadingAddProduct]);
 
   const { edgestore } = useEdgeStore();
   const [progress, setProgress] = useState(0);

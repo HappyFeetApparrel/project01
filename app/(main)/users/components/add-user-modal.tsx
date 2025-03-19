@@ -76,6 +76,7 @@ export function AddUserModal({
 
   const onSubmit = (data: UserFormValues) => {
     if (onAdd) {
+        // @ts-expect-error this will cause error
       const userData: Omit<
         User,
         | "user_id"

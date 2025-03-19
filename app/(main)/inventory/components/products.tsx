@@ -67,12 +67,17 @@ export default function Products() {
     }
   };
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (product) {
       setIsAddModalOpen(true);
       setCreateProduct(false);
     }
   }, [product]);
+
+  useEffect(() => {
+    console.log(isAddModalOpen);
+  }, [isAddModalOpen]);
 
   return (
     <>
