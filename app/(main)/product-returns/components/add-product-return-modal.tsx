@@ -64,6 +64,7 @@ const productReturnSchema = z.object({
   user_id: z.number(),
   id: z.number().int().positive("Product/Order ID is required."),
   type: z.enum([FormType.PRODUCT, FormType.ORDER]),
+  quantity: z.number().int().min(1, "Quantity must be greater than 0."),
   reason: z.enum([
     ProductReturnReason.LOST,
     ProductReturnReason.RETURN,
@@ -167,7 +168,21 @@ export function AddProductReturnModal({
                   </FormItem>
                 )}
               />
-              {/* Name */}
+              {/* Quantity */}
+              <FormField
+                control={form.control}
+                name="quantity"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Quantity</FormLabel>
+                    <FormControl>
+                      <Input type="number" placeholder="Enter quantity" {...field} onChange={(e) => field.onChange(parseInt(e.target.value))}  />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              {/* Reason */}
               <FormField
                 control={form.control}
                 name="reason"
@@ -258,7 +273,21 @@ export function AddProductReturnModal({
                     </FormItem>
                   )}
                 />
-              {/* Name */}
+              {/* Quantity */}
+              <FormField
+                control={form.control}
+                name="quantity"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Quantity</FormLabel>
+                    <FormControl>
+                      <Input type="number" placeholder="Enter quantity" {...field} onChange={(e) => field.onChange(parseInt(e.target.value))}  />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              {/* Reason */}
               <FormField
                 control={form.control}
                 name="reason"

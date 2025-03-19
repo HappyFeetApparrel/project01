@@ -9,12 +9,14 @@ import {
 import { ProductReturn } from "@/prisma/type";
 import { api } from "@/lib/axios";
 
+import { ProductReturnCustom } from "../components/options";
+
 // Define the context type
 interface ProductReturnContextType {
-  productReturns: ProductReturn[];
+  productReturns: ProductReturnCustom[];
   loading: boolean;
   error: string;
-  setProductReturns: (productReturns: ProductReturn[]) => void;
+  setProductReturns: (productReturns: ProductReturnCustom[]) => void;
   fetchProductReturns: () => Promise<void>;
 }
 
@@ -23,7 +25,7 @@ const ProductReturnContext = createContext<ProductReturnContextType | undefined>
 
 // ProductReturnProvider Component
 export const ProductReturnProvider = ({ children }: { children: ReactNode }) => {
-  const [productReturns, setProductReturns] = useState<ProductReturn[]>([]);
+  const [productReturns, setProductReturns] = useState<ProductReturnCustom[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 

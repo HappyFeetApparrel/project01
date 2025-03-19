@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { parseISO } from "date-fns";
+import { parseISO, format } from "date-fns";
 
 export async function GET(req: Request): Promise<NextResponse> {
     try {
@@ -15,7 +15,6 @@ export async function GET(req: Request): Promise<NextResponse> {
         const start = parseISO(startDate);
         const end = parseISO(endDate);
 
-        // Ensure both are in UTC format
         start.setUTCHours(0, 0, 0, 0);
         end.setUTCHours(23, 59, 59, 999);
 
@@ -32,33 +31,35 @@ export async function GET(req: Request): Promise<NextResponse> {
             },
         });
 
-        // Organize results into a structured format
-        const formattedReport: Record<string, { date: string; lost: number; return: number; refund: number; other: number }> = {};
+        // Initialize an object with all months set to zero
+        const months = Array.from({ length: 12 }, (_, i) => ({
+            month: format(new Date(2025, i, 1), "MMM"),
+            lost: 0,
+            return: 0,
+            refund: 0,
+            other: 0,
+        }));
 
+        // Aggregate the data by month
         report.forEach((entry) => {
-            const date = entry.created_at.toISOString().split("T")[0];
-
-            if (!formattedReport[date]) {
-                formattedReport[date] = { date, lost: 0, return: 0, refund: 0, other: 0 };
-            }
-
+            const monthIndex = new Date(entry.created_at).getMonth();
             switch (entry.reason) {
                 case "Lost":
-                    formattedReport[date].lost += entry._sum.quantity || 0;
+                    months[monthIndex].lost += entry._sum.quantity || 0;
                     break;
                 case "Return":
-                    formattedReport[date].return += entry._sum.quantity || 0;
+                    months[monthIndex].return += entry._sum.quantity || 0;
                     break;
                 case "Refund":
-                    formattedReport[date].refund += entry._sum.quantity || 0;
+                    months[monthIndex].refund += entry._sum.quantity || 0;
                     break;
                 default:
-                    formattedReport[date].other += entry._sum.quantity || 0;
+                    months[monthIndex].other += entry._sum.quantity || 0;
                     break;
             }
         });
 
-        return NextResponse.json({ data: Object.values(formattedReport) }, { status: 200 });
+        return NextResponse.json({ data: months }, { status: 200 });
     } catch (error) {
         return NextResponse.json({ error: (error as Error).message }, { status: 500 });
     }

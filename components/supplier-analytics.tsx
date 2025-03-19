@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend } from "recharts";
 import { Download } from "lucide-react";
 import { api } from "@/lib/axios";
+import ViewDefectSalesPDF from "./supplier-components/view-defect-reports";
+import DefectSalesReportDownload from "./supplier-components/download-defect-reports";
 
 import { ThreeDots } from "react-loader-spinner";
 
@@ -196,20 +198,14 @@ export default function SupplierAnalytics() {
       {/* Defect Rate Report */}
       <Card>
         <CardContent className="flex flex-col items-center p-6 text-center">
-          <h3 className="text-xl font-semibold">Defect Rate Report</h3>
+          <h3 className="text-xl font-semibold">Defect Rate Report for Last Month</h3>
           <p className="text-sm text-muted-foreground">
-            Product Defects & Supplier Origin
+            From {startDay} {startMonth} - {endDay} {startMonth}
           </p>
-          <p className="text-sm text-muted-foreground">From 01 Jul - 31 Jul</p>
 
           <div className="mt-4 flex items-center gap-4">
-            <Button className="bg-[#9C27B0] hover:bg-[#9C27B0]/90">
-              <Download className="mr-2 h-4 w-4" />
-              Download PDF
-            </Button>
-            <Button variant="link" className="text-[#9C27B0]">
-              View
-            </Button>
+            <DefectSalesReportDownload />
+           <ViewDefectSalesPDF />
           </div>
         </CardContent>
       </Card>

@@ -20,9 +20,7 @@ export async function GET() {
             },
         });
         const totalSuppliers = await prisma.supplier.count();
-
-        // Random value for page views (if you don't have a pageView model)
-        const randomPageViews = Math.floor(Math.random() * (100000 - 50000 + 1)) + 50000; // Random value between 50,000 and 100,000
+        const totalProducts = await prisma.product.count();
 
         // Prepare the response data
         const data = [
@@ -31,29 +29,29 @@ export async function GET() {
                 iconColorBG: "bg-cyan-50",
                 iconColor: "text-cyan-500",
                 amount: formatAmount(totalOrders),
-                title: "Total Orders",
-            },
-            {
-                icon: FaRegCalendarAlt,
-                iconColorBG: "bg-violet-50",
-                iconColor: "text-violet-500",
-                amount: `$ ${formatAmount(totalRevenue?._sum?.total_price ?? 0)}`,
-                title: "Revenue",
+                title: `Total Order${totalOrders > 0 ? 's' : ''}`,
             },
             {
                 icon: CiDollar,
                 iconColorBG: "bg-orange-50",
                 iconColor: "text-orange-500",
-                amount: `$ ${formatAmount(randomPageViews)}`, // Page Views with random value
-                title: "Page Views",
+                amount: `${formatAmount(totalProducts)}`, // Page Views with random value
+                title: `Total Product${totalProducts > 0 ? 's' : ''}`,
             },
             {
                 icon: IoBagOutline,
                 iconColorBG: "bg-red-50",
                 iconColor: "text-red-500",
                 amount: formatAmount(totalSuppliers),
-                title: "Total Suppliers",
+                title: `Total Supplier${totalSuppliers > 0 ? 's' : ''}`,
             },
+            {
+                icon: FaRegCalendarAlt,
+                iconColorBG: "bg-violet-50",
+                iconColor: "text-violet-500",
+                amount: `₱ ${formatAmount(totalRevenue?._sum?.total_price ?? 0)}`,
+                title: "Revenue",
+            }
         ];
 
         return NextResponse.json({ data }, { status: 200 });

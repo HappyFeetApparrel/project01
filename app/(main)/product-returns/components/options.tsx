@@ -31,8 +31,18 @@ import { useProductReturnContext } from "../provider/product-return-provider";
 
 import { useLayout } from "@/components/context/LayoutProvider";
 
+
+
+export interface ProductReturnCustom extends ProductReturn {
+  name: string;
+  type: string;
+  quantity: number;
+  reason: string;
+  return_id: number;
+}
+
 interface OptionsProps {
-  row: ProductReturn;
+  row: ProductReturnCustom;
 }
 
 const Options = ({ row }: OptionsProps) => {

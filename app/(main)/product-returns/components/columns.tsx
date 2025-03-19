@@ -10,30 +10,9 @@ import { ProductReturn } from "@/prisma/type";
 // components
 import Options from "./options";
 
-export const columns: ColumnDef<ProductReturn>[] = [
-  // {
-  //   id: "select",
-  //   header: ({ table }) => (
-  //     <Checkbox
-  //       checked={
-  //         table.getIsAllPageRowsSelected() ||
-  //         (table.getIsSomePageRowsSelected() && "indeterminate")
-  //       }
-  //       onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-  //       aria-label="Select all"
-  //     />
-  //   ),
-  //   cell: ({ row }) => (
-  //     <Checkbox
-  //       checked={row.getIsSelected()}
-  //       onCheckedChange={(value) => row.toggleSelected(!!value)}
-  //       aria-label="Select row"
-  //     />
-  //   ),
-  //   enableSorting: false,
-  //   enableHiding: false,
-  //   size: 50,
-  // },
+import { ProductReturnCustom } from "./options";
+
+export const columns: ColumnDef<ProductReturnCustom>[] = [
   {
     accessorKey: "name",
     header: ({ column }) => {
@@ -53,20 +32,60 @@ export const columns: ColumnDef<ProductReturn>[] = [
     size: 250,
   },
   {
-    accessorKey: "description",
+    accessorKey: "type",
     header: ({ column }) => {
       return (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Description
+          Type
           <ArrowUpDown />
         </Button>
       );
     },
     cell: ({ row }) => (
-      <div className="lowercase">{row.getValue("description")}</div>
+      <div className="capitalize">{row.getValue("type")}</div>
+    ),
+    minSize: 200,
+    maxSize: 400,
+    size: 250,
+  },
+  {
+    accessorKey: "quantity",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Quantity
+          <ArrowUpDown />
+        </Button>
+      );
+    },
+    cell: ({ row }) => (
+      <div className="lowercase">{row.getValue("quantity")}</div>
+    ),
+    minSize: 200,
+    maxSize: 400,
+    size: 250,
+  },
+  {
+    accessorKey: "reason",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Reason
+          <ArrowUpDown />
+        </Button>
+      );
+    },
+    cell: ({ row }) => (
+      <div >{row.getValue("reason")}</div>
     ),
     minSize: 200,
     maxSize: 400,

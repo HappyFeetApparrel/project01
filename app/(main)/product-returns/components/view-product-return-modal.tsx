@@ -10,10 +10,17 @@ import {
 import { Button } from "@/components/ui/button";
 import { ProductReturn } from "@/prisma/type";
 
+interface ProductReturnCustom extends ProductReturn {
+  name: string;
+  type: string;
+  quantity: number;
+  reason: string;
+}
+
 interface ViewProductReturnModalProps {
   isOpen: boolean;
   onClose: () => void;
-  productReturn: ProductReturn;
+  productReturn: ProductReturnCustom;
 }
 
 export function ViewProductReturnModal({
@@ -25,7 +32,7 @@ export function ViewProductReturnModal({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>ProductReturn Details</DialogTitle>
+          <DialogTitle>Product Return Details</DialogTitle>
         </DialogHeader>
         <div className="py-4">
           <dl className="grid grid-cols-1 gap-4">
@@ -34,8 +41,16 @@ export function ViewProductReturnModal({
               <dd>{productReturn.name}</dd>
             </div>
             <div className="col-span-1 span-y-4">
-              <dt className="font-semibold">Contact Person:</dt>
-              <dd>{productReturn.description || "N/A"}</dd>
+              <dt className="font-semibold">Type:</dt>
+              <dd>{productReturn.type || "N/A"}</dd>
+            </div>
+            <div className="col-span-1 span-y-4">
+              <dt className="font-semibold">Quantity:</dt>
+              <dd>{productReturn.quantity || "N/A"}</dd>
+            </div>
+            <div className="col-span-1 span-y-4">
+              <dt className="font-semibold">Reason:</dt>
+              <dd>{productReturn.reason || "N/A"}</dd>
             </div>
           </dl>
         </div>

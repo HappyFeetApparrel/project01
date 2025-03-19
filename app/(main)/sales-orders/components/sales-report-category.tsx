@@ -85,7 +85,7 @@ const SalesReportPDF = () => {
   };
 
   return (
-    <div className="p-4">
+    <div className="">
       <Button onClick={generatePDF} className="mb-0">
         Download Sales Report
       </Button>

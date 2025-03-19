@@ -60,13 +60,10 @@ export default function ProductReturns() {
       await fetchProductReturns(); // Refresh data after addition
     } catch (error: unknown) {
       setLoadingAddProductReturn(false);
-      if (error instanceof Error) {
-        console.error("Error adding productReturn:", error.message);
-      } else {
-        console.error("An unknown error occurred:", error);
-      }
-      showStatusPopup("An unexpected error occurred", "error");
+      showStatusPopup("Return quantity exceeds available stock.", "error");
     }
+
+    console.log(newProductReturn);
   };
 
   return (

@@ -1,6 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { api } from "@/lib/axios";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Calendar } from "@/components/ui/calendar";
+import { addDays, format } from "date-fns"
+import { CalendarIcon } from "lucide-react"
+import { DateRange } from "react-day-picker"
+import { cn } from "@/lib/utils"
 import {
   LineChart,
   Line,
@@ -11,25 +16,46 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-// Define months for consistent display
+import DefectSalesReportPDF from "../../sales-orders/components/defect-sales-report-pdf";
+
+import { Button } from "@/components/ui/button"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
+
 const months = [
   "Jan", "Feb", "Mar", "Apr", "May", "Jun",
   "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
 ];
 
 const DefectSalesReport = () => {
-  const [loadingSales, setLoadingSales] = useState(true);
-  const [salesData, setSalesData] = useState([]);
-  const [errorSales, setErrorSales] = useState("");
+  const YEAR = new Date().getFullYear();
+  const MONTH = new Date().getMonth();
+  const [loading, setLoading] = useState(true);
+  const [salesData, setSalesData] = useState<
+    { month: string; lost: number; return: number; refund: number; other: number; }[]
+  >([]);
+  const [error, setError] = useState("");
+  const [date, setDate] = React.useState<DateRange | undefined>({
+    from: new Date(YEAR, MONTH, 1),
+    to: addDays(new Date(YEAR, MONTH, 1), 20),
+  })
 
   useEffect(() => {
     const fetchSalesReport = async () => {
+      if (!date) return;
+
       try {
+        setLoading(true);
+        const formattedStartDate = date?.from ? format(date.from, "yyyy-MM-dd") : '';
+        const formattedEndDate = date?.to ? format(date.to, "yyyy-MM-dd") : '';
+
         const { data } = await api.get(
-          "/product-returns-report?startDate=2025-01-01&endDate=2025-12-31"
+          `/product-returns-report?startDate=${formattedStartDate}&endDate=${formattedEndDate}`
         );
 
-        // Create a default object for all months with values set to 0
         const defaultData = months.map((month) => ({
           month,
           lost: 0,
@@ -38,57 +64,98 @@ const DefectSalesReport = () => {
           other: 0,
         }));
 
-        // Map API response into the default data structure
         data.data.forEach((item: any) => {
-          const date = new Date(item.date);
-          const monthIndex = date.getMonth(); // 0-based index (Jan = 0, Dec = 11)
-          defaultData[monthIndex] = {
-            month: months[monthIndex], 
-            lost: item.lost || 0,
-            return: item.return || 0,
-            refund: item.refund || 0,
-            other: item.other || 0,
-          };
+          const monthIndex = months.indexOf(item.month);
+          if (monthIndex !== -1) {
+            defaultData[monthIndex] = item;
+          }
         });
 
         setSalesData(defaultData);
       } catch (error) {
-        setErrorSales("Failed to fetch sales report");
+        setError("Failed to fetch sales report");
       } finally {
-        setLoadingSales(false);
+        setLoading(false);
       }
     };
 
     fetchSalesReport();
-  }, []);
+  }, [date]);
 
   return (
     <div className="space-y-4 p-8 bg-white">
-      {/* Header Section */}
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-semibold">Defect Sales Report</h2>
-        <div className="flex items-center gap-6 flex-wrap">
-          <Legend color="#00A3FF" label="Lost" />
-          <Legend color="#9747FF" label="Return" />
-          <Legend color="#E93BF9" label="Refund" />
-          <Legend color="#FF5733" label="Other" />
+        <div className="flex flex-wrap justify-end gap-2">
+       
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              id="date"
+              variant={"outline"}
+              className={cn(
+                "w-[300px] justify-start text-left font-normal",
+                !date && "text-muted-foreground"
+              )}
+            >
+              <CalendarIcon />
+              {date?.from ? (
+                date.to ? (
+                  <>
+                    {format(date.from, "LLL dd, y")} -{" "}
+                    {format(date.to, "LLL dd, y")}
+                  </>
+                ) : (
+                  format(date.from, "LLL dd, y")
+                )
+              ) : (
+                <span>Pick a date</span>
+              )}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="start">
+            <Calendar
+              initialFocus
+              mode="range"
+              defaultMonth={date?.from}
+              selected={date}
+              onSelect={setDate}
+              numberOfMonths={2}
+            />
+          </PopoverContent>
+        </Popover>
+        <div className="flex gap-4 items-center">
+          <div className="flex items-center gap-6 flex-wrap">
+            <Legend color="#00A3FF" label="Lost" />
+            <Legend color="#9747FF" label="Return" />
+            <Legend color="#E93BF9" label="Refund" />
+            <Legend color="#FF5733" label="Other" />
+          </div>
+          <DefectSalesReportPDF />
+        </div>
         </div>
       </div>
 
-      {/* Chart Section */}
+      
+
       <div className="h-[400px] w-full">
-        {loadingSales ? (
+        {loading ? (
           <div className="h-full w-full flex justify-center items-center">
             <Skeleton className="w-full h-[350px]" />
           </div>
-        ) : errorSales ? (
-          <p className="text-red-500">{errorSales}</p>
+        ) : error ? (
+          <p className="text-red-500">{error}</p>
         ) : (
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={salesData}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} />
               <XAxis dataKey="month" tick={{ fill: "hsl(var(--muted-foreground))" }} />
-              <YAxis tick={{ fill: "hsl(var(--muted-foreground))" }} />
+              <YAxis
+                axisLine={false}
+                tickLine={false}
+                tick={{ fill: "hsl(var(--muted-foreground))" }}
+                domain={[0, "auto"]}
+              />
               <Tooltip
                 contentStyle={{
                   backgroundColor: "hsl(var(--background))",
@@ -108,7 +175,6 @@ const DefectSalesReport = () => {
   );
 };
 
-// Legend Component for Readability
 const Legend = ({ color, label }: { color: string; label: string }) => (
   <div className="flex items-center gap-2">
     <div className="h-3 w-3 rounded-full" style={{ backgroundColor: color }} />

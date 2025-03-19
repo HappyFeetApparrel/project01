@@ -3,7 +3,8 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { useLayout } from "@/components/context/LayoutProvider";
 
 import {
   Dialog,
@@ -25,26 +26,77 @@ import {
 } from "@/components/ui/form";
 import { ProductReturn } from "@/prisma/type";
 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+
+
 import { ThreeDots } from "react-loader-spinner";
+
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+
+import ProductSearch from "./product-search";
+import SalesOrderSearch from "./order-search";
+
+import { ProductReturnCustom } from "./options";
 
 interface UpdateProductReturnModalProps {
   isOpen: boolean;
   onClose: () => void;
-  productReturn: ProductReturn;
+  productReturn: ProductReturnCustom;
   onUpdate: (productReturn: Omit<ProductReturn, "productReturns">) => void;
   loadingUpdateProductReturn: boolean;
 }
 
-// Validation schema using Zod
+// Define validation schema using Zod
+enum FormType {
+  PRODUCT = 'product',
+  ORDER = 'order',
+}
+
+enum ProductReturnReason {
+  LOST = "Lost",
+  RETURN = "Return",
+  REFUND = "Refund",
+  OTHER = "Other",
+}
+
 const productReturnSchema = z.object({
-  name: z.string().min(1, "Name is required."),
-  description: z
-    .string()
-    .max(500, "Description cannot exceed 500 characters")
-    .optional(),
+  user_id: z.number(),
+  id: z.number().int().positive("Product/Order ID is required."),
+  type: z.enum([FormType.PRODUCT, FormType.ORDER]),
+  quantity: z.number().int().min(1, "Quantity must be greater than 0."),
+  reason: z.enum([
+    ProductReturnReason.LOST,
+    ProductReturnReason.RETURN,
+    ProductReturnReason.REFUND,
+    ProductReturnReason.OTHER,
+  ]),
+  otherReason: z.string().max(500, "Description cannot exceed 500 characters").optional(),
+  return_id: z.number().int().positive("Return ID is required."),
+}).refine((data) => {
+  if (data.reason === ProductReturnReason.OTHER) {
+    return data.otherReason !== undefined && data.otherReason !== "";
+  }
+  return true;
+}, {
+  message: "Please provide a reason when selecting 'Other'",
+  path: ["otherReason"],
 });
 
 type ProductReturnFormValues = z.infer<typeof productReturnSchema>;
+
+const getFormType = (value: string): FormType => {
+  if (value === FormType.PRODUCT || value === FormType.ORDER) {
+    return value as FormType;
+  } else {
+    throw new Error(`Invalid form type: ${value}`);
+  }
+}
 
 export function UpdateProductReturnModal({
   isOpen,
@@ -53,13 +105,31 @@ export function UpdateProductReturnModal({
   onUpdate,
   loadingUpdateProductReturn,
 }: UpdateProductReturnModalProps) {
+
+
+
+  const { user } = useLayout();
+  const [activeTab, setActiveTab] = useState(getFormType(productReturn.type));
+
   const form = useForm<ProductReturnFormValues>({
-    resolver: zodResolver(productReturnSchema),
-    defaultValues: {
-      name: productReturn.reason ?? "",
-      description: productReturn.description ?? "",
-    },
-  });
+      resolver: zodResolver(productReturnSchema),
+      defaultValues: {
+        id: productReturn.product_id ?? productReturn.order_item_id,
+        user_id: Number(user?.user.id ?? 0),
+        type: activeTab,
+        reason: productReturn.reason === ProductReturnReason.LOST || productReturn.reason === ProductReturnReason.RETURN || productReturn.reason === ProductReturnReason.REFUND ? productReturn.reason : ProductReturnReason.OTHER,
+        otherReason: productReturn.reason,
+        quantity: productReturn.quantity,
+        return_id: productReturn.return_id
+      },
+    });
+
+    const handleTabChange = (value: string) => {
+      form.reset();
+      console.log("Switched to tab:", value);
+      form.setValue("type", value as FormType);
+      setActiveTab(value as FormType);
+    };
 
   const onSubmit = (data: ProductReturnFormValues) => {
     const updatedProductReturn: Omit<ProductReturn, "productReturns"> = {
@@ -82,49 +152,100 @@ export function UpdateProductReturnModal({
         <DialogHeader>
           <DialogTitle>Update ProductReturn</DialogTitle>
         </DialogHeader>
+        <Tabs defaultValue={activeTab} onValueChange={handleTabChange} className="w-full">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="product">Product</TabsTrigger>
+          <TabsTrigger value="order">Order</TabsTrigger>
+        </TabsList>
+        <TabsContent value="product">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <div className="grid gap-4 py-4 grid-cols-1">
-              {/* Name */}
+              {/* Product */}
               <FormField
                 control={form.control}
-                name="name"
+                name="id"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Name</FormLabel>
+                    <FormLabel>Product</FormLabel>
                     <FormControl>
-                      <Input placeholder="ProductReturn Name" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="description"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Description</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        placeholder="ProductReturn Description"
-                        {...field}
-                        className="h-[200px]"
+                      {/* <Input type="number" {...field} /> */}
+                      <ProductSearch
+                        value={field.value}
+                        onChange={(productId) =>
+                          field.onChange(productId)
+                        }
                       />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
+              {/* Quantity */}
+              <FormField
+                control={form.control}
+                name="quantity"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Quantity</FormLabel>
+                    <FormControl>
+                      <Input type="number" placeholder="Enter quantity" {...field} onChange={(e) => field.onChange(parseInt(e.target.value))}  />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              {/* Reason */}
+              <FormField
+                control={form.control}
+                name="reason"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Reason</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a reason" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value={ProductReturnReason.LOST}>{ProductReturnReason.LOST}</SelectItem>
+                        <SelectItem value={ProductReturnReason.RETURN}>{ProductReturnReason.RETURN}</SelectItem>
+                        <SelectItem value={ProductReturnReason.REFUND}>{ProductReturnReason.REFUND}</SelectItem>
+                        <SelectItem value={ProductReturnReason.OTHER}>{ProductReturnReason.OTHER}</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </FormItem>
+                )}
+              />
+              {form.getValues("reason") === ProductReturnReason.OTHER && (
+                 <FormField
+                 control={form.control}
+                 name="otherReason"
+                 render={({ field }) => (
+                   <FormItem>
+                     <FormLabel>Other</FormLabel>
+                     <FormControl>
+                       <Textarea
+                         placeholder="Enter other reason for product return"
+                         {...field}
+                         className="h-[200px]"
+                       />
+                     </FormControl>
+                     <FormMessage />
+                   </FormItem>
+                 )}
+               />
+              )}
             </div>
             <DialogFooter>
               <Button
                 type="submit"
                 disabled={loadingUpdateProductReturn}
-                className="min-w-[50%]"
+                className="min-w-full"
               >
                 <span className={`${loadingUpdateProductReturn ? "hidden" : "block"}`}>
-                  Update ProductReturn
+                  Update Product Return
                 </span>
                 <ThreeDots
                   visible={true}
@@ -140,6 +261,113 @@ export function UpdateProductReturnModal({
             </DialogFooter>
           </form>
         </Form>
+        </TabsContent>
+        <TabsContent value="order">
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)}>
+            <div className="grid gap-4 py-4 grid-cols-1">
+              {/* Order */}
+              <FormField
+                  control={form.control}
+                  name="id"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Order</FormLabel>
+                      <FormControl>
+                        {/* <Input type="number" {...field} /> */}
+                        <SalesOrderSearch
+                          value={field.value}
+                          onChange={(salesOrderId) =>
+                            field.onChange(salesOrderId)
+                          }
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              {/* Quantity */}
+              <FormField
+                control={form.control}
+                name="quantity"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Quantity</FormLabel>
+                    <FormControl>
+                      <Input type="number" placeholder="Enter quantity" {...field} onChange={(e) => field.onChange(parseInt(e.target.value))}  />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              {/* Reason */}
+              <FormField
+                control={form.control}
+                name="reason"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Reason</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a reason" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value={ProductReturnReason.LOST}>{ProductReturnReason.LOST}</SelectItem>
+                        <SelectItem value={ProductReturnReason.RETURN}>{ProductReturnReason.RETURN}</SelectItem>
+                        <SelectItem value={ProductReturnReason.REFUND}>{ProductReturnReason.REFUND}</SelectItem>
+                        <SelectItem value={ProductReturnReason.OTHER}>{ProductReturnReason.OTHER}</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </FormItem>
+                )}
+              />
+              {form.getValues("reason") === ProductReturnReason.OTHER && (
+                 <FormField
+                 control={form.control}
+                 name="otherReason"
+                 render={({ field }) => (
+                   <FormItem>
+                     <FormLabel>Other</FormLabel>
+                     <FormControl>
+                       <Textarea
+                         placeholder="Enter other reason for order return"
+                         {...field}
+                         className="h-[200px]"
+                       />
+                     </FormControl>
+                     <FormMessage />
+                   </FormItem>
+                 )}
+               />
+              )}
+            </div>
+            <DialogFooter>
+              <Button
+                type="submit"
+                disabled={loadingUpdateProductReturn}
+                className="min-w-full"
+              >
+                <span className={`${loadingUpdateProductReturn ? "hidden" : "block"}`}>
+                  Update Product Return
+                </span>
+                <ThreeDots
+                  visible={true}
+                  height="50"
+                  width="50"
+                  color="#fff"
+                  radius="9"
+                  ariaLabel="three-dots-loading"
+                  wrapperStyle={{}}
+                  wrapperClass={`${loadingUpdateProductReturn ? "block" : "!hidden"}`}
+                />
+              </Button>
+            </DialogFooter>
+          </form>
+        </Form>
+        </TabsContent>
+        </Tabs>
       </DialogContent>
     </Dialog>
   );
