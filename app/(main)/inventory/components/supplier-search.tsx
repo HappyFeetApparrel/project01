@@ -153,6 +153,7 @@ export default function SupplierSearch({
                   handleSupplierClick(supplier.supplier_id, supplier.name)
                 }
                 role="option"
+                type="button"
               >
                 {supplier.name}
               </button>

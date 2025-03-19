@@ -152,6 +152,7 @@ export default function CategorySearch({
                 onClick={() =>
                   handleCategoryClick(category.category_id, category.name)
                 }
+                type="button"
               >
                 {category.name}
               </button>

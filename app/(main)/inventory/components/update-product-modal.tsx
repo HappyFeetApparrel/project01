@@ -59,12 +59,10 @@ const productSchema = z.object({
   quantity_in_stock: z.number().int().min(0, "Quantity must be 0 or greater"),
   unit_price: z
     .number()
-    .min(0, "Unit price must be 0 or greater")
-    .max(10000, "Unit price cannot exceed 10,000"),
+    .min(0, "Unit price must be 0 or greater"),
   cost_price: z
     .number()
-    .min(0, "Cost price must be 0 or greater")
-    .max(10000, "Cost price cannot exceed 10,000"),
+    .min(0, "Cost price must be 0 or greater"),
   supplier_id: z.number().int().positive("Supplier is required."),
   brand_id: z.number().int().positive("Brand is required."),
   size: z
