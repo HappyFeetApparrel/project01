@@ -62,18 +62,31 @@ const SalesReportPDF = () => {
         // @ts-ignore
         totalOrders: lastMonthSales ? category.totalOrders : 0,
       };
-    });
+    }).filter((sale) => sale.totalSales > 0 || sale.totalOrders > 0);
 
-    // Add sales data to the table
-    filteredSales.forEach(({ category, totalSales, totalOrders }) => {
-      if (y < 50) return;
+    console.log(filteredSales.length)
 
-      page.drawText(category, { x: leftMargin, y, size: 10, font });
-      page.drawText(`PHP ${totalSales.toFixed(2)}`, { x: 250, y, size: 10, font });
-      page.drawText(totalOrders.toString(), { x: 450, y, size: 10, font });
-
-      y -= 15;
-    });
+    if (filteredSales) {
+      page.drawText("No data available for this month", {
+        x: 250,
+        y,
+        size: 10,
+        font,
+        color: rgb(0, 0, 0),
+      });
+    } else {
+      // Add sales data to the table
+      // @ts-ignore
+      filteredSales.forEach(({ category, totalSales, totalOrders }) => {
+        if (y < 50) return;
+    
+        page.drawText(category, { x: leftMargin, y, size: 10, font });
+        page.drawText(`PHP ${totalSales.toFixed(2)}`, { x: 250, y, size: 10, font });
+        page.drawText(totalOrders.toString(), { x: 450, y, size: 10, font });
+    
+        y -= 15;
+      });
+    }
 
     // Save PDF
     const pdfBytes = await pdfDoc.save();
