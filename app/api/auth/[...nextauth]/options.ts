@@ -8,7 +8,6 @@ interface ExtendedUser extends User {
   user_id: string;
 }
 
-
 const login = async (credentials: { email: string; password: string }) => {
   const response = await axios.post(
     `${process.env.NEXTAUTH_URL}/api/auth/login`,
@@ -36,7 +35,10 @@ export const authOptions: NextAuthOptions = {
         if (!credentials) return null;
 
         try {
-          const loginCredentials = credentials as { email: string; password: string };
+          const loginCredentials = credentials as {
+            email: string;
+            password: string;
+          };
           const response = await login(loginCredentials);
 
           if (response.status === 200 && response.data && response.data.user) {

@@ -158,10 +158,10 @@ export function PlaceOrderDialog({
     const subtotal = orderItems.reduce((total, item) => {
       return total + item.product.unit_price * item.quantity_in_stock;
     }, 0);
-  
+
     const vatAmount = subtotal * VAT_RATE;
     const totalWithVAT = subtotal + vatAmount;
-  
+
     return { subtotal, vatAmount, totalWithVAT };
   };
 
@@ -170,7 +170,6 @@ export function PlaceOrderDialog({
     const amountGiven = form.getValues("amountGiven");
     setChange(amountGiven - totalWithVAT);
   }, [orderItems, form.watch("amountGiven")]);
-  
 
   const { saveActivity } = useLayout();
 
@@ -204,7 +203,6 @@ export function PlaceOrderDialog({
       if (response.status === 201) {
         setNewOrder(response.data.orderCode);
         saveActivity(`Added new order`, "added");
-
       } else {
         console.error("Unexpected response:", response);
       }

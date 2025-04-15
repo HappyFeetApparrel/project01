@@ -5,15 +5,15 @@ import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
 import { Button } from "@/components/ui/button";
 import { format, subMonths, startOfMonth, endOfMonth } from "date-fns";
 
-interface DefectSalesReportPDFProps {
+interface DefectProductReportPDFProps {
   startDate: string | undefined;
   endDate: string | undefined;
 }
 
-const DefectSalesReportPDF = ({
+const DefectProductReportPDF = ({
   startDate,
   endDate,
-}: DefectSalesReportPDFProps) => {
+}: DefectProductReportPDFProps) => {
   const [defectData, setDefectData] = useState([]);
 
   useEffect(() => {
@@ -21,7 +21,7 @@ const DefectSalesReportPDF = ({
 
     const fetchDefectData = async () => {
       const response = await fetch(
-        `/api/product-returns-report?startDate=${startDate}&endDate=${endDate}`
+        `/api/product-defect-reports?startDate=${startDate}&endDate=${endDate}`
       );
       const data = await response.json();
       setDefectData(data.data);
@@ -41,7 +41,7 @@ const DefectSalesReportPDF = ({
     const leftMargin = 50;
     const lastMonthFormatted = format(subMonths(new Date(), 1), "MMMM yyyy");
 
-    page.drawText(`Defect Sales Report - ${lastMonthFormatted}`, {
+    page.drawText(`Defect Product Report - ${lastMonthFormatted}`, {
       x: leftMargin,
       y,
       size: 16,
@@ -79,17 +79,17 @@ const DefectSalesReportPDF = ({
     const blob = new Blob([pdfBytes], { type: "application/pdf" });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.download = `Defect_Sales_Report_${format(subMonths(new Date(), 1), "yyyy-MM")}.pdf`;
+    link.download = `Defect_Product_Report_${format(subMonths(new Date(), 1), "yyyy-MM")}.pdf`;
     link.click();
   };
 
   return (
     <div className="p-4">
       <Button onClick={generatePDF} className="mb-0">
-        Download Defect Sales Report
+        Download Defect Product Report
       </Button>
     </div>
   );
 };
 
-export default DefectSalesReportPDF;
+export default DefectProductReportPDF;

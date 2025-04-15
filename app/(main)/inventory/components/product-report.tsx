@@ -16,7 +16,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-import DefectSalesReportPDF from "../../sales-orders/components/defect-sales-report-pdf";
+import DefectProductReportPDF from "./defect-product-report-pdf";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -68,9 +68,13 @@ const DefectSalesReport = () => {
 
       try {
         setLoading(true);
+        const formattedStartDate = date?.from
+          ? format(date.from, "yyyy-MM-dd")
+          : "";
+        const formattedEndDate = date?.to ? format(date.to, "yyyy-MM-dd") : "";
 
         const { data } = await api.get(
-          `/product-returns-report?startDate=${startDate}&endDate=${endDate}`
+          `/product-defect-reports?startDate=${formattedStartDate}&endDate=${formattedEndDate}`
         );
 
         const defaultData = months.map((month) => ({
@@ -115,7 +119,7 @@ const DefectSalesReport = () => {
   return (
     <div className="space-y-4 p-8 bg-white">
       <div className="flex items-center justify-between flex-wrap">
-        <h2 className="text-2xl font-semibold">Defect Sales Report</h2>
+        <h2 className="text-2xl font-semibold">Product Defect Reports</h2>
         <div className="flex flex-wrap justify-end gap-2">
           <Popover>
             <PopoverTrigger asChild>
@@ -160,7 +164,7 @@ const DefectSalesReport = () => {
               <Legend color="#E93BF9" label="Refund" />
               <Legend color="#FF5733" label="Other" />
             </div>
-            <DefectSalesReportPDF startDate={startDate} endDate={endDate} />
+            <DefectProductReportPDF startDate={startDate} endDate={endDate} />
           </div>
         </div>
       </div>

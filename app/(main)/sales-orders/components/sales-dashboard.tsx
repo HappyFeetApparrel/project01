@@ -50,10 +50,8 @@ export default function SalesDashboard() {
   const [currentOrderData, setCurrentOrderData] = useState<OrderData | null>(
     null
   );
-  
+
   const { order, setCreateOrder } = useLayout();
-
-
 
   useEffect(() => {
     if (order) {
@@ -97,7 +95,6 @@ export default function SalesDashboard() {
     );
   });
 
-
   return (
     <>
       <div className="w-full space-y-8">
@@ -138,8 +135,6 @@ export default function SalesDashboard() {
 
           <SalesReport />
         </div>
-
-        
       </div>
       <PlaceOrderDialog
         open={open}
@@ -149,13 +144,18 @@ export default function SalesDashboard() {
         setShowFailPopup={setShowFailPopup}
         setShowPrintInvoice={setShowPrintInvoice}
       />
-      {showPrintInvoice && (
+      {showPrintInvoice && newOrder && (
         // <PrintInvoiceDialog
         //   isOpen={showPrintInvoice}
         //   onClose={handlePrintInvoiceClose}
         //   orderData={currentOrderData}
         // />
-        <PrintInvoiceDialog isOpen={showPrintInvoice} onClose={ handlePrintInvoiceClose} orderData={currentOrderData} />
+        <PrintInvoiceDialog
+          isOpen={showPrintInvoice}
+          onClose={handlePrintInvoiceClose}
+          orderData={currentOrderData}
+          orderCode={newOrder}
+        />
       )}
       {showSuccessPopup && (
         <SuccessPopup

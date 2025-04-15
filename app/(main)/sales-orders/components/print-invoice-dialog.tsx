@@ -1,28 +1,33 @@
-"use client"
+"use client";
 
-import { useState, useRef } from "react"
-import html2canvas from "html2canvas"
-import jsPDF from "jspdf"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
+import { useState, useRef } from "react";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 // Updated OrderData interface to match your data structure
 interface Product {
-  product_id: number
-  name: string
-  unit_price: number
-  discount: number
+  product_id: number;
+  name: string;
+  unit_price: number;
+  discount: number;
   category: {
-    name: string
-  }
+    name: string;
+  };
 }
 
 import { OrderData } from "./place-order-dialog";
 
-
 interface OrderItem {
-  product: Product
-  quantity_in_stock: number
+  product: Product;
+  quantity_in_stock: number;
 }
 
 // interface OrderData {
@@ -36,14 +41,20 @@ interface OrderItem {
 // }
 
 interface PrintInvoiceDialogProps {
-  isOpen: boolean
-  onClose: () => void
-  orderData: OrderData | null
+  isOpen: boolean;
+  onClose: () => void;
+  orderData: OrderData | null;
+  orderCode: string;
 }
 
-export function PrintInvoiceDialog({ isOpen, onClose, orderData }: PrintInvoiceDialogProps) {
-  const [isPrinting, setIsPrinting] = useState(false)
-  const invoiceRef = useRef(null)
+export function PrintInvoiceDialog({
+  isOpen,
+  onClose,
+  orderData,
+  orderCode,
+}: PrintInvoiceDialogProps) {
+  const [isPrinting, setIsPrinting] = useState(false);
+  const invoiceRef = useRef(null);
 
   // Helper function to get payment method name
   const getPaymentMethodName = (code: number): string => {
@@ -53,13 +64,13 @@ export function PrintInvoiceDialog({ isOpen, onClose, orderData }: PrintInvoiceD
       300: "Debit Card",
       400: "Mobile Payment",
       500: "Bank Transfer",
-    }
-    return methods[code] || "Other"
-  }
+    };
+    return methods[code] || "Other";
+  };
 
   const handlePrint = async () => {
-    if (!invoiceRef.current) return
-    setIsPrinting(true)
+    if (!invoiceRef.current) return;
+    setIsPrinting(true);
 
     try {
       // Capture the receipt content
@@ -68,34 +79,34 @@ export function PrintInvoiceDialog({ isOpen, onClose, orderData }: PrintInvoiceD
         logging: false,
         useCORS: true,
         allowTaint: true,
-      })
+      });
 
-      const imgData = canvas.toDataURL("image/png")
+      const imgData = canvas.toDataURL("image/png");
 
       // Create PDF with proper dimensions for a receipt
-      const pdfWidth = 80 // 80mm width (standard receipt width)
-      const pdfHeight = (canvas.height * pdfWidth) / canvas.width
+      const pdfWidth = 80; // 80mm width (standard receipt width)
+      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
 
       // Create PDF with mm units
       const pdf = new jsPDF({
         orientation: "portrait",
         unit: "mm",
         format: [pdfWidth, pdfHeight + 10], // Add some margin at the bottom
-      })
+      });
 
       // Add the image to the PDF
-      pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight)
+      pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
 
       // Auto print and open in new window
-      pdf.autoPrint()
-      window.open(pdf.output("bloburl"), "_blank")
+      pdf.autoPrint();
+      window.open(pdf.output("bloburl"), "_blank");
     } catch (error) {
-      console.error("Error generating PDF:", error)
+      console.error("Error generating PDF:", error);
     }
 
-    setIsPrinting(false)
-    onClose()
-  }
+    setIsPrinting(false);
+    onClose();
+  };
 
   // Calculate subtotal and tax
   // const subtotal = orderData?.totalAmount ? orderData.totalAmount / 1.09 : 0 // Assuming 9% tax
@@ -106,12 +117,12 @@ export function PrintInvoiceDialog({ isOpen, onClose, orderData }: PrintInvoiceD
     const subtotal = orderData?.items.reduce((total, item) => {
       return total + item.product.unit_price * item.quantity_in_stock;
     }, 0);
-  
+
     // @ts-ignore
     const vatAmount = subtotal * VAT_RATE;
     // @ts-ignore
     const totalWithVAT = subtotal + vatAmount;
-  
+
     return { subtotal, vatAmount, totalWithVAT };
   };
 
@@ -124,7 +135,7 @@ export function PrintInvoiceDialog({ isOpen, onClose, orderData }: PrintInvoiceD
         month: "2-digit",
         day: "2-digit",
       }).format(new Date(orderData.orderDate))
-    : ""
+    : "";
 
   // Format time for receipt
   const formattedTime = orderData?.orderDate
@@ -134,10 +145,7 @@ export function PrintInvoiceDialog({ isOpen, onClose, orderData }: PrintInvoiceD
         second: "2-digit",
         hour12: false,
       }).format(new Date(orderData.orderDate))
-    : ""
-
-  // Generate receipt number from timestamp if not available
-  const receiptNumber = `INV-${Date.now().toString().slice(-8)}`
+    : "";
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -146,7 +154,9 @@ export function PrintInvoiceDialog({ isOpen, onClose, orderData }: PrintInvoiceD
           <DialogTitle>Print Invoice</DialogTitle>
         </DialogHeader>
         <div className="py-4">
-          <p className="px-6 mb-4">Would you like to print an invoice for this order?</p>
+          <p className="px-6 mb-4">
+            Would you like to print an invoice for this order?
+          </p>
 
           {/* POS Receipt Layout */}
           <div
@@ -166,7 +176,7 @@ export function PrintInvoiceDialog({ isOpen, onClose, orderData }: PrintInvoiceD
 
             {/* Receipt Info */}
             <div className="mb-4">
-              <p>Receipt No.: {receiptNumber}</p>
+              <p>Receipt No.: {orderCode}</p>
               <p>
                 {formattedDate}, {formattedTime}
               </p>
@@ -183,7 +193,7 @@ export function PrintInvoiceDialog({ isOpen, onClose, orderData }: PrintInvoiceD
                 // const discountAmount = item.product.unit_price * (item.product.discount / 100)
                 // const priceAfterDiscount = item.product.unit_price - discountAmount
                 // const totalPrice = priceAfterDiscount * item.quantity_in_stock
-                const totalPrice =  item.product.unit_price;
+                const totalPrice = item.product.unit_price;
 
                 return (
                   <div key={index} className="flex justify-between mb-2">
@@ -197,11 +207,11 @@ export function PrintInvoiceDialog({ isOpen, onClose, orderData }: PrintInvoiceD
                     </div>
                     <div className="text-right">
                       <p>₱{totalPrice.toFixed(2)}</p>
-                        {/* @ts-ignore */}
+                      {/* @ts-ignore */}
                       <p className="text-xs">{item.product.category.name}</p>
                     </div>
                   </div>
-                )
+                );
               })}
             </div>
 
@@ -249,6 +259,5 @@ export function PrintInvoiceDialog({ isOpen, onClose, orderData }: PrintInvoiceD
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  )
+  );
 }
-

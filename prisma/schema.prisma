@@ -3,9 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgres"
-  url  	    = env("POSTGRES_PRISMA_URL")
-  directUrl = env("POSTGRES_URL_NON_POOLING")
+  provider  = "postgresql"
+  url  	    = env("DATABASE_URL")
 }
 
 model User {
@@ -144,6 +143,7 @@ model ProductReturn {
   order         SalesOrder? @relation(fields: [order_id], references: [order_id])
   product       Product? @relation(fields: [product_id], references: [product_id])
   processed_by_user User? @relation(fields: [processed_by_user_id], references: [user_id], name: "ProcessedByUser")
+
 }
 
 model Category {
@@ -185,3 +185,4 @@ model Setting {
   name        String   @unique
   value       String   
 }
+

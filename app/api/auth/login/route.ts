@@ -12,7 +12,10 @@ export async function POST(req: Request): Promise<NextResponse> {
     const { email, password }: LoginRequestBody = await req.json();
 
     if (!email || !password) {
-      return NextResponse.json({ error: "Email and password are required." }, { status: 400 });
+      return NextResponse.json(
+        { error: "Email and password are required." },
+        { status: 400 }
+      );
     }
 
     const user = await prisma.user.findUnique({
@@ -25,28 +28,40 @@ export async function POST(req: Request): Promise<NextResponse> {
     });
 
     if (!user) {
-      return NextResponse.json({ error: "Invalid email or password." }, { status: 401 });
+      return NextResponse.json(
+        { error: "Invalid email or password." },
+        { status: 401 }
+      );
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if (!isPasswordValid) {
-      return NextResponse.json({ error: "Invalid email or password." }, { status: 401 });
+      return NextResponse.json(
+        { error: "Invalid email or password." },
+        { status: 401 }
+      );
     }
 
-    return NextResponse.json({
-      message: "Login successful",
-      user: {
-        user_id: user.user_id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        created_at: user.created_at,
-        updated_at: user.updated_at,
-      }
-    }, { status: 200 });
+    return NextResponse.json(
+      {
+        message: "Login successful",
+        user: {
+          user_id: user.user_id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+          created_at: user.created_at,
+          updated_at: user.updated_at,
+        },
+      },
+      { status: 200 }
+    );
   } catch (error) {
     console.error("Error during login:", error);
-    return NextResponse.json({ error: "An unexpected error occurred." }, { status: 500 });
+    return NextResponse.json(
+      { error: "An unexpected error occurred." },
+      { status: 500 }
+    );
   }
 }

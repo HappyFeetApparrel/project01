@@ -10,6 +10,8 @@ import { StatusPopup } from "@/components/global/status-popup";
 
 import { useLayout } from "@/components/context/LayoutProvider";
 
+import ProductDefectReport from "./product-report";
+
 // types
 import { Product } from "@/prisma/type";
 
@@ -88,6 +90,8 @@ export default function Products() {
         error={error}
         setIsAddModalOpen={() => setIsAddModalOpen(true)}
       />
+
+      <ProductDefectReport />
 
       {/* Modals */}
       <AddProductModal
