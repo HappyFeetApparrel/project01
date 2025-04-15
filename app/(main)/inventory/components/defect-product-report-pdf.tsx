@@ -41,7 +41,21 @@ const DefectProductReportPDF = ({
     const leftMargin = 50;
     const lastMonthFormatted = format(subMonths(new Date(), 1), "MMMM yyyy");
 
-    page.drawText(`Defect Product Report - ${lastMonthFormatted}`, {
+    const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+
+    // Title
+    page.drawText("Happy Feet and Apparel", {
+      x: leftMargin,
+      y,
+      size: 16,
+      font: boldFont,
+      color: rgb(0, 0, 0),
+    });
+
+    // Report Date
+    y -= 20;
+
+    page.drawText(`Defect Product Reports - ${lastMonthFormatted}`, {
       x: leftMargin,
       y,
       size: 16,

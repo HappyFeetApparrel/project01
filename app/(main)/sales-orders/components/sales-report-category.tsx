@@ -30,6 +30,20 @@ const SalesReportPDF = () => {
     const lastMonth = format(subMonths(new Date(), 1), "yyyy-MM");
     const lastMonthFormatted = format(subMonths(new Date(), 1), "MMMM yyyy");
 
+    const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+
+    // Title
+    page.drawText("Happy Feet and Apparel", {
+      x: leftMargin,
+      y,
+      size: 16,
+      font: boldFont,
+      color: rgb(0, 0, 0),
+    });
+
+    // Report Date
+    y -= 20;
+    
     // Title
     const title = `Sales Report - ${lastMonthFormatted}`;
     page.drawText(title, {

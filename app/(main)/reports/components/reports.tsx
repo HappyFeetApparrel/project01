@@ -9,15 +9,27 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
 import { useState, useEffect, useRef } from "react";
 
+import WeeklySalesReportPDF from "./weekly-sales-report-pdf";
+
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 
-import { format, startOfWeek, endOfWeek, addDays, subWeeks, addWeeks } from "date-fns";
+import {
+  format,
+  startOfWeek,
+  endOfWeek,
+  addDays,
+  subWeeks,
+  addWeeks,
+} from "date-fns";
 import { useLayout } from "@/components/context/LayoutProvider";
 import { isAfter, isBefore, isSameDay } from "date-fns";
 
-
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 
 export interface WeeklySalesData {
@@ -49,12 +61,13 @@ const getCurrentWeekRange = () => {
 export default function Reports() {
   const { saveActivity } = useLayout();
 
-  const [dateRange, setDateRange] = useState<{ start: Date; end: Date }>(getCurrentWeekRange);
+  const [dateRange, setDateRange] = useState<{ start: Date; end: Date }>(
+    getCurrentWeekRange
+  );
   const [weeklySales, setWeeklySales] = useState<WeeklySalesData[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
-
 
   const formattedRange = `${format(dateRange.start, "MMM d")} - ${format(dateRange.end, "d")}`;
   const reportRef = useRef<HTMLDivElement>(null);
@@ -129,10 +142,10 @@ export default function Reports() {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between pb-7">
           <CardTitle className="text-2xl font-bold">Reports</CardTitle>
-          <Button className="bg-[#00A3FF] hover:bg-[#00A3FF]/90" onClick={handlePrint}>
-            <Printer className="mr-2 h-4 w-4" />
-            Print Reports
-          </Button>
+          <WeeklySalesReportPDF
+            startDate={format(dateRange.start, "yyyy-MM-dd")}
+            endDate={format(dateRange.end, "yyyy-MM-dd")}
+          />
         </CardHeader>
 
         <CardContent className="space-y-8">
@@ -141,14 +154,14 @@ export default function Reports() {
             <div className="flex items-center justify-between">
               <h3 className="text-xl font-semibold">Weekly Sales</h3>
               <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
-              <PopoverTrigger asChild>
+                <PopoverTrigger asChild>
                   <Button variant="outline" className="text-[#00A3FF]">
                     <CalendarIcon className="mr-2 h-4 w-4" />
                     {formattedRange}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0">
-                <Calendar
+                  <Calendar
                     mode="single"
                     selected={dateRange.start}
                     onSelect={handleDateSelect}
@@ -156,7 +169,8 @@ export default function Reports() {
                       start: dateRange.start,
                       end: addDays(dateRange.start ?? new Date(), 6),
                       // @ts-ignore
-                      hovered: hoveredDate && ((date) => isInHoveredRange(date)), // ✅ Fix
+                      hovered:
+                        hoveredDate && ((date) => isInHoveredRange(date)), // ✅ Fix
                     }}
                     modifiersClassNames={{
                       start: "bg-blue-500 text-white", // Start date style
@@ -166,7 +180,7 @@ export default function Reports() {
                     onDayMouseEnter={(date) => setHoveredDate(date)}
                     onDayMouseLeave={() => setHoveredDate(null)}
                   />
-                {/* <Calendar
+                  {/* <Calendar
                     mode="single"
                     selected={dateRange.start}
                     onSelect={handleDateSelect}
@@ -192,52 +206,77 @@ export default function Reports() {
               <div className="space-y-2 h-[500px] overflow-y-auto">
                 <div className="grid grid-cols-[80px_repeat(7,1fr)] gap-1">
                   <div className="text-sm text-muted-foreground"></div>
-                  {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day) => (
-                    <div key={day} className="text-center text-sm text-muted-foreground">
-                      {day}
-                    </div>
-                  ))}
+                  {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map(
+                    (day) => (
+                      <div
+                        key={day}
+                        className="text-center text-sm text-muted-foreground"
+                      >
+                        {day}
+                      </div>
+                    )
+                  )}
                 </div>
 
                 {loading
                   ? Array.from({ length: 10 }).map((_, idx) => (
-                      <div key={idx} className="grid grid-cols-[80px_repeat(7,1fr)] gap-1">
-                        <div className="text-sm text-muted-foreground">--:--</div>
+                      <div
+                        key={idx}
+                        className="grid grid-cols-[80px_repeat(7,1fr)] gap-1"
+                      >
+                        <div className="text-sm text-muted-foreground">
+                          --:--
+                        </div>
                         {Array.from({ length: 7 }).map((_, i) => (
-                          <Skeleton key={i} className="h-12 rounded bg-primary/30" />
+                          <Skeleton
+                            key={i}
+                            className="h-12 rounded bg-primary/30"
+                          />
                         ))}
                       </div>
                     ))
                   : weeklySales.map((row) => (
-                      <div key={row.time} className="grid grid-cols-[80px_repeat(7,1fr)] gap-1">
-                        <div className="text-sm text-muted-foreground">{row.time}</div>
-                        {[row.mon, row.tue, row.wed, row.thu, row.fri, row.sat, row.sun].map((value, i) => (
-                          <div key={i} className={`h-12 rounded ${getColorForValue(value)}`} />
+                      <div
+                        key={row.time}
+                        className="grid grid-cols-[80px_repeat(7,1fr)] gap-1"
+                      >
+                        <div className="text-sm text-muted-foreground">
+                          {row.time}
+                        </div>
+                        {[
+                          row.mon,
+                          row.tue,
+                          row.wed,
+                          row.thu,
+                          row.fri,
+                          row.sat,
+                          row.sun,
+                        ].map((value, i) => (
+                          <div
+                            key={i}
+                            className={`h-12 rounded ${getColorForValue(value)}`}
+                          />
                         ))}
                       </div>
                     ))}
               </div>
             )}
             <div className="mt-4 flex items-center gap-4">
-                    <div className="flex items-center gap-2">
-                      <div className="h-3 w-3 rounded bg-[#E3F2FD]" />
-                      <span className="text-sm text-muted-foreground">
-                        0-500
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="h-3 w-3 rounded bg-[#29B6F6]" />
-                      <span className="text-sm text-muted-foreground">
-                        501-1,000
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="h-3 w-3 rounded bg-[#0277BD]" />
-                      <span className="text-sm text-muted-foreground">
-                        1,001-5,000
-                      </span>
-                    </div>
-                  </div>
+              <div className="flex items-center gap-2">
+                <div className="h-3 w-3 rounded bg-[#E3F2FD]" />
+                <span className="text-sm text-muted-foreground">0-500</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="h-3 w-3 rounded bg-[#29B6F6]" />
+                <span className="text-sm text-muted-foreground">501-1,000</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="h-3 w-3 rounded bg-[#0277BD]" />
+                <span className="text-sm text-muted-foreground">
+                  1,001-5,000
+                </span>
+              </div>
+            </div>
           </div>
         </CardContent>
       </Card>

@@ -29,6 +29,7 @@ const DefectSalesReportDownload = () => {
     const page = pdfDoc.addPage([600, 800]);
     const { width, height } = page.getSize();
     const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+    const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
 
     let y = height - 50;
     const leftMargin = 50;
@@ -37,10 +38,22 @@ const DefectSalesReportDownload = () => {
     const lastMonthFormatted = format(subMonths(new Date(), 1), "MMMM yyyy");
 
     // Title
-    page.drawText(`Defect Sales Report - ${lastMonthFormatted}`, {
+    page.drawText("Happy Feet and Apparel", {
       x: leftMargin,
       y,
       size: 16,
+      font: boldFont,
+      color: rgb(0, 0, 0),
+    });
+
+    // Report Date
+    y -= 20;
+
+    // Title
+    page.drawText(`Defect Sales Report - ${lastMonthFormatted}`, {
+      x: leftMargin,
+      y,
+      size: 12,
       font,
       color: rgb(0, 0, 0),
     });
@@ -90,10 +103,13 @@ const DefectSalesReportDownload = () => {
 
   return (
     <div className="p-4">
-      <Button className="bg-[#9C27B0] hover:bg-[#9C27B0]/90"  onClick={generateAndDownloadPDF} >
+      <Button
+        className="bg-[#9C27B0] hover:bg-[#9C27B0]/90"
+        onClick={generateAndDownloadPDF}
+      >
         <Download className="mr-2 h-4 w-4" />
         Download PDF
-    </Button>
+      </Button>
     </div>
   );
 };
