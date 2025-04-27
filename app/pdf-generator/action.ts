@@ -8,6 +8,9 @@ export async function getLogoBytes(
 ): Promise<Uint8Array | null> {
   try {
     const logoPath = path.join(process.cwd(), "public", relativeLogoPath);
+    console.log("logoPath");
+    console.log(logoPath);
+    console.log("logoPath");
     const imageBytes = await fs.readFile(logoPath);
     return imageBytes;
   } catch (error) {
