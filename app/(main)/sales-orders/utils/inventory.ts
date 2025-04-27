@@ -271,7 +271,7 @@ export async function addFooter(
   });
 
   // Footer text
-  page.drawText(`${companyName} - Quality Assurance Department`, {
+  page.drawText(`${companyName}`, {
     x: margin,
     y: footerHeight - 20,
     size: 10,
