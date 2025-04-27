@@ -57,9 +57,12 @@ const getOrdersData = async (period: string) => {
     },
   });
 
+  // return orders;
+
   const formattedOrders = orders.flatMap((order) =>
     order.order_items.map((item) => ({
-      id: item.order_item_id,
+      id: item.order_id,
+      order_item_id: item.order_item_id,
       productImage: item.product.product_image,
       productName: item.product.name,
       orderCode: order.order_code,
