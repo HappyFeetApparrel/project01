@@ -38,7 +38,7 @@ const DefectSalesReportPDF = () => {
     const leftMargin = 50;
 
     // Get last month's date
-    const lastMonthFormatted = format(subMonths(new Date(), 1), "MMMM yyyy");
+    const date = new Date();
 
     // Title
     page.drawText("Happy Feet and Apparel", {
@@ -53,7 +53,7 @@ const DefectSalesReportPDF = () => {
     y -= 20;
 
     // Title
-    page.drawText(`Defect Sales Report - ${lastMonthFormatted}`, {
+    page.drawText(`Defect Sales Report - ${date.getFullYear()}`, {
       x: leftMargin,
       y,
       size: 16,
@@ -62,7 +62,7 @@ const DefectSalesReportPDF = () => {
     });
 
     await addHeader(page, {
-      title: `Defect Sales Report - ${lastMonthFormatted}`,
+      title: `Defect Sales Report - ${date.getFullYear()}`,
       companyName: "Happy Feet and Apparel",
       logoPath: "/logo.png",
       logoWidth: 50, // Adjust as needed

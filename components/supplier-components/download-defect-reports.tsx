@@ -39,10 +39,10 @@ const DefectSalesReportDownload = () => {
     const leftMargin = 50;
 
     // Get last month's date
-    const lastMonthFormatted = format(subMonths(new Date(), 1), "MMMM yyyy");
+    const date = new Date();
 
     await addHeader(page, {
-      title: `Defect Sales Report - ${lastMonthFormatted}`,
+      title: `Defect Sales Report - ${date.getFullYear()}`,
       companyName: "Happy Feet and Apparel",
       logoPath: "/logo.png",
       logoWidth: 50, // Adjust as needed
@@ -96,7 +96,7 @@ const DefectSalesReportDownload = () => {
 
     const a = document.createElement("a");
     a.href = url;
-    a.download = `Defect_Sales_Report_${lastMonthFormatted}.pdf`;
+    a.download = `Defect_Sales_Report_${date.getFullYear()}.pdf`;
     a.click();
     URL.revokeObjectURL(url);
   };

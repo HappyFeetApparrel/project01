@@ -35,7 +35,7 @@ const DefectSalesReportPDF = ({
     const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
     const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
     const leftMargin = 50;
-    const lastMonthFormatted = format(subMonths(new Date(), 1), "MMMM yyyy");
+    const date = new Date();
 
     // 1st page: Itemized Defect Details
     const firstPage = pdfDoc.addPage([600, 800]);
@@ -44,7 +44,7 @@ const DefectSalesReportPDF = ({
 
     // Add header with logo
     await addHeader(firstPage, {
-      title: `Defect Sales Report - ${lastMonthFormatted}`,
+      title: `Defect Sales Report - ${date.getFullYear()}`,
       companyName: "Happy Feet and Apparel",
       logoPath: "/logo.png",
       logoWidth: 50, // Adjust as needed
@@ -91,7 +91,7 @@ const DefectSalesReportPDF = ({
     let y2 = secondHeight - 170;
 
     await addHeader(secondPage, {
-      title: `Defect Sales Report - ${lastMonthFormatted}`,
+      title: `Defect Sales Report - ${date.getFullYear()}`,
       companyName: "Happy Feet and Apparel",
       logoPath: "/logo.png",
       logoWidth: 50, // Adjust as needed
