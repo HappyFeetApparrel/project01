@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
+import { addHeader, addFooter } from "../../sales-orders/utils/inventory";
 
 interface WeeklySalesReportPDFProps {
   startDate: string | undefined;
@@ -52,34 +53,15 @@ const WeeklySalesReportPDF = ({
     let y = height - 50;
     const margin = 40;
 
-    // Title
-    page.drawText("Happy Feet and Apparel", {
-      x: margin,
-      y,
-      size: 16,
-      font: boldFont,
-      color: rgb(0, 0, 0),
-    });
-    page.drawText("Sales Report", {
-      x: margin,
-      y: y - 20,
-      size: 14,
-      font: boldFont,
-      color: rgb(0, 0, 0),
+    await addHeader(page, {
+      title: `Weekly Sales Report (${startDate} to ${endDate})`,
+      companyName: "Happy Feet and Apparel",
+      logoPath: "/logo.png",
+      logoWidth: 50, // Adjust as needed
+      logoHeight: 50, // Adjust as needed
     });
 
-    // Report Date
-    y -= 50;
-
-    page.drawText(`Weekly Sales Report (${startDate} to ${endDate})`, {
-      x: margin,
-      y,
-      size: 12,
-      font,
-      color: rgb(0, 0, 0),
-    });
-
-    y -= 30;
+    y -= 120;
 
     const headers = ["Time", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
     const colWidths = [60, 60, 60, 60, 60, 60, 60, 60];
@@ -140,6 +122,15 @@ const WeeklySalesReportPDF = ({
       );
 
       y -= 18;
+    });
+
+    await addFooter(page, {
+      companyName: "Happy Feet and Apparel",
+      website: "www.happyfeetandapparel.com",
+      email: "contact@happyfeetandapparel.com",
+      phone: "(123) 456-7890",
+      pageNumber: 1,
+      totalPages: 1,
     });
 
     const pdfBytes = await pdfDoc.save();

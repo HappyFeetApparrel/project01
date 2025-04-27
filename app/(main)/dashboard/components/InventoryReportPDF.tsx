@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
 import { Button } from "@/components/ui/button"; // Replace with your own button component
+import { addHeader, addFooter } from "../../sales-orders/utils/inventory";
 
 interface Product {
   name: string;
@@ -46,30 +47,16 @@ const InventoryReportPDF = () => {
 
     const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
 
-    // Title
-    page.drawText("Happy Feet and Apparel", {
-      x: leftMargin,
-      y,
-      size: 16,
-      font: boldFont,
-      color: rgb(0, 0, 0),
+    // Add header with logo
+    await addHeader(page, {
+      title: `Inventory Report`,
+      companyName: "Happy Feet and Apparel",
+      logoPath: "/logo.png",
+      logoWidth: 50, // Adjust as needed
+      logoHeight: 50, // Adjust as needed
     });
 
-    // Report Date
-    y -= 20;
-
-    // Title with Timestamp
-    const title = `Inventory Report - ${timestamp}`;
-
-    page.drawText(title, {
-      x: leftMargin,
-      y,
-      size: 16,
-      font,
-      color: rgb(0, 0, 0),
-    });
-
-    y -= 30;
+    y -= 120;
 
     // Table Headers
     page.drawText("Product Name", { x: leftMargin, y, size: 12, font });
@@ -116,6 +103,15 @@ const InventoryReportPDF = () => {
       page.drawText(product.status, { x: 470, y, size: 10, font });
 
       y -= 15;
+    });
+
+    await addFooter(page, {
+      companyName: "Happy Feet and Apparel",
+      website: "www.happyfeetandapparel.com",
+      email: "contact@happyfeetandapparel.com",
+      phone: "(123) 456-7890",
+      pageNumber: 1,
+      totalPages: 1,
     });
 
     // Save PDF

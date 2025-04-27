@@ -4,6 +4,10 @@ import { useState, useEffect } from "react";
 import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
 import { Button } from "@/components/ui/button";
 import { format, subMonths } from "date-fns";
+import {
+  addHeader,
+  addFooter,
+} from "@/app/(main)/sales-orders/utils/inventory";
 
 const DefectSalesReportPDF = () => {
   const [salesData, setSalesData] = useState([]);
@@ -57,7 +61,15 @@ const DefectSalesReportPDF = () => {
       color: rgb(0, 0, 0),
     });
 
-    y -= 30;
+    await addHeader(page, {
+      title: `Defect Sales Report - ${lastMonthFormatted}`,
+      companyName: "Happy Feet and Apparel",
+      logoPath: "/logo.png",
+      logoWidth: 50, // Adjust as needed
+      logoHeight: 50, // Adjust as needed
+    });
+
+    y -= 120;
 
     // Table Headers
     page.drawText("Month", { x: leftMargin, y, size: 12, font });
@@ -86,6 +98,15 @@ const DefectSalesReportPDF = () => {
       page.drawText(String(other), { x: 450, y, size: 10, font });
 
       y -= 15;
+    });
+
+    await addFooter(page, {
+      companyName: "Happy Feet and Apparel",
+      website: "www.happyfeetandapparel.com",
+      email: "contact@happyfeetandapparel.com",
+      phone: "(123) 456-7890",
+      pageNumber: 1,
+      totalPages: 1,
     });
 
     // Save PDF and open in new tab

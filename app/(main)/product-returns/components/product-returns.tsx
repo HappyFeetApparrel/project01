@@ -1,7 +1,7 @@
 "use client";
 // import axios
 import { api } from "@/lib/axios";
-
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 // components
@@ -22,8 +22,9 @@ import { useLayout } from "@/components/context/LayoutProvider";
 
 export default function ProductReturns() {
   const { saveActivity } = useLayout();
-
-  const { productReturns, loading, error, fetchProductReturns } = useProductReturnContext();
+  const router = useRouter();
+  const { productReturns, loading, error, fetchProductReturns } =
+    useProductReturnContext();
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isStatusPopupOpen, setIsStatusPopupOpen] = useState(false);
@@ -32,7 +33,8 @@ export default function ProductReturns() {
     "success" | "error"
   >("success");
 
-  const [loadingAddProductReturn, setLoadingAddProductReturn] = useState<boolean>(false);
+  const [loadingAddProductReturn, setLoadingAddProductReturn] =
+    useState<boolean>(false);
 
   const showStatusPopup = (message: string, status: "success" | "error") => {
     setStatusPopupMessage(message);
@@ -50,12 +52,21 @@ export default function ProductReturns() {
 
       if (response.status === 201) {
         console.log("ProductReturn added:", response.data.data);
-        saveActivity(`Added productReturn: ${newProductReturn.reason}`, "added");
-
-        showStatusPopup("ProductReturn added successfully", "success");
+        saveActivity(
+          `Added productReturn: ${newProductReturn.reason}`,
+          "added"
+        );
+        if (newProductReturn.reason === "Replace") {
+          router.push(response.data.data.redirect_url);
+        } else {
+          showStatusPopup("ProductReturn added successfully", "success");
+        }
       } else {
         console.error("Unexpected response:", response);
-        showStatusPopup("Unexpected response while adding productReturn", "error");
+        showStatusPopup(
+          "Unexpected response while adding productReturn",
+          "error"
+        );
       }
       await fetchProductReturns(); // Refresh data after addition
     } catch (error: unknown) {

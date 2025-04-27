@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import SalesDashboard from "./components/sales-dashboard";
 
 // right sidebar

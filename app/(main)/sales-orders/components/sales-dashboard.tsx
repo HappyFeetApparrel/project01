@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 // import { Checkbox } from "@/components/ui/checkbox";
 
 import SalesReport from "./sales-report";
+import { useSearchParams } from "next/navigation";
 
 // import component
 import { PlaceOrderDialog } from "./place-order-dialog";
@@ -46,10 +47,22 @@ export default function SalesDashboard() {
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
   const [showFailPopup, setShowFailPopup] = useState(false);
   const [showPrintInvoice, setShowPrintInvoice] = useState(false);
+  const search = useSearchParams();
 
   const [currentOrderData, setCurrentOrderData] = useState<OrderData | null>(
     null
   );
+
+  const [price, setPrice] = useState<number>(0);
+  const [isProductSwap, setIsProductSwap] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (search.size === 0) return;
+
+    setOpen(true);
+    setPrice(Number(search.get("price") ?? 0));
+    setIsProductSwap(search.get("isProductSwap") === "swap");
+  }, [search.size]);
 
   const { order, setCreateOrder } = useLayout();
 
@@ -143,6 +156,7 @@ export default function SalesDashboard() {
         setCurrentOrderData={setCurrentOrderData}
         setShowFailPopup={setShowFailPopup}
         setShowPrintInvoice={setShowPrintInvoice}
+        replace_data={{ price, status: "pending" }}
       />
       {showPrintInvoice && newOrder && (
         // <PrintInvoiceDialog

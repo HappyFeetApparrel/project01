@@ -78,16 +78,17 @@ const DefectSalesReport = () => {
           lost: 0,
           return: 0,
           refund: 0,
+          replace: 0,
           other: 0,
         }));
 
-        data.data.forEach((item: any) => {
+        data.data.months.forEach((item: any) => {
           const monthIndex = months.indexOf(item.month);
           if (monthIndex !== -1) {
             defaultData[monthIndex] = item;
           }
         });
-
+        console.log(defaultData);
         setSalesData(defaultData);
       } catch (error) {
         setError("Failed to fetch sales report");
@@ -101,7 +102,6 @@ const DefectSalesReport = () => {
 
   useEffect(() => {
     if (date) {
-      console.log(typeof date);
       const formattedStartDate = date?.from
         ? format(date.from, "yyyy-MM-dd")
         : "";
@@ -158,6 +158,7 @@ const DefectSalesReport = () => {
               <Legend color="#00A3FF" label="Lost" />
               <Legend color="#9747FF" label="Return" />
               <Legend color="#E93BF9" label="Refund" />
+              <Legend color="#E94AF9" label="Replace" />
               <Legend color="#FF5733" label="Other" />
             </div>
             <DefectSalesReportPDF startDate={startDate} endDate={endDate} />

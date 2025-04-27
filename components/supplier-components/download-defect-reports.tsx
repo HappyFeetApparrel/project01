@@ -5,6 +5,10 @@ import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
 import { Button } from "@/components/ui/button";
 import { format, subMonths } from "date-fns";
 import { Download } from "lucide-react";
+import {
+  addHeader,
+  addFooter,
+} from "@/app/(main)/sales-orders/utils/inventory";
 
 const DefectSalesReportDownload = () => {
   const [salesData, setSalesData] = useState([]);
@@ -37,28 +41,15 @@ const DefectSalesReportDownload = () => {
     // Get last month's date
     const lastMonthFormatted = format(subMonths(new Date(), 1), "MMMM yyyy");
 
-    // Title
-    page.drawText("Happy Feet and Apparel", {
-      x: leftMargin,
-      y,
-      size: 16,
-      font: boldFont,
-      color: rgb(0, 0, 0),
+    await addHeader(page, {
+      title: `Defect Sales Report - ${lastMonthFormatted}`,
+      companyName: "Happy Feet and Apparel",
+      logoPath: "/logo.png",
+      logoWidth: 50, // Adjust as needed
+      logoHeight: 50, // Adjust as needed
     });
 
-    // Report Date
-    y -= 20;
-
-    // Title
-    page.drawText(`Defect Sales Report - ${lastMonthFormatted}`, {
-      x: leftMargin,
-      y,
-      size: 12,
-      font,
-      color: rgb(0, 0, 0),
-    });
-
-    y -= 30;
+    y -= 120;
 
     // Table Headers
     page.drawText("Month", { x: leftMargin, y, size: 12, font });
@@ -87,6 +78,15 @@ const DefectSalesReportDownload = () => {
       page.drawText(String(other), { x: 450, y, size: 10, font });
 
       y -= 15;
+    });
+
+    await addFooter(page, {
+      companyName: "Happy Feet and Apparel",
+      website: "www.happyfeetandapparel.com",
+      email: "contact@happyfeetandapparel.com",
+      phone: "(123) 456-7890",
+      pageNumber: 1,
+      totalPages: 1,
     });
 
     // Save PDF and trigger download

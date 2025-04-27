@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
 import { Button } from "@/components/ui/button";
 import { format, subMonths } from "date-fns";
+import { addHeader, addFooter } from "../utils/inventory";
 
 const SalesReportPDF = () => {
   const [salesData, setSalesData] = useState([]);
@@ -32,29 +33,15 @@ const SalesReportPDF = () => {
 
     const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
 
-    // Title
-    page.drawText("Happy Feet and Apparel", {
-      x: leftMargin,
-      y,
-      size: 16,
-      font: boldFont,
-      color: rgb(0, 0, 0),
+    await addHeader(page, {
+      title: `Sales Report - ${lastMonthFormatted}`,
+      companyName: "Happy Feet and Apparel",
+      logoPath: "/logo.png",
+      logoWidth: 50, // Adjust as needed
+      logoHeight: 50, // Adjust as needed
     });
 
-    // Report Date
-    y -= 20;
-    
-    // Title
-    const title = `Sales Report - ${lastMonthFormatted}`;
-    page.drawText(title, {
-      x: leftMargin,
-      y,
-      size: 16,
-      font,
-      color: rgb(0, 0, 0),
-    });
-
-    y -= 30;
+    y -= 120;
 
     // Table Headers
     page.drawText("Category", { x: leftMargin, y, size: 12, font });
@@ -62,23 +49,31 @@ const SalesReportPDF = () => {
     page.drawText("Total Orders", { x: 450, y, size: 12, font });
 
     y -= 15;
-    page.drawLine({ start: { x: leftMargin, y }, end: { x: width - leftMargin, y }, thickness: 1, color: rgb(0, 0, 0) });
+    page.drawLine({
+      start: { x: leftMargin, y },
+      end: { x: width - leftMargin, y },
+      thickness: 1,
+      color: rgb(0, 0, 0),
+    });
     y -= 15;
 
     // Filter sales data for last month
-    const filteredSales = salesData.map((category) => {
+    const filteredSales = salesData
+      .map((category) => {
         // @ts-ignore
-      const lastMonthSales = category.salesData.find((sale) => sale.month === lastMonth);
-      return {
-        // @ts-ignore
-        category: category.category,
-        totalSales: lastMonthSales ? lastMonthSales.totalSales : 0,
-        // @ts-ignore
-        totalOrders: lastMonthSales ? category.totalOrders : 0,
-      };
-    }).filter((sale) => sale.totalSales > 0 || sale.totalOrders > 0);
-
-    console.log(filteredSales.length)
+        const lastMonthSales = category.salesData.find(
+          // @ts-ignore
+          (sale) => sale.month === lastMonth
+        );
+        return {
+          // @ts-ignore
+          category: category.category,
+          totalSales: lastMonthSales ? lastMonthSales.totalSales : 0,
+          // @ts-ignore
+          totalOrders: lastMonthSales ? category.totalOrders : 0,
+        };
+      })
+      .filter((sale) => sale.totalSales > 0 || sale.totalOrders > 0);
 
     if (filteredSales) {
       page.drawText("No data available for this month", {
@@ -93,14 +88,28 @@ const SalesReportPDF = () => {
       // @ts-ignore
       filteredSales.forEach(({ category, totalSales, totalOrders }) => {
         if (y < 50) return;
-    
+
         page.drawText(category, { x: leftMargin, y, size: 10, font });
-        page.drawText(`PHP ${totalSales.toFixed(2)}`, { x: 250, y, size: 10, font });
+        page.drawText(`PHP ${totalSales.toFixed(2)}`, {
+          x: 250,
+          y,
+          size: 10,
+          font,
+        });
         page.drawText(totalOrders.toString(), { x: 450, y, size: 10, font });
-    
+
         y -= 15;
       });
     }
+
+    await addFooter(page, {
+      companyName: "Happy Feet and Apparel",
+      website: "www.happyfeetandapparel.com",
+      email: "contact@happyfeetandapparel.com",
+      phone: "(123) 456-7890",
+      pageNumber: 1,
+      totalPages: 1,
+    });
 
     // Save PDF
     const pdfBytes = await pdfDoc.save();
