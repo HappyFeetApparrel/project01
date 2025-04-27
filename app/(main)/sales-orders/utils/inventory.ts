@@ -162,9 +162,11 @@ export async function addHeader(
   if (options.logoPath) {
     try {
       const logoBytes = await getLogoBytes("logo.png");
+      console.log(logoBytes);
 
       if (logoBytes) {
         const logoImage = await pdfDoc.embedPng(logoBytes); // NOW it's allowed, client side!
+        console.log(logoImage);
 
         if (logoImage) {
           page.drawImage(logoImage, {
