@@ -36,7 +36,6 @@ const WeeklySalesReportPDF = ({
         `/api/weekly-sales?start=${startDate}&end=${endDate}`
       );
       const data = await res.json();
-      console.log(data.data);
       setSalesData(data.data);
     };
 
@@ -84,7 +83,6 @@ const WeeklySalesReportPDF = ({
     drawRow(headers, y, true);
     y -= 20;
 
-    console.log(salesData);
     salesData.forEach((entry) => {
       if (y < 60) {
         page = pdfDoc.addPage([750, 1000]);

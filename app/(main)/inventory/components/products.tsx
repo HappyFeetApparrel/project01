@@ -51,7 +51,6 @@ export default function Products() {
 
       if (response.status === 201) {
         saveActivity("Add Product", "Product added successfully");
-        console.log("Product added:", response.data.data);
         showStatusPopup("Product added successfully", "success");
       } else {
         console.error("Unexpected response:", response);
@@ -77,9 +76,7 @@ export default function Products() {
     }
   }, [product]);
 
-  useEffect(() => {
-    console.log(isAddModalOpen);
-  }, [isAddModalOpen]);
+  useEffect(() => {}, [isAddModalOpen]);
 
   return (
     <>

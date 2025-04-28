@@ -34,7 +34,6 @@ export default function RecentActivity() {
     };
 
     fetchActivities();
-    console.log(activities);
   }, [activities]);
 
   if (error) return <div>{error}</div>;

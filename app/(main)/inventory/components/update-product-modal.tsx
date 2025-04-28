@@ -57,12 +57,8 @@ const productSchema = z.object({
     .optional(),
   category_id: z.number().int().positive("Category is required."),
   quantity_in_stock: z.number().int().min(0, "Quantity must be 0 or greater"),
-  unit_price: z
-    .number()
-    .min(0, "Unit price must be 0 or greater"),
-  cost_price: z
-    .number()
-    .min(0, "Cost price must be 0 or greater"),
+  unit_price: z.number().min(0, "Unit price must be 0 or greater"),
+  cost_price: z.number().min(0, "Cost price must be 0 or greater"),
   supplier_id: z.number().int().positive("Supplier is required."),
   brand_id: z.number().int().positive("Brand is required."),
   size: z
@@ -123,8 +119,6 @@ export function UpdateProductModal({
       ...data,
     };
     onUpdate(updatedProduct);
-
-    console.log(data);
   };
 
   useEffect(() => {
@@ -143,13 +137,11 @@ export function UpdateProductModal({
         file,
         onProgressChange: (progress) => {
           // you can use this to show a progress bar
-          console.log(progress);
           setProgress(progress);
         },
       });
       // you can run some server action or api here
       // to add the necessary data to your database
-      console.log(res);
       form.setValue("product_image", res.url);
     }
   };
@@ -285,7 +277,9 @@ export function UpdateProductModal({
                                 <SelectValue placeholder="Select status" />
                               </SelectTrigger>
                               <SelectContent>
-                                <SelectItem value="active">Active</SelectItem>
+                                <SelectItem value="active">
+                                  Available
+                                </SelectItem>
                                 <SelectItem value="out_of_stock">
                                   Out of Stock
                                 </SelectItem>

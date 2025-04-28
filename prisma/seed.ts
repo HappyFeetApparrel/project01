@@ -82,7 +82,7 @@ async function main() {
     //             size: faker.helpers.arrayElement(['S', 'M', 'L', 'XL']),
     //             color: faker.color.human(),
     //             product_image: faker.image.url(),
-    //             status: faker.helpers.arrayElement(['Active', 'Discontinued', 'Out of Stock']),
+    //             status: faker.helpers.arrayElement(['Available', 'Discontinued', 'Out of Stock']),
     //             discount: faker.number.float({ min: 0, max: 50 }),
     //             quantity_damaged: faker.number.int({ min: 0, max: 10 }),
     //             quantity_returned: faker.number.int({ min: 0, max: 5 }),

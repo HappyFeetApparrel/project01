@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { Suspense, useEffect, useState } from "react";
 import type React from "react";
@@ -62,7 +62,8 @@ export function ResetPasswordForm() {
     if (!token) {
       toast({
         title: "Invalid reset link",
-        description: "Your password reset link appears to be invalid or expired.",
+        description:
+          "Your password reset link appears to be invalid or expired.",
         variant: "destructive",
       });
       return;
@@ -92,8 +93,6 @@ export function ResetPasswordForm() {
       }, 2000);
     } catch (error) {
       if (error instanceof AxiosError) {
-        console.log(error.response?.data as string); // ✅ Ensures response exists before accessing `data`
-
         const error_message = error.response?.data.error;
         toast({
           title: "Something went wrong", //
@@ -181,7 +180,9 @@ export function ResetPasswordForm() {
                 ) : (
                   <X className="h-4 w-4 text-red-500" />
                 )}
-                <span className={hasMinLength ? "text-green-700" : "text-red-700"}>
+                <span
+                  className={hasMinLength ? "text-green-700" : "text-red-700"}
+                >
                   At least 8 characters
                 </span>
               </li>
@@ -191,7 +192,9 @@ export function ResetPasswordForm() {
                 ) : (
                   <X className="h-4 w-4 text-red-500" />
                 )}
-                <span className={hasUppercase ? "text-green-700" : "text-red-700"}>
+                <span
+                  className={hasUppercase ? "text-green-700" : "text-red-700"}
+                >
                   At least one uppercase letter
                 </span>
               </li>
@@ -201,7 +204,9 @@ export function ResetPasswordForm() {
                 ) : (
                   <X className="h-4 w-4 text-red-500" />
                 )}
-                <span className={hasLowercase ? "text-green-700" : "text-red-700"}>
+                <span
+                  className={hasLowercase ? "text-green-700" : "text-red-700"}
+                >
                   At least one lowercase letter
                 </span>
               </li>
@@ -221,7 +226,9 @@ export function ResetPasswordForm() {
                 ) : (
                   <X className="h-4 w-4 text-red-500" />
                 )}
-                <span className={hasSpecialChar ? "text-green-700" : "text-red-700"}>
+                <span
+                  className={hasSpecialChar ? "text-green-700" : "text-red-700"}
+                >
                   At least one special character
                 </span>
               </li>
@@ -231,7 +238,9 @@ export function ResetPasswordForm() {
                 ) : (
                   <X className="h-4 w-4 text-red-500" />
                 )}
-                <span className={passwordsMatch ? "text-green-700" : "text-red-700"}>
+                <span
+                  className={passwordsMatch ? "text-green-700" : "text-red-700"}
+                >
                   Passwords match
                 </span>
               </li>
@@ -243,7 +252,11 @@ export function ResetPasswordForm() {
             disabled={!isValidPassword || !passwordsMatch || isLoading}
             className="w-full"
           >
-            {isLoading ? <ThreeDots width="30" color="#fff" /> : <>Reset Password</>}
+            {isLoading ? (
+              <ThreeDots width="30" color="#fff" />
+            ) : (
+              <>Reset Password</>
+            )}
           </Button>
         </form>
       </CardContent>

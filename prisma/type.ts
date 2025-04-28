@@ -30,7 +30,7 @@ export type Product = {
   product_image?: string; // URL or path to image
   brand_id?: number;
   expiration_date?: Date;
-  status: string; // e.g., Active, Discontinued, Out of Stock
+  status: string; // e.g., Available, Discontinued, Out of Stock
   discount?: number; // Optional discount percentage
   quantity_damaged?: number;
   quantity_returned?: number;

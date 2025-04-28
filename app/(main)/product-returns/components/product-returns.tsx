@@ -51,7 +51,6 @@ export default function ProductReturns() {
       setLoadingAddProductReturn(false);
 
       if (response.status === 201) {
-        console.log("ProductReturn added:", response.data.data);
         saveActivity(
           `Added productReturn: ${newProductReturn.reason}`,
           "added"
@@ -73,8 +72,6 @@ export default function ProductReturns() {
       setLoadingAddProductReturn(false);
       showStatusPopup("Return quantity exceeds available stock.", "error");
     }
-
-    console.log(newProductReturn);
   };
 
   return (

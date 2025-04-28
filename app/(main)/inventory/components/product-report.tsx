@@ -105,7 +105,6 @@ const DefectSalesReport = () => {
 
   useEffect(() => {
     if (date) {
-      console.log(typeof date);
       const formattedStartDate = date?.from
         ? format(date.from, "yyyy-MM-dd")
         : "";

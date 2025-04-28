@@ -88,7 +88,6 @@ const DefectSalesReport = () => {
             defaultData[monthIndex] = item;
           }
         });
-        console.log(defaultData);
         setSalesData(defaultData);
       } catch (error) {
         setError("Failed to fetch sales report");

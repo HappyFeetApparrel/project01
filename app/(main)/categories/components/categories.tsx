@@ -49,7 +49,6 @@ export default function Categories() {
       setLoadingAddCategory(false);
 
       if (response.status === 201) {
-        console.log("Category added:", response.data.data);
         saveActivity(`Added category: ${newCategory.name}`, "added");
 
         showStatusPopup("Category added successfully", "success");

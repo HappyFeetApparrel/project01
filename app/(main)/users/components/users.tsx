@@ -57,7 +57,6 @@ export default function Users() {
       setLoadingAddUser(false);
 
       if (response.status === 201) {
-        console.log("User added:", response.data.data);
         saveActivity(`Added user: ${newUser.name}`, "added");
 
         showStatusPopup("User added successfully", "success");

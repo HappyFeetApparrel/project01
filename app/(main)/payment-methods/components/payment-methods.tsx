@@ -69,7 +69,6 @@ export default function PaymentMethods() {
       setLoadingAddPaymentMethod(false);
 
       if (response.status === 201) {
-        console.log("PaymentMethod added:", response.data.data);
         saveActivity(`Added payment method: ${newPaymentMethod.name}`, "added");
         showStatusPopup("PaymentMethod added successfully", "success");
       } else {

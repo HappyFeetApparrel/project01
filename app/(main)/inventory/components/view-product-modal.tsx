@@ -118,7 +118,7 @@ export function ViewProductModal({
       product_image: product.product_image ?? "",
       brand_id: product.brand_id ?? 0,
       expiration_date: product.expiration_date ?? undefined,
-      status: product.status ?? "Active",
+      status: product.status ?? "Available",
       discount: product.discount ?? 0,
     },
   });
@@ -257,7 +257,9 @@ export function ViewProductModal({
                               <SelectValue placeholder="Select status" />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="active">Active</SelectItem>
+                              <SelectItem value="available">
+                                Available
+                              </SelectItem>
                               <SelectItem value="out_of_stock">
                                 Out of Stock
                               </SelectItem>

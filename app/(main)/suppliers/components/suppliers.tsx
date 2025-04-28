@@ -49,7 +49,6 @@ export default function Suppliers() {
       setLoadingAddSupplier(false);
 
       if (response.status === 200) {
-        console.log("Supplier added:", response.data.data);
         saveActivity(`Added supplier: ${newSupplier.name}`, "added");
 
         showStatusPopup("Supplier added successfully", "success");

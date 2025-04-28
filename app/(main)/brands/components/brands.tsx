@@ -49,7 +49,6 @@ export default function Brands() {
       setLoadingAddBrand(false);
 
       if (response.status === 201) {
-        console.log("Brand added:", response.data.data);
         saveActivity(`Added brand: ${newBrand.name}`, "added");
 
         showStatusPopup("Brand added successfully", "success");

@@ -20,11 +20,11 @@ interface SalesOrderSearchProps {
 }
 
 interface SalesOrderWithCode extends SalesOrder {
-    orderCode: string;
-    id: number;
-    productName: string;
-    productImage: string;
-  }
+  orderCode: string;
+  id: number;
+  productName: string;
+  productImage: string;
+}
 
 export default function SalesOrderSearch({
   value,
@@ -33,7 +33,9 @@ export default function SalesOrderSearch({
 }: SalesOrderSearchProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [isOpen, setIsOpen] = useState(false);
-  const [filteredSalesOrders, setFilteredSalesOrders] = useState<SalesOrderWithCode[]>([]);
+  const [filteredSalesOrders, setFilteredSalesOrders] = useState<
+    SalesOrderWithCode[]
+  >([]);
   const inputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [salesOrders, setSalesOrders] = useState<SalesOrderWithCode[]>([]);
@@ -43,7 +45,7 @@ export default function SalesOrderSearch({
   const fetchSalesOrders = async () => {
     setLoading(true);
     try {
-      const { data } = await api.get("/order-data");
+      const { data } = await api.get("/order-item-data");
       setSalesOrders(data.data);
     } catch (err) {
       setError("Failed to load products. Please try again.");
@@ -59,13 +61,17 @@ export default function SalesOrderSearch({
 
   useEffect(() => {
     const filtered: SalesOrderWithCode[] = salesOrders.filter((salesOrder) =>
-      salesOrderInfo(salesOrder).toLowerCase().includes(searchTerm.toLowerCase())
+      salesOrderInfo(salesOrder)
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase())
     );
     setFilteredSalesOrders(filtered);
   }, [searchTerm, salesOrders]);
 
   useEffect(() => {
-    const selectedSalesOrder = salesOrders.find((salesOrder) => salesOrder.id === value);
+    const selectedSalesOrder = salesOrders.find(
+      (salesOrder) => salesOrder.id === value
+    );
     if (selectedSalesOrder) {
       setSearchTerm(salesOrderInfo(selectedSalesOrder));
     } else {
@@ -107,7 +113,7 @@ export default function SalesOrderSearch({
 
   const salesOrderInfo = (salesOrder: SalesOrderWithCode) => {
     return `${salesOrder.orderCode} - ${salesOrder.productName}`;
-  }
+  };
 
   return (
     <div className="relative w-full" ref={dropdownRef}>
@@ -155,16 +161,23 @@ export default function SalesOrderSearch({
           ) : error ? (
             <p>Error loading data: {error}</p>
           ) : filteredSalesOrders.length > 0 ? (
-            filteredSalesOrders.map((salesOrder: SalesOrderWithCode, index: number) => (
-              <Button
-                key={index}
-                className="block w-full px-4 py-2 text-left text-gray-700 hover:bg-blue-100 focus:bg-blue-100 focus:outline-none bg-white "
-                onClick={() => handleSalesOrderClick(salesOrder.id, salesOrderInfo(salesOrder))}
-                type="button"
-              >
-                {`${salesOrderInfo(salesOrder)}`}
-              </Button>
-            ))
+            filteredSalesOrders.map(
+              (salesOrder: SalesOrderWithCode, index: number) => (
+                <Button
+                  key={index}
+                  className="block w-full px-4 py-2 text-left text-gray-700 hover:bg-blue-100 focus:bg-blue-100 focus:outline-none bg-white "
+                  onClick={() =>
+                    handleSalesOrderClick(
+                      salesOrder.id,
+                      salesOrderInfo(salesOrder)
+                    )
+                  }
+                  type="button"
+                >
+                  {`${salesOrderInfo(salesOrder)}`}
+                </Button>
+              )
+            )
           ) : (
             <div className="px-4 py-2 text-gray-500">No sales orders found</div>
           )}

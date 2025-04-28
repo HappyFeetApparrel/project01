@@ -45,10 +45,17 @@ export async function GET(req: Request): Promise<NextResponse> {
         order: {
           include: {
             user: true, // Include the user associated with the order
+            order_items: {
+              include: {
+                product: true, // 👈 include product under order_items
+              },
+            },
           },
         },
+        product: true,
         processed_by_user: true, // Correct relation name to fetch the user who processed the return
       },
+
       orderBy: {
         created_at: "asc",
       },
@@ -60,6 +67,7 @@ export async function GET(req: Request): Promise<NextResponse> {
       status: r.reason,
       date: r.created_at.toISOString().split("T")[0],
       name: r.processed_by_user?.name || "N/A",
+      item_name: r.product?.name || r.order?.order_items[0].product.name,
     }));
 
     // Initialize an object with all months set to zero

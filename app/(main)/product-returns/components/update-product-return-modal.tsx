@@ -137,7 +137,6 @@ export function UpdateProductReturnModal({
 
   const handleTabChange = (value: string) => {
     form.reset();
-    console.log("Switched to tab:", value);
     form.setValue("type", value as FormType);
     setActiveTab(value as FormType);
   };
@@ -148,7 +147,6 @@ export function UpdateProductReturnModal({
       ...data, // spread the updated data
     };
     // onUpdate(updatedProductReturn);
-    console.log(updatedProductReturn);
   };
 
   useEffect(() => {

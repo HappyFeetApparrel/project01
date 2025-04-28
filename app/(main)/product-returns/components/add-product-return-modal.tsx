@@ -116,7 +116,6 @@ export function AddProductReturnModal({
 
   const handleTabChange = (value: string) => {
     form.reset();
-    console.log("Switched to tab:", value);
     form.setValue("type", value as FormType);
     setActiveTab(value as FormType);
   };
