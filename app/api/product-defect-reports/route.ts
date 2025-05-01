@@ -19,7 +19,7 @@ export async function GET(req: Request): Promise<NextResponse> {
     const end = parseISO(endDate);
 
     // Fetch all product returns within the date range
-    const productReturns = await prisma.productReturn.findMany({
+    const productReturns = await prisma.return.findMany({
       where: {
         created_at: {
           gte: start,

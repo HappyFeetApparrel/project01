@@ -162,10 +162,10 @@ async function main() {
 
   // // Seed Product Returns
   // for (let i = 0; i < 100; i++) {
-  //     await prisma.productReturn.create({
+  //     await prisma.return.create({
   //         data: {
   //             order_id: faker.number.int({ min: 1, max: 100 }),
-  //             processed_by_user_id: faker.number.int({ min: 1, max: 100 }),
+  //             processed_by_id: faker.number.int({ min: 1, max: 100 }),
   //             product_id: faker.number.int({ min: 1, max: 100 }),
   //             quantity: faker.number.int({ min: 1, max: 5 }),
   //             reason: faker.helpers.arrayElement(["Defective", "Wrong Item", "Customer Changed Mind"]),

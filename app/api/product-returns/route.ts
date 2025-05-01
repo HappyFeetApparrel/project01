@@ -3,7 +3,7 @@ import prisma from "@/lib/prisma";
 
 export async function GET(req: Request): Promise<NextResponse> {
   try {
-    const returns = await prisma.productReturn.findMany({
+    const returns = await prisma.return.findMany({
       include: {
         product: {
           select: { name: true },
@@ -94,7 +94,7 @@ export async function POST(req: Request): Promise<NextResponse> {
       product_id = orderItem.product_id;
 
       // Check if total returned quantity will exceed the ordered quantity
-      const previousReturns = await prisma.productReturn.aggregate({
+      const previousReturns = await prisma.return.aggregate({
         where: { order_id: id },
         _sum: { quantity: true },
       });
@@ -134,13 +134,13 @@ export async function POST(req: Request): Promise<NextResponse> {
 
     const returnReason = reason === "Other" ? otherReason : reason;
 
-    const productReturn = await prisma.productReturn.create({
+    const productReturn = await prisma.return.create({
       data: {
         order_id: type === "order" ? id : null,
         product_id: type === "product" ? id : null,
         quantity: quantity,
         reason: returnReason,
-        processed_by_user_id: user_id,
+        processed_by_id: user_id,
         updated_at: new Date(), // Add this line
       },
     });
@@ -212,7 +212,7 @@ export async function PUT(req: Request): Promise<NextResponse> {
     }
 
     // Fetch the existing return record
-    const existingReturn = await prisma.productReturn.findUnique({
+    const existingReturn = await prisma.return.findUnique({
       where: { return_id },
       include: { product: true, order: true },
     });
@@ -247,12 +247,12 @@ export async function PUT(req: Request): Promise<NextResponse> {
     }
 
     // Update the product return record
-    const updatedReturn = await prisma.productReturn.update({
+    const updatedReturn = await prisma.return.update({
       where: { return_id },
       data: {
         quantity,
         reason: reason === "Other" ? otherReason : reason,
-        processed_by_user_id: user_id,
+        processed_by_id: user_id,
         updated_at: new Date(),
       },
     });
@@ -280,7 +280,7 @@ export async function DELETE(req: Request): Promise<NextResponse> {
     }
 
     // Fetch the return details first
-    const productReturn = await prisma.productReturn.findUnique({
+    const productReturn = await prisma.return.findUnique({
       where: { return_id },
       include: { product: true, order: true }, // Include related data
     });
@@ -301,7 +301,7 @@ export async function DELETE(req: Request): Promise<NextResponse> {
     }
 
     // Delete the product return record
-    await prisma.productReturn.delete({
+    await prisma.return.delete({
       where: { return_id },
     });
 
