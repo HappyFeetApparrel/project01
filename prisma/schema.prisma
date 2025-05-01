@@ -22,7 +22,8 @@ model User {
   orders      SalesOrder[]
   adjustments InventoryAdjustment[]
   logs        UserActivityLog[]
-  processed_returns ProductReturn[] @relation(name: "ProcessedByUser")
+  returns        Return[]  @relation(name: "ReturnProcessedByUser")
+  replacements   Replace[]
 }
 
 model Product {
@@ -53,7 +54,9 @@ model Product {
   supplier       Supplier? @relation(fields: [supplier_id], references: [supplier_id])
   order_items    OrderItem[]
   adjustments    InventoryAdjustment[]
-  returns        ProductReturn[]
+  returns_as_product    Return[]
+  replaces_as_original  Replace[] @relation("OriginalProduct")
+  replaces_as_new       Replace[] @relation("ReplacementProduct")
 }
 
 model Supplier {
@@ -86,7 +89,9 @@ model SalesOrder {
   user          User @relation(fields: [user_id], references: [user_id])
   payment_method PaymentMethod? @relation(fields: [payment_method_id], references: [payment_method_id])
   order_items   OrderItem[]
-  productReturns ProductReturn[]
+  returns         Return[]
+  replacements_original Replace[] @relation("OriginalOrder")
+  replacements_new      Replace[] @relation("ReplacementOrder")
 }
 
 model OrderItem {
@@ -129,22 +134,45 @@ model InventoryAdjustment {
   adjusted_by_user  User @relation(fields: [adjusted_by], references: [user_id])
 }
 
-model ProductReturn {
-  return_id           Int      @id @default(autoincrement())
-  order_id           Int?
-  product_id         Int?
-  quantity           Int
-  reason             String   
-  processed_by_user_id Int?  // Now optional
-  created_at        DateTime @default(now())
-  updated_at        DateTime @default(dbgenerated()) // Fix
+
+model Return {
+  return_id       Int      @id @default(autoincrement())
+  order_id        Int?
+  product_id      Int?
+  quantity        Int
+  reason          String
+  processed_by_id Int?
+  created_at      DateTime @default(now())
+  updated_at      DateTime? @default(dbgenerated())
 
   // Relations
-  order         SalesOrder? @relation(fields: [order_id], references: [order_id])
-  product       Product? @relation(fields: [product_id], references: [product_id])
-  processed_by_user User? @relation(fields: [processed_by_user_id], references: [user_id], name: "ProcessedByUser")
-
+  order           SalesOrder? @relation(fields: [order_id], references: [order_id])
+  product         Product? @relation(fields: [product_id], references: [product_id])
+  processed_by    User? @relation(fields: [processed_by_id], references: [user_id], name: "ReturnProcessedByUser")
+  replacement Replace? @relation(name: "ReturnReplace")
 }
+
+model Replace {
+  replace_id             Int      @id @default(autoincrement())
+  return_id              Int      @unique
+  original_order_id      Int
+  original_product_id    Int
+  replacement_product_id Int
+  replacement_order_id   Int?
+  reason                 String
+  processed_by_id        Int
+  created_at             DateTime @default(now())
+  updated_at             DateTime? @default(dbgenerated())
+
+  // Relations
+  return Return @relation(name: "ReturnReplace", fields: [return_id], references: [return_id])
+  original_order         SalesOrder @relation("OriginalOrder", fields: [original_order_id], references: [order_id])
+  replacement_order      SalesOrder? @relation("ReplacementOrder", fields: [replacement_order_id], references: [order_id])
+  original_product       Product @relation("OriginalProduct", fields: [original_product_id], references: [product_id])
+  replacement_product    Product @relation("ReplacementProduct", fields: [replacement_product_id], references: [product_id])
+  processed_by           User @relation(fields: [processed_by_id], references: [user_id])
+}
+
 
 model Category {
   category_id Int      @id @default(autoincrement())
@@ -185,4 +213,5 @@ model Setting {
   name        String   @unique
   value       String   
 }
+
 

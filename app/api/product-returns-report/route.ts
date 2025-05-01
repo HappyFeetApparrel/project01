@@ -17,24 +17,22 @@ export async function GET(req: Request): Promise<NextResponse> {
 
     const start = parseISO(startDate);
     const end = parseISO(endDate);
-
     start.setUTCHours(0, 0, 0, 0);
     end.setUTCHours(23, 59, 59, 999);
 
-    const report = await prisma.productReturn.groupBy({
+    const report = await prisma.return.groupBy({
       by: ["reason", "created_at"],
-      where: {
-        created_at: {
-          gte: start,
-          lte: end,
-        },
-      },
       _sum: {
         quantity: true,
       },
+      where: {
+        product_id: {
+          not: null,
+        },
+      },
     });
 
-    const returns = await prisma.productReturn.findMany({
+    const returns = await prisma.return.findMany({
       where: {
         created_at: {
           gte: start,
@@ -44,33 +42,33 @@ export async function GET(req: Request): Promise<NextResponse> {
       include: {
         order: {
           include: {
-            user: true, // Include the user associated with the order
+            user: true,
             order_items: {
               include: {
-                product: true, // 👈 include product under order_items
+                product: true,
               },
             },
           },
         },
         product: true,
-        processed_by_user: true, // Correct relation name to fetch the user who processed the return
+        processed_by: true,
       },
-
       orderBy: {
         created_at: "asc",
       },
     });
 
     const itemizedData = returns.map((r) => ({
-      // @ts-ignore
-      sku: r.order?.order_code || "PROD-000" + r.product_id.toString(), // Use product_id if order_code is null
+      sku: r.order?.order_code || `PROD-000${r.product_id?.toString() ?? "NA"}`,
       status: r.reason,
       date: r.created_at.toISOString().split("T")[0],
-      name: r.processed_by_user?.name || "N/A",
-      item_name: r.product?.name || r.order?.order_items[0].product.name,
+      name: r.processed_by?.name ?? "N/A",
+      item_name:
+        r.product?.name ??
+        r.order?.order_items?.[0]?.product?.name ??
+        "Unnamed Product",
     }));
 
-    // Initialize an object with all months set to zero
     const months = Array.from({ length: 12 }, (_, i) => ({
       month: format(new Date(2025, i, 1), "MMM"),
       lost: 0,
@@ -80,7 +78,6 @@ export async function GET(req: Request): Promise<NextResponse> {
       other: 0,
     }));
 
-    // Aggregate the data by month
     report.forEach((entry) => {
       const monthIndex = new Date(entry.created_at).getMonth();
       switch (entry.reason) {
@@ -105,7 +102,7 @@ export async function GET(req: Request): Promise<NextResponse> {
     return NextResponse.json(
       {
         data: {
-          months: months,
+          months,
           returns: itemizedData,
         },
       },

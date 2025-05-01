@@ -58,49 +58,45 @@ const SalesReportPDF = () => {
     y -= 15;
 
     // Filter sales data for last month
-    const filteredSales = salesData
-      .map((category) => {
-        // @ts-ignore
-        const lastMonthSales = category.salesData.find(
-          // @ts-ignore
-          (sale) => sale.month === lastMonth
-        );
-        return {
-          // @ts-ignore
-          category: category.category,
-          totalSales: lastMonthSales ? lastMonthSales.totalSales : 0,
-          // @ts-ignore
-          totalOrders: lastMonthSales ? category.totalOrders : 0,
-        };
-      })
-      .filter((sale) => sale.totalSales > 0 || sale.totalOrders > 0);
+    // const filteredSales = salesData
+    //   .map((category) => {
+    //     const lastMonthSales = category.salesData.find(
+    //       (sale: any) => sale.month === lastMonth
+    //     );
 
-    if (filteredSales) {
-      page.drawText("No data available for this month", {
+    //     console.log("category");
+    //     console.log(lastMonthSales);
+    //     console.log("category");
+    //     return {
+    //       category: category?.category || 0,
+    //       totalSales: lastMonthSales ? lastMonthSales.totalSales : 0,
+    //       // @ts-ignore
+    //       totalOrders: lastMonthSales ? category.totalOrders : 0,
+    //     };
+    //   })
+    //   .filter((sale) => sale.totalSales > 0 || sale.totalOrders > 0);
+
+    // Add sales data to the table
+    // @ts-ignore
+    salesData.forEach(({ category, totalSales, totalOrders }) => {
+      if (y < 50) return;
+
+      page.drawText(category, { x: leftMargin, y, size: 10, font });
+      page.drawText(`PHP ${(totalSales as number).toFixed(2)}`, {
         x: 250,
         y,
         size: 10,
         font,
-        color: rgb(0, 0, 0),
       });
-    } else {
-      // Add sales data to the table
-      // @ts-ignore
-      filteredSales.forEach(({ category, totalSales, totalOrders }) => {
-        if (y < 50) return;
-
-        page.drawText(category, { x: leftMargin, y, size: 10, font });
-        page.drawText(`PHP ${totalSales.toFixed(2)}`, {
-          x: 250,
-          y,
-          size: 10,
-          font,
-        });
-        page.drawText(totalOrders.toString(), { x: 450, y, size: 10, font });
-
-        y -= 15;
+      page.drawText((totalOrders as number).toString(), {
+        x: 450,
+        y,
+        size: 10,
+        font,
       });
-    }
+
+      y -= 15;
+    });
 
     await addFooter(page, {
       companyName: "Happy Feet and Apparel",

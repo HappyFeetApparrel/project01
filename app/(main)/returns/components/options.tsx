@@ -16,24 +16,22 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 // types
-import { ProductReturn } from "@/prisma/type";
+import { Returns } from "@/prisma/type";
 
 // components
-import { DeleteProductReturnConfirmation } from "./delete-product-return-confirmation";
-import { ViewProductReturnModal } from "./view-product-return-modal";
-import { UpdateProductReturnModal } from "./update-product-return-modal";
+import { DeleteProductReturnConfirmation } from "./delete-returns-confirmation";
+import { ViewProductReturnModal } from "./view-returns-modal";
+import { UpdateProductReturnModal } from "./update-returns-modal";
 import { StatusPopup } from "@/components/global/status-popup";
 
 // icons
 import { Pencil, Trash2, Eye } from "lucide-react";
 
-import { useProductReturnContext } from "../provider/product-return-provider";
+import { useProductReturnContext } from "../provider/returns-provider";
 
 import { useLayout } from "@/components/context/LayoutProvider";
 
-
-
-export interface ProductReturnCustom extends ProductReturn {
+export interface ProductReturnCustom extends Returns {
   name: string;
   type: string;
   quantity: number;
@@ -58,11 +56,13 @@ const Options = ({ row }: OptionsProps) => {
     "success" | "error"
   >("success");
 
-  const [loadingUpdateProductReturn, setLoadingUpdateProductReturn] = useState<boolean>(false);
+  const [loadingUpdateProductReturn, setLoadingUpdateProductReturn] =
+    useState<boolean>(false);
 
-  const [loadingDeleteProductReturn, setLoadingDeleteProductReturn] = useState<boolean>(false);
+  const [loadingDeleteProductReturn, setLoadingDeleteProductReturn] =
+    useState<boolean>(false);
 
-  const productReturn = row;
+  const returns = row;
 
   const { fetchProductReturns } = useProductReturnContext();
 
@@ -76,44 +76,46 @@ const Options = ({ row }: OptionsProps) => {
     try {
       setLoadingDeleteProductReturn(true);
       // Call the delete API
-      const response = await api.delete("/product-returns", {
-        data: { return_id: productReturn.return_id },
+      const response = await api.delete("/returns", {
+        data: { return_id: returns.return_id },
       });
       setLoadingDeleteProductReturn(false);
 
       if (response.status === 200) {
         fetchProductReturns();
         // Update the local productReturns state
-        saveActivity(`Deleted productReturn: ${productReturn.reason}`, "deleted");
+        saveActivity(`Deleted returns: ${returns.reason}`, "deleted");
 
-        showStatusPopup("ProductReturn deleted successfully", "success");
+        showStatusPopup("Returns deleted successfully", "success");
       }
     } catch (error) {
       setLoadingDeleteProductReturn(false);
 
-      console.error("Error deleting productReturn:", error);
-      showStatusPopup("Failed to delete productReturn", "error");
+      console.error("Error deleting returns:", error);
+      showStatusPopup("Failed to delete returns", "error");
     }
   };
 
-  const handleUpdateProductReturn = async (updatedProductReturn: Omit<ProductReturn, "productReturns">) => {
+  const handleUpdateProductReturn = async (
+    updatedProductReturn: Omit<Returns, "productReturns">
+  ) => {
     try {
       setLoadingUpdateProductReturn(true);
       // Call the update API
-      updatedProductReturn.return_id = productReturn.return_id;
-      const response = await api.put("/product-returns", updatedProductReturn);
+      updatedProductReturn.return_id = returns.return_id;
+      const response = await api.put("/returns", updatedProductReturn);
       setLoadingUpdateProductReturn(false);
 
       if (response.status === 200) {
         fetchProductReturns();
-        saveActivity(`Updated productReturn: ${productReturn.reason}`, "updated");
+        saveActivity(`Updated returns: ${returns.reason}`, "updated");
 
-        showStatusPopup("ProductReturn updated successfully", "success");
+        showStatusPopup("Returns updated successfully", "success");
       }
     } catch (error) {
       setLoadingUpdateProductReturn(false);
-      console.error("Error updating productReturn:", error);
-      showStatusPopup("Failed to update productReturn", "error");
+      console.error("Error updating returns:", error);
+      showStatusPopup("Failed to update returns", "error");
     }
   };
 
@@ -168,13 +170,15 @@ const Options = ({ row }: OptionsProps) => {
       <ViewProductReturnModal
         isOpen={isViewModalOpen}
         onClose={() => setIsViewModalOpen(false)}
-        productReturn={productReturn}
+        returns={returns}
       />
       <UpdateProductReturnModal
         isOpen={isUpdateModalOpen}
         onClose={() => setIsUpdateModalOpen(false)}
-        onUpdate={(updatedProductReturn) => handleUpdateProductReturn(updatedProductReturn)}
-        productReturn={productReturn}
+        onUpdate={(updatedProductReturn) =>
+          handleUpdateProductReturn(updatedProductReturn)
+        }
+        returns={returns}
         loadingUpdateProductReturn={loadingUpdateProductReturn}
       />
       <DeleteProductReturnConfirmation
@@ -183,7 +187,7 @@ const Options = ({ row }: OptionsProps) => {
         onConfirm={() => {
           handleDeleteProductReturn();
         }}
-        productReturnName={productReturn.reason}
+        productReturnName={returns.reason}
         loadingDeleteProductReturn={loadingDeleteProductReturn}
       />
       <StatusPopup

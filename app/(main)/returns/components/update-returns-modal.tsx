@@ -3,7 +3,8 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useLayout } from "@/components/context/LayoutProvider";
 
 import {
   Dialog,
@@ -23,8 +24,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { ProductReturn } from "@/prisma/type";
-import { useLayout } from "@/components/context/LayoutProvider";
+import { Returns } from "@/prisma/type";
 
 import {
   Select,
@@ -35,15 +35,20 @@ import {
 } from "@/components/ui/select";
 
 import { ThreeDots } from "react-loader-spinner";
-import { useEffect } from "react";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-interface AddProductReturnModalProps {
+import ProductSearch from "./product-search";
+import SalesOrderSearch from "./order-search";
+
+import { ProductReturnCustom } from "./options";
+
+interface UpdateProductReturnModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onAdd?: (productReturn: Pick<ProductReturn, "reason">) => void;
-  loadingAddProductReturn: boolean;
+  returns: ProductReturnCustom;
+  onUpdate: (returns: Omit<Returns, "productReturns">) => void;
+  loadingUpdateProductReturn: boolean;
 }
 
 // Define validation schema using Zod
@@ -77,6 +82,7 @@ const productReturnSchema = z
       .string()
       .max(500, "Description cannot exceed 500 characters")
       .optional(),
+    return_id: z.number().int().positive("Return ID is required."),
   })
   .refine(
     (data) => {
@@ -93,24 +99,39 @@ const productReturnSchema = z
 
 type ProductReturnFormValues = z.infer<typeof productReturnSchema>;
 
-import ProductSearch from "./product-search";
-import SalesOrderSearch from "./order-search";
+const getFormType = (value: string): FormType => {
+  if (value === FormType.PRODUCT || value === FormType.ORDER) {
+    return value as FormType;
+  } else {
+    throw new Error(`Invalid form type: ${value}`);
+  }
+};
 
-export function AddProductReturnModal({
+export function UpdateProductReturnModal({
   isOpen,
   onClose,
-  onAdd,
-  loadingAddProductReturn,
-}: AddProductReturnModalProps) {
+  returns,
+  onUpdate,
+  loadingUpdateProductReturn,
+}: UpdateProductReturnModalProps) {
   const { user } = useLayout();
-  const [activeTab, setActiveTab] = useState(FormType.PRODUCT);
+  const [activeTab, setActiveTab] = useState(getFormType(returns.type));
+
   const form = useForm<ProductReturnFormValues>({
     resolver: zodResolver(productReturnSchema),
     defaultValues: {
+      id: returns.product_id ?? returns.order_id ?? 0,
       user_id: Number(user?.user.id ?? 0),
       type: activeTab,
-      reason: ProductReturnReason.OTHER,
-      otherReason: "",
+      reason:
+        returns.reason === ProductReturnReason.LOST ||
+        returns.reason === ProductReturnReason.RETURN ||
+        returns.reason === ProductReturnReason.REFUND
+          ? returns.reason
+          : ProductReturnReason.OTHER,
+      otherReason: returns.reason,
+      quantity: returns.quantity,
+      return_id: returns.return_id,
     },
   });
 
@@ -121,33 +142,28 @@ export function AddProductReturnModal({
   };
 
   const onSubmit = (data: ProductReturnFormValues) => {
-    if (onAdd) {
-      data.user_id = Number(user?.user.id ?? 0);
-      const productReturnData: Pick<ProductReturn, "reason"> = {
-        ...data,
-      };
-      onAdd(productReturnData);
-    }
+    const updatedProductReturn: Omit<Returns, "productReturns"> = {
+      ...returns, // spread the returns object to include productReturn_id and products
+      ...data, // spread the updated data
+    };
+    // onUpdate(updatedProductReturn);
   };
 
   useEffect(() => {
-    if (!loadingAddProductReturn) {
+    if (!loadingUpdateProductReturn) {
       form.reset();
       onClose();
     }
-  }, [loadingAddProductReturn]);
-
-  // useEffect(() => {
-  // }, [form.watch()]);
+  }, [loadingUpdateProductReturn]);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
-          <DialogTitle>Add New Product Return</DialogTitle>
+          <DialogTitle>Update Returns</DialogTitle>
         </DialogHeader>
         <Tabs
-          defaultValue="product"
+          defaultValue={activeTab}
           onValueChange={handleTabChange}
           className="w-full"
         >
@@ -224,6 +240,9 @@ export function AddProductReturnModal({
                             <SelectItem value={ProductReturnReason.REFUND}>
                               {ProductReturnReason.REFUND}
                             </SelectItem>
+                            <SelectItem value={ProductReturnReason.REPLACE}>
+                              {ProductReturnReason.REPLACE}
+                            </SelectItem>
                             <SelectItem value={ProductReturnReason.OTHER}>
                               {ProductReturnReason.OTHER}
                             </SelectItem>
@@ -255,13 +274,13 @@ export function AddProductReturnModal({
                 <DialogFooter>
                   <Button
                     type="submit"
-                    disabled={loadingAddProductReturn}
+                    disabled={loadingUpdateProductReturn}
                     className="min-w-full"
                   >
                     <span
-                      className={`${loadingAddProductReturn ? "hidden" : "block"}`}
+                      className={`${loadingUpdateProductReturn ? "hidden" : "block"}`}
                     >
-                      Add Product Return
+                      Update Product Return
                     </span>
                     <ThreeDots
                       visible={true}
@@ -271,7 +290,7 @@ export function AddProductReturnModal({
                       radius="9"
                       ariaLabel="three-dots-loading"
                       wrapperStyle={{}}
-                      wrapperClass={`${loadingAddProductReturn ? "block" : "!hidden"}`}
+                      wrapperClass={`${loadingUpdateProductReturn ? "block" : "!hidden"}`}
                     />
                   </Button>
                 </DialogFooter>
@@ -349,9 +368,6 @@ export function AddProductReturnModal({
                             <SelectItem value={ProductReturnReason.REFUND}>
                               {ProductReturnReason.REFUND}
                             </SelectItem>
-                            <SelectItem value={ProductReturnReason.REPLACE}>
-                              {ProductReturnReason.REPLACE}
-                            </SelectItem>
                             <SelectItem value={ProductReturnReason.OTHER}>
                               {ProductReturnReason.OTHER}
                             </SelectItem>
@@ -383,13 +399,13 @@ export function AddProductReturnModal({
                 <DialogFooter>
                   <Button
                     type="submit"
-                    disabled={loadingAddProductReturn}
+                    disabled={loadingUpdateProductReturn}
                     className="min-w-full"
                   >
                     <span
-                      className={`${loadingAddProductReturn ? "hidden" : "block"}`}
+                      className={`${loadingUpdateProductReturn ? "hidden" : "block"}`}
                     >
-                      Add Product Return
+                      Update Product Return
                     </span>
                     <ThreeDots
                       visible={true}
@@ -399,7 +415,7 @@ export function AddProductReturnModal({
                       radius="9"
                       ariaLabel="three-dots-loading"
                       wrapperStyle={{}}
-                      wrapperClass={`${loadingAddProductReturn ? "block" : "!hidden"}`}
+                      wrapperClass={`${loadingUpdateProductReturn ? "block" : "!hidden"}`}
                     />
                   </Button>
                 </DialogFooter>

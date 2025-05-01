@@ -48,7 +48,7 @@ export default function Suppliers() {
       const response = await api.post("/suppliers", newSupplier);
       setLoadingAddSupplier(false);
 
-      if (response.status === 200) {
+      if (response.status === 201) {
         saveActivity(`Added supplier: ${newSupplier.name}`, "added");
 
         showStatusPopup("Supplier added successfully", "success");

@@ -88,7 +88,7 @@ export default function Products() {
         setIsAddModalOpen={() => setIsAddModalOpen(true)}
       />
 
-      <ProductDefectReport />
+      {/* <ProductDefectReport /> */}
 
       {/* Modals */}
       <AddProductModal

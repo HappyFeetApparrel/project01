@@ -52,7 +52,7 @@ const DefectSalesReportPDF = ({
     });
 
     firstPage.drawText("Item/SKU/Code", { x: leftMargin, y, size: 12, font });
-    firstPage.drawText("Item Name", { x: 200, y, size: 12, font });
+    firstPage.drawText("Item Name", { x: 150, y, size: 12, font });
     firstPage.drawText("Status", { x: 300, y, size: 12, font });
     firstPage.drawText("Date", { x: 400, y, size: 12, font });
     firstPage.drawText("Name", { x: 500, y, size: 12, font });
@@ -71,7 +71,7 @@ const DefectSalesReportPDF = ({
     defectData?.returns.forEach(({ sku, item_name, status, date, name }) => {
       if (y < 50) return;
       firstPage.drawText(sku, { x: leftMargin, y, size: 10, font });
-      firstPage.drawText(item_name, { x: 200, y, size: 10, font });
+      firstPage.drawText(item_name, { x: 150, y, size: 10, font });
       firstPage.drawText(status, { x: 300, y, size: 10, font });
       firstPage.drawText(date, { x: 400, y, size: 10, font });
       firstPage.drawText(name, { x: 500, y, size: 10, font });

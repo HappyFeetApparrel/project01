@@ -55,11 +55,11 @@ export function PrintInvoiceDialog({
 }: PrintInvoiceDialogProps) {
   const [isPrinting, setIsPrinting] = useState(false);
   const invoiceRef = useRef(null);
-
+  console.log(orderData);
   // Helper function to get payment method name
   const getPaymentMethodName = (code: number): string => {
     const methods: Record<number, string> = {
-      100: "Cash",
+      1: "Cash",
       200: "Credit Card",
       300: "Debit Card",
       400: "Mobile Payment",
@@ -113,7 +113,7 @@ export function PrintInvoiceDialog({
   // const taxAmount = orderData?.totalAmount ? orderData.totalAmount - subtotal : 0
 
   const VAT_RATE = 0.12;
-  const calculateTotal = () => {
+  const calculateTotal = (): any => {
     const subtotal = orderData?.items.reduce((total, item) => {
       return total + item.product.unit_price * item.quantity_in_stock;
     }, 0);
@@ -220,16 +220,16 @@ export function PrintInvoiceDialog({
               <p>Items count: {orderData?.items.length || 0}</p>
               <div className="flex justify-between">
                 <p>Subtotal:</p>
-                {/* @ts-ignore */}
-                <p>₱{subtotal.toFixed(2)}</p>
+                <p>₱{subtotal.toFixed(2) || "0.00"}</p>
               </div>
               <div className="flex justify-between">
-                <p>VAT 12%:</p>
-                <p>₱{vatAmount.toFixed(2)}</p>
+                <p>VAT: 12%</p>
+                <p>₱{vatAmount.toFixed(2) || "0.00"}</p>
               </div>
               <div className="flex justify-between font-bold mt-2">
                 <p>TOTAL:</p>
-                <p>₱{totalWithVAT.toFixed(2) || "0.00"}</p>
+                {/* @ts-ignore */}
+                <p clas>₱{totalWithVAT.toFixed(2)}</p>
               </div>
               <div className="flex justify-between">
                 {/* @ts-ignore */}

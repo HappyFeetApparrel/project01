@@ -24,7 +24,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { ProductReturn } from "@/prisma/type";
+import { Replace } from "@/prisma/type";
 
 import {
   Select,
@@ -41,14 +41,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ProductSearch from "./product-search";
 import SalesOrderSearch from "./order-search";
 
-import { ProductReturnCustom } from "./options";
+import { ReplaceCustom } from "./options";
 
-interface UpdateProductReturnModalProps {
+interface UpdateReplaceModalProps {
   isOpen: boolean;
   onClose: () => void;
-  productReturn: ProductReturnCustom;
-  onUpdate: (productReturn: Omit<ProductReturn, "productReturns">) => void;
-  loadingUpdateProductReturn: boolean;
+  replace: ReplaceCustom;
+  onUpdate: (replace: Omit<Replace, "replaces">) => void;
+  loadingUpdateReplace: boolean;
 }
 
 // Define validation schema using Zod
@@ -57,7 +57,7 @@ enum FormType {
   ORDER = "order",
 }
 
-enum ProductReturnReason {
+enum ReplaceReason {
   LOST = "Lost",
   RETURN = "Return",
   REFUND = "Refund",
@@ -65,18 +65,18 @@ enum ProductReturnReason {
   OTHER = "Other",
 }
 
-const productReturnSchema = z
+const replaceSchema = z
   .object({
     user_id: z.number(),
     id: z.number().int().positive("Product/Order ID is required."),
     type: z.enum([FormType.PRODUCT, FormType.ORDER]),
     quantity: z.number().int().min(1, "Quantity must be greater than 0."),
     reason: z.enum([
-      ProductReturnReason.LOST,
-      ProductReturnReason.RETURN,
-      ProductReturnReason.REFUND,
-      ProductReturnReason.REPLACE,
-      ProductReturnReason.OTHER,
+      ReplaceReason.LOST,
+      ReplaceReason.RETURN,
+      ReplaceReason.REFUND,
+      ReplaceReason.REPLACE,
+      ReplaceReason.OTHER,
     ]),
     otherReason: z
       .string()
@@ -86,7 +86,7 @@ const productReturnSchema = z
   })
   .refine(
     (data) => {
-      if (data.reason === ProductReturnReason.OTHER) {
+      if (data.reason === ReplaceReason.OTHER) {
         return data.otherReason !== undefined && data.otherReason !== "";
       }
       return true;
@@ -97,7 +97,7 @@ const productReturnSchema = z
     }
   );
 
-type ProductReturnFormValues = z.infer<typeof productReturnSchema>;
+type ReplaceFormValues = z.infer<typeof replaceSchema>;
 
 const getFormType = (value: string): FormType => {
   if (value === FormType.PRODUCT || value === FormType.ORDER) {
@@ -107,31 +107,31 @@ const getFormType = (value: string): FormType => {
   }
 };
 
-export function UpdateProductReturnModal({
+export function UpdateReplaceModal({
   isOpen,
   onClose,
-  productReturn,
+  replace,
   onUpdate,
-  loadingUpdateProductReturn,
-}: UpdateProductReturnModalProps) {
+  loadingUpdateReplace,
+}: UpdateReplaceModalProps) {
   const { user } = useLayout();
-  const [activeTab, setActiveTab] = useState(getFormType(productReturn.type));
+  const [activeTab, setActiveTab] = useState(getFormType(replace.type));
 
-  const form = useForm<ProductReturnFormValues>({
-    resolver: zodResolver(productReturnSchema),
+  const form = useForm<ReplaceFormValues>({
+    resolver: zodResolver(replaceSchema),
     defaultValues: {
-      id: productReturn.product_id ?? productReturn.order_item_id,
+      id: replace.replacement_product_id ?? replace.replacement_order_id ?? 0,
       user_id: Number(user?.user.id ?? 0),
       type: activeTab,
       reason:
-        productReturn.reason === ProductReturnReason.LOST ||
-        productReturn.reason === ProductReturnReason.RETURN ||
-        productReturn.reason === ProductReturnReason.REFUND
-          ? productReturn.reason
-          : ProductReturnReason.OTHER,
-      otherReason: productReturn.reason,
-      quantity: productReturn.quantity,
-      return_id: productReturn.return_id,
+        replace.reason === ReplaceReason.LOST ||
+        replace.reason === ReplaceReason.RETURN ||
+        replace.reason === ReplaceReason.REFUND
+          ? replace.reason
+          : ReplaceReason.OTHER,
+      otherReason: replace.reason,
+      quantity: replace.quantity,
+      return_id: replace.return_id,
     },
   });
 
@@ -141,26 +141,26 @@ export function UpdateProductReturnModal({
     setActiveTab(value as FormType);
   };
 
-  const onSubmit = (data: ProductReturnFormValues) => {
-    const updatedProductReturn: Omit<ProductReturn, "productReturns"> = {
-      ...productReturn, // spread the productReturn object to include productReturn_id and products
+  const onSubmit = (data: ReplaceFormValues) => {
+    const updatedReplace: Omit<Replace, "replaces"> = {
+      ...replace, // spread the replace object to include replace_id and products
       ...data, // spread the updated data
     };
-    // onUpdate(updatedProductReturn);
+    // onUpdate(updatedReplace);
   };
 
   useEffect(() => {
-    if (!loadingUpdateProductReturn) {
+    if (!loadingUpdateReplace) {
       form.reset();
       onClose();
     }
-  }, [loadingUpdateProductReturn]);
+  }, [loadingUpdateReplace]);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
-          <DialogTitle>Update ProductReturn</DialogTitle>
+          <DialogTitle>Update Replace</DialogTitle>
         </DialogHeader>
         <Tabs
           defaultValue={activeTab}
@@ -231,27 +231,27 @@ export function UpdateProductReturnModal({
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value={ProductReturnReason.LOST}>
-                              {ProductReturnReason.LOST}
+                            <SelectItem value={ReplaceReason.LOST}>
+                              {ReplaceReason.LOST}
                             </SelectItem>
-                            <SelectItem value={ProductReturnReason.RETURN}>
-                              {ProductReturnReason.RETURN}
+                            <SelectItem value={ReplaceReason.RETURN}>
+                              {ReplaceReason.RETURN}
                             </SelectItem>
-                            <SelectItem value={ProductReturnReason.REFUND}>
-                              {ProductReturnReason.REFUND}
+                            <SelectItem value={ReplaceReason.REFUND}>
+                              {ReplaceReason.REFUND}
                             </SelectItem>
-                            <SelectItem value={ProductReturnReason.REPLACE}>
-                              {ProductReturnReason.REPLACE}
+                            <SelectItem value={ReplaceReason.REPLACE}>
+                              {ReplaceReason.REPLACE}
                             </SelectItem>
-                            <SelectItem value={ProductReturnReason.OTHER}>
-                              {ProductReturnReason.OTHER}
+                            <SelectItem value={ReplaceReason.OTHER}>
+                              {ReplaceReason.OTHER}
                             </SelectItem>
                           </SelectContent>
                         </Select>
                       </FormItem>
                     )}
                   />
-                  {form.getValues("reason") === ProductReturnReason.OTHER && (
+                  {form.getValues("reason") === ReplaceReason.OTHER && (
                     <FormField
                       control={form.control}
                       name="otherReason"
@@ -274,11 +274,11 @@ export function UpdateProductReturnModal({
                 <DialogFooter>
                   <Button
                     type="submit"
-                    disabled={loadingUpdateProductReturn}
+                    disabled={loadingUpdateReplace}
                     className="min-w-full"
                   >
                     <span
-                      className={`${loadingUpdateProductReturn ? "hidden" : "block"}`}
+                      className={`${loadingUpdateReplace ? "hidden" : "block"}`}
                     >
                       Update Product Return
                     </span>
@@ -290,7 +290,7 @@ export function UpdateProductReturnModal({
                       radius="9"
                       ariaLabel="three-dots-loading"
                       wrapperStyle={{}}
-                      wrapperClass={`${loadingUpdateProductReturn ? "block" : "!hidden"}`}
+                      wrapperClass={`${loadingUpdateReplace ? "block" : "!hidden"}`}
                     />
                   </Button>
                 </DialogFooter>
@@ -359,24 +359,24 @@ export function UpdateProductReturnModal({
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value={ProductReturnReason.LOST}>
-                              {ProductReturnReason.LOST}
+                            <SelectItem value={ReplaceReason.LOST}>
+                              {ReplaceReason.LOST}
                             </SelectItem>
-                            <SelectItem value={ProductReturnReason.RETURN}>
-                              {ProductReturnReason.RETURN}
+                            <SelectItem value={ReplaceReason.RETURN}>
+                              {ReplaceReason.RETURN}
                             </SelectItem>
-                            <SelectItem value={ProductReturnReason.REFUND}>
-                              {ProductReturnReason.REFUND}
+                            <SelectItem value={ReplaceReason.REFUND}>
+                              {ReplaceReason.REFUND}
                             </SelectItem>
-                            <SelectItem value={ProductReturnReason.OTHER}>
-                              {ProductReturnReason.OTHER}
+                            <SelectItem value={ReplaceReason.OTHER}>
+                              {ReplaceReason.OTHER}
                             </SelectItem>
                           </SelectContent>
                         </Select>
                       </FormItem>
                     )}
                   />
-                  {form.getValues("reason") === ProductReturnReason.OTHER && (
+                  {form.getValues("reason") === ReplaceReason.OTHER && (
                     <FormField
                       control={form.control}
                       name="otherReason"
@@ -399,11 +399,11 @@ export function UpdateProductReturnModal({
                 <DialogFooter>
                   <Button
                     type="submit"
-                    disabled={loadingUpdateProductReturn}
+                    disabled={loadingUpdateReplace}
                     className="min-w-full"
                   >
                     <span
-                      className={`${loadingUpdateProductReturn ? "hidden" : "block"}`}
+                      className={`${loadingUpdateReplace ? "hidden" : "block"}`}
                     >
                       Update Product Return
                     </span>
@@ -415,7 +415,7 @@ export function UpdateProductReturnModal({
                       radius="9"
                       ariaLabel="three-dots-loading"
                       wrapperStyle={{}}
-                      wrapperClass={`${loadingUpdateProductReturn ? "block" : "!hidden"}`}
+                      wrapperClass={`${loadingUpdateReplace ? "block" : "!hidden"}`}
                     />
                   </Button>
                 </DialogFooter>

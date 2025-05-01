@@ -10,8 +10,18 @@ import {
   addFooter,
 } from "@/app/(main)/sales-orders/utils/inventory";
 
+interface SalesData {
+  months: {
+    month: string;
+    lost: number;
+    return: number;
+    refund: number;
+    other: number;
+  }[];
+}
+
 const DefectSalesReportDownload = () => {
-  const [salesData, setSalesData] = useState([]);
+  const [salesData, setSalesData] = useState<SalesData>();
 
   useEffect(() => {
     const fetchSalesData = async () => {
@@ -23,6 +33,7 @@ const DefectSalesReportDownload = () => {
         `/api/product-returns-report?startDate=${startDate}&endDate=${endDate}`
       );
       const data = await response.json();
+      console.log(data.data);
       setSalesData(data.data);
     };
     fetchSalesData();
@@ -67,18 +78,19 @@ const DefectSalesReportDownload = () => {
     });
     y -= 15;
 
-    // Add sales data to the table
-    salesData.forEach(({ month, lost, return: returned, refund, other }) => {
-      if (y < 50) return;
+    salesData?.months.forEach(
+      ({ month, lost, return: returned, refund, other }) => {
+        if (y < 50) return;
 
-      page.drawText(month, { x: leftMargin, y, size: 10, font });
-      page.drawText(String(lost), { x: 150, y, size: 10, font });
-      page.drawText(String(returned), { x: 250, y, size: 10, font });
-      page.drawText(String(refund), { x: 350, y, size: 10, font });
-      page.drawText(String(other), { x: 450, y, size: 10, font });
+        page.drawText(month, { x: leftMargin, y, size: 10, font });
+        page.drawText(String(lost), { x: 150, y, size: 10, font });
+        page.drawText(String(returned), { x: 250, y, size: 10, font });
+        page.drawText(String(refund), { x: 350, y, size: 10, font });
+        page.drawText(String(other), { x: 450, y, size: 10, font });
 
-      y -= 15;
-    });
+        y -= 15;
+      }
+    );
 
     await addFooter(page, {
       companyName: "Happy Feet and Apparel",

@@ -6,7 +6,7 @@ import {
   useEffect,
   ReactNode,
 } from "react";
-import { ProductReturn } from "@/prisma/type";
+import { Returns } from "@/prisma/type";
 import { api } from "@/lib/axios";
 
 import { ProductReturnCustom } from "../components/options";
@@ -21,18 +21,26 @@ interface ProductReturnContextType {
 }
 
 // Create the context
-const ProductReturnContext = createContext<ProductReturnContextType | undefined>(undefined);
+const ProductReturnContext = createContext<
+  ProductReturnContextType | undefined
+>(undefined);
 
 // ProductReturnProvider Component
-export const ProductReturnProvider = ({ children }: { children: ReactNode }) => {
-  const [productReturns, setProductReturns] = useState<ProductReturnCustom[]>([]);
+export const ProductReturnProvider = ({
+  children,
+}: {
+  children: ReactNode;
+}) => {
+  const [productReturns, setProductReturns] = useState<ProductReturnCustom[]>(
+    []
+  );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   const fetchProductReturns = async () => {
     setLoading(true);
     try {
-      const { data } = await api.get("/product-returns");
+      const { data } = await api.get("/returns");
       setProductReturns(data.data);
     } catch (err) {
       setError("Failed to load productReturns. Please try again.");
@@ -48,7 +56,13 @@ export const ProductReturnProvider = ({ children }: { children: ReactNode }) => 
 
   return (
     <ProductReturnContext.Provider
-      value={{ productReturns, loading, error, setProductReturns, fetchProductReturns }}
+      value={{
+        productReturns,
+        loading,
+        error,
+        setProductReturns,
+        fetchProductReturns,
+      }}
     >
       {children}
     </ProductReturnContext.Provider>
@@ -59,7 +73,9 @@ export const ProductReturnProvider = ({ children }: { children: ReactNode }) => 
 export const useProductReturnContext = () => {
   const context = useContext(ProductReturnContext);
   if (!context) {
-    throw new Error("useProductReturnContext must be used within a ProductReturnProvider");
+    throw new Error(
+      "useProductReturnContext must be used within a ProductReturnProvider"
+    );
   }
   return context;
 };

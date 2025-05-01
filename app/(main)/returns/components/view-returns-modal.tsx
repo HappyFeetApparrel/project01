@@ -8,9 +8,9 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { ProductReturn } from "@/prisma/type";
+import { Returns } from "@/prisma/type";
 
-interface ProductReturnCustom extends ProductReturn {
+interface ProductReturnCustom extends Returns {
   name: string;
   type: string;
   quantity: number;
@@ -20,13 +20,13 @@ interface ProductReturnCustom extends ProductReturn {
 interface ViewProductReturnModalProps {
   isOpen: boolean;
   onClose: () => void;
-  productReturn: ProductReturnCustom;
+  returns: ProductReturnCustom;
 }
 
 export function ViewProductReturnModal({
   isOpen,
   onClose,
-  productReturn,
+  returns,
 }: ViewProductReturnModalProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -38,19 +38,19 @@ export function ViewProductReturnModal({
           <dl className="grid grid-cols-1 gap-4">
             <div className="col-span-1 span-y-4">
               <dt className="font-semibold">Name:</dt>
-              <dd>{productReturn.name}</dd>
+              <dd>{returns.name}</dd>
             </div>
             <div className="col-span-1 span-y-4">
               <dt className="font-semibold">Type:</dt>
-              <dd>{productReturn.type || "N/A"}</dd>
+              <dd>{returns.type || "N/A"}</dd>
             </div>
             <div className="col-span-1 span-y-4">
               <dt className="font-semibold">Quantity:</dt>
-              <dd>{productReturn.quantity || "N/A"}</dd>
+              <dd>{returns.quantity || "N/A"}</dd>
             </div>
             <div className="col-span-1 span-y-4">
               <dt className="font-semibold">Reason:</dt>
-              <dd>{productReturn.reason || "N/A"}</dd>
+              <dd>{returns.reason || "N/A"}</dd>
             </div>
           </dl>
         </div>

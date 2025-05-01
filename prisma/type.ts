@@ -41,7 +41,7 @@ export type Product = {
   supplier?: Supplier;
   order_items: OrderItem[];
   adjustments: InventoryAdjustment[];
-  returns?: ProductReturn[];
+  returns?: Returns[];
 };
 
 export type Supplier = {
@@ -156,19 +156,40 @@ export type UserActivityLogFormatted = Omit<
   timeAgo: string;
 };
 
-export interface ProductReturn {
+export type Returns = {
   return_id: number;
-  order_item_id: number;
-  user_id: number;
-  product_id: number;
+  order_id?: number | null;
+  product_id?: number | null;
   quantity: number;
-  reason: string; // "Defective", "Wrong Item", "Customer Changed Mind"
-  processed_by: number;
+  reason: string;
+  processed_by_id?: number | null;
   created_at: Date;
+  updated_at?: Date | null;
 
   // Relations
-  order_item: OrderItem;
-  user: User;
-  product: Product;
-  processed_by_user: User;
-}
+  order?: SalesOrder | null;
+  product?: Product | null;
+  processed_by?: User | null;
+  replacement?: Replace | null;
+};
+
+export type Replace = {
+  replace_id: number;
+  return_id: number;
+  original_order_id: number;
+  original_product_id: number;
+  replacement_product_id: number;
+  replacement_order_id?: number | null;
+  reason: string;
+  processed_by_id: number;
+  created_at: Date;
+  updated_at?: Date | null;
+
+  // Relations
+  return: Returns;
+  original_order: SalesOrder;
+  replacement_order?: SalesOrder | null;
+  original_product: Product;
+  replacement_product: Product;
+  processed_by: User;
+};

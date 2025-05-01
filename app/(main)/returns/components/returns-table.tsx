@@ -90,7 +90,7 @@ export default function ProductReturnTable<TData, TValue>({
   return (
     <div className="w-full space-y-6">
       <div className="flex items-center justify-between flex-wrap gap-4">
-        <h2 className="text-2xl font-semibold">Product Returns</h2>
+        <h2 className="text-2xl font-semibold">Returns</h2>
         <div className="flex gap-4 flex-wrap flex-col w-full sm:flex-row justify-between">
           <div className="flex items-center gap-4 flex-1 max-w-xl flex-nowrap flex-grow">
             <div className="relative flex-1">
@@ -109,7 +109,7 @@ export default function ProductReturnTable<TData, TValue>({
             onClick={() => setIsAddModalOpen()}
           >
             <Plus className="mr-2 h-4 w-4" />
-            Add New ProductReturn
+            Add New Returns
           </Button>
         </div>
       </div>

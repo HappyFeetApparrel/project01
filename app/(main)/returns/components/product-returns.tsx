@@ -5,18 +5,18 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 // components
-import { AddProductReturnModal } from "./add-product-return-modal";
+import { AddProductReturnModal } from "./add-returns-modal";
 import { StatusPopup } from "@/components/global/status-popup";
 
 // types
-import { ProductReturn } from "@/prisma/type";
+import { Returns } from "@/prisma/type";
 
 // components
-import ProductReturnTable from "./product-return-table";
+import ProductReturnTable from "./returns-table";
 
 import { columns } from "./columns";
 
-import { useProductReturnContext } from "../provider/product-return-provider";
+import { useProductReturnContext } from "../provider/returns-provider";
 
 import { useLayout } from "@/components/context/LayoutProvider";
 
@@ -43,29 +43,23 @@ export default function ProductReturns() {
   };
 
   const handleAddProductReturn = async (
-    newProductReturn: Pick<ProductReturn, "reason">
+    newProductReturn: Pick<Returns, "reason">
   ) => {
     try {
       setLoadingAddProductReturn(true);
-      const response = await api.post("/product-returns", newProductReturn);
+      const response = await api.post("/returns", newProductReturn);
       setLoadingAddProductReturn(false);
 
       if (response.status === 201) {
-        saveActivity(
-          `Added productReturn: ${newProductReturn.reason}`,
-          "added"
-        );
+        saveActivity(`Added returns: ${newProductReturn.reason}`, "added");
         if (newProductReturn.reason === "Replace") {
           router.push(response.data.data.redirect_url);
         } else {
-          showStatusPopup("ProductReturn added successfully", "success");
+          showStatusPopup("Returns added successfully", "success");
         }
       } else {
         console.error("Unexpected response:", response);
-        showStatusPopup(
-          "Unexpected response while adding productReturn",
-          "error"
-        );
+        showStatusPopup("Unexpected response while adding returns", "error");
       }
       await fetchProductReturns(); // Refresh data after addition
     } catch (error: unknown) {
@@ -88,8 +82,8 @@ export default function ProductReturns() {
       <AddProductReturnModal
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
-        onAdd={async (productReturn) => {
-          await handleAddProductReturn(productReturn);
+        onAdd={async (returns) => {
+          await handleAddProductReturn(returns);
         }}
         loadingAddProductReturn={loadingAddProductReturn}
       />

@@ -5,14 +5,14 @@ import { Button } from "@/components/ui/button";
 import { ArrowUpDown } from "lucide-react";
 
 // types
-import { ProductReturn } from "@/prisma/type";
+import { Replace } from "@/prisma/type";
 
 // components
 import Options from "./options";
 
-import { ProductReturnCustom } from "./options";
+import { ReplaceCustom } from "./options";
 
-export const columns: ColumnDef<ProductReturnCustom>[] = [
+export const columns: ColumnDef<ReplaceCustom>[] = [
   {
     accessorKey: "name",
     header: ({ column }) => {
@@ -44,9 +44,7 @@ export const columns: ColumnDef<ProductReturnCustom>[] = [
         </Button>
       );
     },
-    cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("type")}</div>
-    ),
+    cell: ({ row }) => <div className="capitalize">{row.getValue("type")}</div>,
     minSize: 200,
     maxSize: 400,
     size: 250,
@@ -84,9 +82,7 @@ export const columns: ColumnDef<ProductReturnCustom>[] = [
         </Button>
       );
     },
-    cell: ({ row }) => (
-      <div >{row.getValue("reason")}</div>
-    ),
+    cell: ({ row }) => <div>{row.getValue("reason")}</div>,
     minSize: 200,
     maxSize: 400,
     size: 250,
