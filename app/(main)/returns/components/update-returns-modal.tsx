@@ -59,7 +59,6 @@ enum FormType {
 
 enum ProductReturnReason {
   LOST = "Lost",
-  RETURN = "Return",
   REFUND = "Refund",
   REPLACE = "Replace",
   OTHER = "Other",
@@ -73,7 +72,6 @@ const productReturnSchema = z
     quantity: z.number().int().min(1, "Quantity must be greater than 0."),
     reason: z.enum([
       ProductReturnReason.LOST,
-      ProductReturnReason.RETURN,
       ProductReturnReason.REFUND,
       ProductReturnReason.REPLACE,
       ProductReturnReason.OTHER,
@@ -125,7 +123,6 @@ export function UpdateProductReturnModal({
       type: activeTab,
       reason:
         returns.reason === ProductReturnReason.LOST ||
-        returns.reason === ProductReturnReason.RETURN ||
         returns.reason === ProductReturnReason.REFUND
           ? returns.reason
           : ProductReturnReason.OTHER,
@@ -233,9 +230,6 @@ export function UpdateProductReturnModal({
                           <SelectContent>
                             <SelectItem value={ProductReturnReason.LOST}>
                               {ProductReturnReason.LOST}
-                            </SelectItem>
-                            <SelectItem value={ProductReturnReason.RETURN}>
-                              {ProductReturnReason.RETURN}
                             </SelectItem>
                             <SelectItem value={ProductReturnReason.REFUND}>
                               {ProductReturnReason.REFUND}
@@ -361,9 +355,6 @@ export function UpdateProductReturnModal({
                           <SelectContent>
                             <SelectItem value={ProductReturnReason.LOST}>
                               {ProductReturnReason.LOST}
-                            </SelectItem>
-                            <SelectItem value={ProductReturnReason.RETURN}>
-                              {ProductReturnReason.RETURN}
                             </SelectItem>
                             <SelectItem value={ProductReturnReason.REFUND}>
                               {ProductReturnReason.REFUND}

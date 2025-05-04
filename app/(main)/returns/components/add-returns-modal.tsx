@@ -54,7 +54,6 @@ enum FormType {
 
 enum ProductReturnReason {
   LOST = "Lost",
-  RETURN = "Return",
   REFUND = "Refund",
   OTHER = "Other",
 }
@@ -67,7 +66,6 @@ const productReturnSchema = z
     quantity: z.number().int().min(1, "Quantity must be greater than 0."),
     reason: z.enum([
       ProductReturnReason.LOST,
-      ProductReturnReason.RETURN,
       ProductReturnReason.REFUND,
       ProductReturnReason.OTHER,
     ]),
@@ -215,9 +213,6 @@ export function AddProductReturnModal({
                             <SelectItem value={ProductReturnReason.LOST}>
                               {ProductReturnReason.LOST}
                             </SelectItem>
-                            <SelectItem value={ProductReturnReason.RETURN}>
-                              {ProductReturnReason.RETURN}
-                            </SelectItem>
                             <SelectItem value={ProductReturnReason.REFUND}>
                               {ProductReturnReason.REFUND}
                             </SelectItem>
@@ -339,9 +334,6 @@ export function AddProductReturnModal({
                           <SelectContent>
                             <SelectItem value={ProductReturnReason.LOST}>
                               {ProductReturnReason.LOST}
-                            </SelectItem>
-                            <SelectItem value={ProductReturnReason.RETURN}>
-                              {ProductReturnReason.RETURN}
                             </SelectItem>
                             <SelectItem value={ProductReturnReason.REFUND}>
                               {ProductReturnReason.REFUND}
