@@ -48,7 +48,6 @@ const DefectSalesReport = () => {
     {
       month: string;
       lost: number;
-      return: number;
       refund: number;
       other: number;
     }[]
@@ -80,7 +79,6 @@ const DefectSalesReport = () => {
         const defaultData = months.map((month) => ({
           month,
           lost: 0,
-          return: 0,
           refund: 0,
           other: 0,
         }));
@@ -159,7 +157,6 @@ const DefectSalesReport = () => {
           <div className="flex gap-4 items-center">
             <div className="flex items-center gap-6 flex-wrap">
               <Legend color="#00A3FF" label="Lost" />
-              <Legend color="#9747FF" label="Return" />
               <Legend color="#E93BF9" label="Refund" />
               <Legend color="#FF5733" label="Other" />
             </div>
@@ -202,12 +199,7 @@ const DefectSalesReport = () => {
                 stroke="#00A3FF"
                 strokeWidth={2}
               />
-              <Line
-                type="monotone"
-                dataKey="return"
-                stroke="#9747FF"
-                strokeWidth={2}
-              />
+
               <Line
                 type="monotone"
                 dataKey="refund"

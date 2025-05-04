@@ -55,7 +55,6 @@ const DefectProductReportPDF = ({
 
     page.drawText("Month", { x: leftMargin, y, size: 12, font });
     page.drawText("Lost", { x: 150, y, size: 12, font });
-    page.drawText("Return", { x: 250, y, size: 12, font });
     page.drawText("Refund", { x: 350, y, size: 12, font });
     page.drawText("Other", { x: 450, y, size: 12, font });
     y -= 15;
@@ -67,18 +66,15 @@ const DefectProductReportPDF = ({
     });
     y -= 15;
 
-    defectData.forEach(
-      ({ month, lost, return: returns, refund, other, replace }) => {
-        if (y < 50) return;
+    defectData.forEach(({ month, lost, refund, other, replace }) => {
+      if (y < 50) return;
 
-        page.drawText(month, { x: leftMargin, y, size: 10, font });
-        page.drawText(String(lost), { x: 150, y, size: 10, font });
-        page.drawText(String(returns), { x: 250, y, size: 10, font });
-        page.drawText(String(refund), { x: 350, y, size: 10, font });
-        page.drawText(String(other), { x: 450, y, size: 10, font });
-        y -= 15;
-      }
-    );
+      page.drawText(month, { x: leftMargin, y, size: 10, font });
+      page.drawText(String(lost), { x: 150, y, size: 10, font });
+      page.drawText(String(refund), { x: 350, y, size: 10, font });
+      page.drawText(String(other), { x: 450, y, size: 10, font });
+      y -= 15;
+    });
 
     await addFooter(page, {
       companyName: "Happy Feet and Apparel",

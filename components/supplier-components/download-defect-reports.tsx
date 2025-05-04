@@ -14,7 +14,6 @@ interface SalesData {
   months: {
     month: string;
     lost: number;
-    return: number;
     refund: number;
     other: number;
   }[];
@@ -65,7 +64,6 @@ const DefectSalesReportDownload = () => {
     // Table Headers
     page.drawText("Month", { x: leftMargin, y, size: 12, font });
     page.drawText("Lost", { x: 150, y, size: 12, font });
-    page.drawText("Return", { x: 250, y, size: 12, font });
     page.drawText("Refund", { x: 350, y, size: 12, font });
     page.drawText("Other", { x: 450, y, size: 12, font });
 
@@ -78,19 +76,16 @@ const DefectSalesReportDownload = () => {
     });
     y -= 15;
 
-    salesData?.months.forEach(
-      ({ month, lost, return: returned, refund, other }) => {
-        if (y < 50) return;
+    salesData?.months.forEach(({ month, lost, refund, other }) => {
+      if (y < 50) return;
 
-        page.drawText(month, { x: leftMargin, y, size: 10, font });
-        page.drawText(String(lost), { x: 150, y, size: 10, font });
-        page.drawText(String(returned), { x: 250, y, size: 10, font });
-        page.drawText(String(refund), { x: 350, y, size: 10, font });
-        page.drawText(String(other), { x: 450, y, size: 10, font });
+      page.drawText(month, { x: leftMargin, y, size: 10, font });
+      page.drawText(String(lost), { x: 150, y, size: 10, font });
+      page.drawText(String(refund), { x: 350, y, size: 10, font });
+      page.drawText(String(other), { x: 450, y, size: 10, font });
 
-        y -= 15;
-      }
-    );
+      y -= 15;
+    });
 
     await addFooter(page, {
       companyName: "Happy Feet and Apparel",

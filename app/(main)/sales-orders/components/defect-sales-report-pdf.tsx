@@ -102,7 +102,6 @@ const DefectSalesReportPDF = ({
 
     secondPage.drawText("Month", { x: leftMargin, y: y2, size: 12, font });
     secondPage.drawText("Lost", { x: 100, y: y2, size: 12, font });
-    secondPage.drawText("Return", { x: 200, y: y2, size: 12, font });
     secondPage.drawText("Refund", { x: 300, y: y2, size: 12, font });
     secondPage.drawText("Replace", { x: 400, y: y2, size: 12, font });
     secondPage.drawText("Other", { x: 500, y: y2, size: 12, font });
@@ -120,11 +119,10 @@ const DefectSalesReportPDF = ({
     // @ts-ignore
     defectData?.months.forEach(
       // @ts-ignore
-      ({ month, lost, return: returns, refund, replace, other }) => {
+      ({ month, lost, refund, replace, other }) => {
         if (y2 < 50) return;
         secondPage.drawText(month, { x: leftMargin, y: y2, size: 10, font });
         secondPage.drawText(String(lost), { x: 100, y: y2, size: 10, font });
-        secondPage.drawText(String(returns), { x: 200, y: y2, size: 10, font });
         secondPage.drawText(String(refund), { x: 300, y: y2, size: 10, font });
         secondPage.drawText(String(replace), { x: 400, y: y2, size: 10, font });
         secondPage.drawText(String(other), { x: 500, y: y2, size: 10, font });
