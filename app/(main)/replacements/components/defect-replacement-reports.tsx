@@ -160,7 +160,7 @@ const DefectReplacementReports = ({
     const blob = new Blob([pdfBytes], { type: "application/pdf" });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.download = `Defect_Sales_Report_${format(subMonths(new Date(), 1), "yyyy-MM")}.pdf`;
+    link.download = `Replacement_Sales_Report_${format(subMonths(new Date(), 1), "yyyy-MM")}.pdf`;
     link.click();
   };
 
