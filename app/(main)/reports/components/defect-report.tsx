@@ -157,7 +157,6 @@ const DefectSalesReport = () => {
               <Legend color="#00A3FF" label="Lost" />
               <Legend color="#9747FF" label="Return" />
               <Legend color="#E93BF9" label="Refund" />
-              <Legend color="#E94AF9" label="Replace" />
               <Legend color="#FF5733" label="Other" />
             </div>
             <DefectSalesReportPDF startDate={startDate} endDate={endDate} />

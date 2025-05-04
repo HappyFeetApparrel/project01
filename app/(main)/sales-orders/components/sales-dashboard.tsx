@@ -156,7 +156,6 @@ export default function SalesDashboard() {
         setCurrentOrderData={setCurrentOrderData}
         setShowFailPopup={setShowFailPopup}
         setShowPrintInvoice={setShowPrintInvoice}
-        replace_data={{ price, status: "pending" }}
       />
       {showPrintInvoice && newOrder && (
         // <PrintInvoiceDialog

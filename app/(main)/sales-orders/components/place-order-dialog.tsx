@@ -46,7 +46,6 @@ interface PlaceOrderDialogProps {
   setCurrentOrderData: Dispatch<SetStateAction<OrderData | null>>;
   setShowPrintInvoice: Dispatch<SetStateAction<boolean>>;
   setShowFailPopup: Dispatch<SetStateAction<boolean>>;
-  replace_data: { price: number; status: string };
 }
 
 import { Product } from "@/prisma/type";
@@ -74,7 +73,6 @@ export function PlaceOrderDialog({
   setCurrentOrderData,
   setShowPrintInvoice,
   setShowFailPopup,
-  replace_data,
 }: PlaceOrderDialogProps) {
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
   const [change, setChange] = useState(0);
@@ -111,11 +109,6 @@ export function PlaceOrderDialog({
       amountGiven: 0,
     },
   });
-
-  useEffect(() => {
-    if (!replace_data.price && !replace_data.status) return;
-    form.setValue("amountGiven", replace_data.price);
-  }, [replace_data, open]);
 
   const addToOrder = (product: Product) => {
     const existingItem = orderItems.find(

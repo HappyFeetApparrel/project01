@@ -16,12 +16,16 @@ interface ProductSearchProps {
   value: number | undefined;
   onChange: (value: number) => void;
   disabled?: boolean;
+  placeholder: string;
+  setSelectedProduct?: (value: Product) => void;
 }
 
 export default function ProductSearch({
   value,
   onChange,
   disabled,
+  placeholder,
+  setSelectedProduct,
 }: ProductSearchProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [isOpen, setIsOpen] = useState(false);
@@ -57,7 +61,9 @@ export default function ProductSearch({
   }, [searchTerm, products]);
 
   useEffect(() => {
-    const selectedProduct = products.find((product) => product.product_id === value);
+    const selectedProduct = products.find(
+      (product) => product.product_id === value
+    );
     if (selectedProduct) {
       setSearchTerm(selectedProduct.name);
     } else {
@@ -90,11 +96,16 @@ export default function ProductSearch({
     setIsOpen(true);
   };
 
-  const handleProductClick = (productId: number, productName: string) => {
+  const handleProductClick = (
+    productId: number,
+    productName: string,
+    product: Product
+  ) => {
     onChange(productId);
     setSearchTerm(productName);
     setIsOpen(false);
     inputRef.current?.focus();
+    setSelectedProduct && setSelectedProduct(product);
   };
 
   return (
@@ -106,8 +117,8 @@ export default function ProductSearch({
           onChange={handleInputChange}
           onFocus={handleInputFocus}
           ref={inputRef}
-          placeholder="Search products..."
-          aria-label="Search products"
+          placeholder={placeholder}
+          aria-label={placeholder}
           aria-expanded={isOpen}
           aria-controls="product-list"
           disabled={disabled ? true : false}
@@ -147,7 +158,9 @@ export default function ProductSearch({
               <button
                 key={index}
                 className="block w-full px-4 py-2 text-left text-gray-700 hover:bg-blue-100 focus:bg-blue-100 focus:outline-none"
-                onClick={() => handleProductClick(product.product_id, product.name)}
+                onClick={() =>
+                  handleProductClick(product.product_id, product.name, product)
+                }
                 type="button"
               >
                 {product.name}

@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
+  provider  = "sqlite"
   url  	    = env("DATABASE_URL")
 }
 
@@ -149,27 +149,25 @@ model Return {
   order           SalesOrder? @relation(fields: [order_id], references: [order_id])
   product         Product? @relation(fields: [product_id], references: [product_id])
   processed_by    User? @relation(fields: [processed_by_id], references: [user_id], name: "ReturnProcessedByUser")
-  replacement Replace? @relation(name: "ReturnReplace")
 }
 
 model Replace {
   replace_id             Int      @id @default(autoincrement())
-  return_id              Int      @unique
-  original_order_id      Int
-  original_product_id    Int
-  replacement_product_id Int
+  original_order_id      Int?
+  original_product_id    Int?
+  replacement_product_id Int?
   replacement_order_id   Int?
   reason                 String
   processed_by_id        Int
+  quantity               Int      // NEW FIELD
   created_at             DateTime @default(now())
   updated_at             DateTime? @default(dbgenerated())
 
   // Relations
-  return Return @relation(name: "ReturnReplace", fields: [return_id], references: [return_id])
-  original_order         SalesOrder @relation("OriginalOrder", fields: [original_order_id], references: [order_id])
+  original_order         SalesOrder? @relation("OriginalOrder", fields: [original_order_id], references: [order_id])
   replacement_order      SalesOrder? @relation("ReplacementOrder", fields: [replacement_order_id], references: [order_id])
-  original_product       Product @relation("OriginalProduct", fields: [original_product_id], references: [product_id])
-  replacement_product    Product @relation("ReplacementProduct", fields: [replacement_product_id], references: [product_id])
+  original_product       Product? @relation("OriginalProduct", fields: [original_product_id], references: [product_id])
+  replacement_product    Product? @relation("ReplacementProduct", fields: [replacement_product_id], references: [product_id])
   processed_by           User @relation(fields: [processed_by_id], references: [user_id])
 }
 

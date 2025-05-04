@@ -21,7 +21,6 @@ import { Replace } from "@/prisma/type";
 // components
 import { DeleteReplaceConfirmation } from "./delete-replace-confirmation";
 import { ViewReplaceModal } from "./view-replace-modal";
-import { UpdateReplaceModal } from "./update-replace-modal";
 import { StatusPopup } from "@/components/global/status-popup";
 
 // icons
@@ -102,7 +101,6 @@ const Options = ({ row }: OptionsProps) => {
     try {
       setLoadingUpdateReplace(true);
       // Call the update API
-      updatedReplace.return_id = replace.return_id;
       const response = await api.put("/product-returns", updatedReplace);
       setLoadingUpdateReplace(false);
 
@@ -172,13 +170,7 @@ const Options = ({ row }: OptionsProps) => {
         onClose={() => setIsViewModalOpen(false)}
         replace={replace}
       />
-      <UpdateReplaceModal
-        isOpen={isUpdateModalOpen}
-        onClose={() => setIsUpdateModalOpen(false)}
-        onUpdate={(updatedReplace) => handleUpdateReplace(updatedReplace)}
-        replace={replace}
-        loadingUpdateReplace={loadingUpdateReplace}
-      />
+
       <DeleteReplaceConfirmation
         isOpen={isDeleteConfirmationOpen}
         onClose={() => setIsDeleteConfirmationOpen(false)}

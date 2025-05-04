@@ -7,48 +7,52 @@ import { ArrowUpDown } from "lucide-react";
 // types
 import { Replace } from "@/prisma/type";
 
-// components
-import Options from "./options";
-
-import { ReplaceCustom } from "./options";
-
-export const columns: ColumnDef<ReplaceCustom>[] = [
+export const columns: ColumnDef<Replace>[] = [
   {
-    accessorKey: "name",
+    accessorKey: "original_order",
     header: ({ column }) => {
       return (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Name
+          Original Order
           <ArrowUpDown />
         </Button>
       );
     },
-    cell: ({ row }) => <div className="capitalize">{row.getValue("name")}</div>,
+    cell: ({ row }) => (
+      <div className="capitalize">
+        {row.getValue("original_order") ?? "N/A"}
+      </div>
+    ),
     minSize: 200,
     maxSize: 400,
     size: 250,
   },
   {
-    accessorKey: "type",
+    accessorKey: "replacement_product_name",
     header: ({ column }) => {
       return (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Type
+          Replacement Product
           <ArrowUpDown />
         </Button>
       );
     },
-    cell: ({ row }) => <div className="capitalize">{row.getValue("type")}</div>,
+    cell: ({ row }) => (
+      <div className="capitalize">
+        {row.getValue("replacement_product_name") ?? "N/A"}
+      </div>
+    ),
     minSize: 200,
     maxSize: 400,
     size: 250,
   },
+
   {
     accessorKey: "quantity",
     header: ({ column }) => {
@@ -87,10 +91,10 @@ export const columns: ColumnDef<ReplaceCustom>[] = [
     maxSize: 400,
     size: 250,
   },
-  {
-    id: "actions",
-    enableHiding: false,
-    cell: ({ row }) => <Options row={row.original} />,
-    size: 100,
-  },
+  // {
+  //   id: "actions",
+  //   enableHiding: false,
+  //   cell: ({ row }) => <Options row={row.original} />,
+  //   size: 100,
+  // },
 ];

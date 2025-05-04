@@ -165,7 +165,6 @@ export function AddProductReturnModal({
                       <FormItem>
                         <FormLabel>Product</FormLabel>
                         <FormControl>
-                          {/* <Input type="number" {...field} /> */}
                           <ProductSearch
                             value={field.value}
                             onChange={(productId) => field.onChange(productId)}

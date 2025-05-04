@@ -1,4 +1,4 @@
-import Replaces from "./components/product-returns";
+import Replaces from "./components/product-replace";
 
 // right sidebar
 import SupplierAnalytics from "@/components/supplier-analytics";

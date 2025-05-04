@@ -17,6 +17,8 @@ interface SalesOrderSearchProps {
   value: number | undefined;
   onChange: (value: number) => void;
   disabled?: boolean;
+  placeholder: string;
+  setSelectedOrder?: (value: SalesOrder) => void;
 }
 
 interface SalesOrderWithCode extends SalesOrder {
@@ -30,6 +32,8 @@ export default function SalesOrderSearch({
   value,
   onChange,
   disabled,
+  placeholder,
+  setSelectedOrder,
 }: SalesOrderSearchProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [isOpen, setIsOpen] = useState(false);
@@ -104,11 +108,16 @@ export default function SalesOrderSearch({
     setIsOpen(true);
   };
 
-  const handleSalesOrderClick = (id: number, salesOrderName: string) => {
+  const handleSalesOrderClick = (
+    id: number,
+    salesOrderName: string,
+    salesOrder: SalesOrder
+  ) => {
     onChange(id);
     setSearchTerm(salesOrderName);
     setIsOpen(false);
     inputRef.current?.focus();
+    setSelectedOrder && setSelectedOrder(salesOrder);
   };
 
   const salesOrderInfo = (salesOrder: SalesOrderWithCode) => {
@@ -124,8 +133,8 @@ export default function SalesOrderSearch({
           onChange={handleInputChange}
           onFocus={handleInputFocus}
           ref={inputRef}
-          placeholder="Search sales orders..."
-          aria-label="Search sales orders"
+          placeholder={`${placeholder}...`}
+          aria-label={`${placeholder}`}
           aria-expanded={isOpen}
           aria-controls="salesOrder-list"
           disabled={disabled ? true : false}
@@ -169,7 +178,8 @@ export default function SalesOrderSearch({
                   onClick={() =>
                     handleSalesOrderClick(
                       salesOrder.id,
-                      salesOrderInfo(salesOrder)
+                      salesOrderInfo(salesOrder),
+                      salesOrder
                     )
                   }
                   type="button"

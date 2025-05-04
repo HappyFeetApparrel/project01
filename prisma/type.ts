@@ -170,12 +170,10 @@ export type Returns = {
   order?: SalesOrder | null;
   product?: Product | null;
   processed_by?: User | null;
-  replacement?: Replace | null;
 };
 
 export type Replace = {
   replace_id: number;
-  return_id: number;
   original_order_id: number;
   original_product_id: number;
   replacement_product_id: number;
@@ -184,9 +182,9 @@ export type Replace = {
   processed_by_id: number;
   created_at: Date;
   updated_at?: Date | null;
+  quantity: number;
 
   // Relations
-  return: Returns;
   original_order: SalesOrder;
   replacement_order?: SalesOrder | null;
   original_product: Product;

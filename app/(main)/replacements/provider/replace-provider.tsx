@@ -8,8 +8,9 @@ import {
 } from "react";
 import { Replace } from "@/prisma/type";
 import { api } from "@/lib/axios";
-
+import { getReplacements } from "@/lib/data/replacements";
 import { ReplaceCustom } from "../components/options";
+import { getAllReplacements } from "@/lib/actions/replacement-actions";
 
 // Define the context type
 interface ReplaceContextType {
@@ -25,15 +26,16 @@ const ReplaceContext = createContext<ReplaceContextType | undefined>(undefined);
 
 // ReplaceProvider Component
 export const ReplaceProvider = ({ children }: { children: ReactNode }) => {
-  const [replaces, setReplaces] = useState<ReplaceCustom[]>([]);
+  const [replaces, setReplaces] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   const fetchReplaces = async () => {
     setLoading(true);
     try {
-      const { data } = await api.get("/product-returns");
-      setReplaces(data.data);
+      // const { data } = await api.get("/product-returns");
+      const replacements = await getAllReplacements();
+      setReplaces(replacements?.data ?? []);
     } catch (err) {
       setError("Failed to load replaces. Please try again.");
       console.error("Error fetching replaces:", err);
