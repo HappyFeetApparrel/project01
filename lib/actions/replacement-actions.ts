@@ -2,7 +2,7 @@
 import crypto from "crypto";
 import prisma from "@/lib/prisma";
 import { Product } from "@/prisma/type";
-
+import { eachMonthOfInterval, format } from "date-fns";
 // 🟢 CREATE — Product Replacement
 export async function createProductReplacement({
   original_order_id,
@@ -216,6 +216,7 @@ export async function getAllReplacements() {
       replacement_product_name: r.replacement_product?.name ?? null,
       original_order: r.original_order?.order_code ?? null,
       replacement_order: r.replacement_order?.order_code ?? null, // r.replacement_order?.name ?? null,
+      type: r.replacement_order ? "Order Replacement" : "Product Replacement",
     }));
 
     return { success: true, data: formatted };
@@ -266,3 +267,81 @@ export async function getAllReplacements() {
 //     return { success: false, error: (error as Error).message };
 //   }
 // }
+
+export async function getReplacementReports() {
+  try {
+    const monthsOfYear = eachMonthOfInterval({
+      start: new Date(`${new Date().getFullYear()}-01-01`),
+      end: new Date(`${new Date().getFullYear()}-12-31`),
+    });
+
+    const returnReasons = ["Defective", "Wrong Item", "Damaged", "Other"];
+
+    // Group by created_at and reason
+    const replacements = await prisma.replace.groupBy({
+      by: ["created_at", "reason"],
+      _count: { _all: true },
+    });
+
+    const monthlyReturnMap: {
+      [month: string]: {
+        [reason: string]: number;
+      };
+    } = {};
+
+    // Build the nested map
+    replacements.forEach((rep) => {
+      const month = format(rep.created_at, "MMM");
+      if (!monthlyReturnMap[month]) monthlyReturnMap[month] = {};
+      monthlyReturnMap[month][rep.reason] =
+        (monthlyReturnMap[month][rep.reason] || 0) + rep._count._all;
+    });
+
+    const months = monthsOfYear.map((m) => {
+      const monthName = format(m, "MMM");
+
+      // Create an entry with all reasons defaulted to 0
+      const reasonData = Object.fromEntries(
+        returnReasons.map((reason) => [
+          reason,
+          monthlyReturnMap[monthName]?.[reason] || 0,
+        ])
+      );
+
+      return {
+        month: monthName,
+        ...reasonData,
+      };
+    });
+
+    const replacementDetails = await prisma.replace.findMany({
+      include: {
+        original_order: true,
+        replacement_product: true,
+        processed_by: true,
+      },
+      orderBy: {
+        created_at: "desc",
+      },
+    });
+
+    const replacements_data = replacementDetails.map((r) => ({
+      sku: r.original_order?.order_code || "N/A",
+      status: r.reason,
+      date: r.created_at.toISOString().split("T")[0],
+      name: r.processed_by.name,
+      item_name: r.replacement_product?.name || "N/A",
+    }));
+
+    return {
+      success: true,
+      data: {
+        months: months,
+        replacements: replacements_data,
+      },
+    };
+  } catch (error) {
+    console.error("Fetch Replacements Error:", error);
+    return { success: false, error: (error as Error).message };
+  }
+}

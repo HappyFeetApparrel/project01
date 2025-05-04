@@ -25,6 +25,8 @@ import { useReplaceContext } from "../provider/replace-provider";
 
 import { useLayout } from "@/components/context/LayoutProvider";
 
+import ReplacementReports from "./replacement-sales-report";
+
 export default function Replaces() {
   const { saveActivity } = useLayout();
   const router = useRouter();
@@ -110,6 +112,7 @@ export default function Replaces() {
           globalFilter={globalFilter}
           setGlobalFilter={setGlobalFilter}
         />
+        <ReplacementReports />
       </div>
 
       {/* Modals */}

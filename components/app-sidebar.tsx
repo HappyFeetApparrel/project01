@@ -75,7 +75,7 @@ const sidebarMenuItemsGeneral: SidebarMenuItem[] = [
   {
     id: 5,
     icon: MdFindReplace,
-    label: "Replace",
+    label: "Replacements",
     link: "/replacements",
     rolesAllowed: ["Admin", "Manager"],
   },
