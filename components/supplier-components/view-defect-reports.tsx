@@ -82,9 +82,9 @@ const DefectSalesReportPDF = () => {
 
     // Table Headers
     page.drawText("Month", { x: leftMargin, y, size: 12, font });
-    page.drawText("Lost", { x: 150, y, size: 12, font });
-    page.drawText("Refund", { x: 350, y, size: 12, font });
-    page.drawText("Other", { x: 450, y, size: 12, font });
+    page.drawText("Lost", { x: 200, y, size: 12, font });
+    page.drawText("Refund", { x: 300, y, size: 12, font });
+    page.drawText("Other", { x: 400, y, size: 12, font });
 
     y -= 15;
     page.drawLine({
@@ -100,9 +100,9 @@ const DefectSalesReportPDF = () => {
       if (y < 50) return;
 
       page.drawText(month, { x: leftMargin, y, size: 10, font });
-      page.drawText(String(lost), { x: 150, y, size: 10, font });
-      page.drawText(String(refund), { x: 350, y, size: 10, font });
-      page.drawText(String(other), { x: 450, y, size: 10, font });
+      page.drawText(String(lost), { x: 200, y, size: 10, font });
+      page.drawText(String(refund), { x: 300, y, size: 10, font });
+      page.drawText(String(other), { x: 400, y, size: 10, font });
 
       y -= 15;
     });
