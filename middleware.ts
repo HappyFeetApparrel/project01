@@ -22,7 +22,6 @@ export default withAuth(
     // Restricted paths for "Manager"
     const restrictedPathsManager = [
       "/users",
-      "/settings",
       "/",
       "/signup",
       "/forgot-password",
@@ -33,14 +32,19 @@ export default withAuth(
 
     // Restricted paths for "Staff"
     const restrictedPathsStaff = [
-      "/users",
-      "/settings",
-      "/sales-orders",
-      "/reports",
+      "/dashboard",
+      "/inventory",
+      "/returns",
+      "/replacements",
+      "/suppliers",
+      "/categories",
       "/",
-      "/signup",
+      "/brands",
       "/forgot-password",
       "/change-password",
+      "/payment-methods",
+      "/reports",
+      "/users",
     ];
 
     const isRestrictedStaff = restrictedPathsStaff.includes(pathname);
@@ -48,12 +52,16 @@ export default withAuth(
     // General restricted paths for unauthenticated users
     const restrictedPaths = [
       "/dashboard",
-      "/users",
+      "/inventory",
       "/sales-orders",
+      "/returns",
+      "/replacements",
       "/suppliers",
+      "/categories",
+      "/brands",
+      "/payment-methods",
       "/reports",
-      "/help",
-      "/settings",
+      "/users",
     ];
 
     const isRestrictedPath = restrictedPaths.includes(pathname);
@@ -68,7 +76,7 @@ export default withAuth(
     }
 
     if (token?.role === "Staff" && isRestrictedStaff) {
-      return NextResponse.redirect(new URL("/dashboard", request.url));
+      return NextResponse.redirect(new URL("/sales-orders", request.url));
     }
 
     if (!token && isRestrictedPath) {
@@ -87,15 +95,18 @@ export default withAuth(
 export const config = {
   matcher: [
     "/dashboard",
-    "/users",
+    "/inventory",
     "/sales-orders",
+    "/returns",
+    "/replacements",
     "/suppliers",
-    "/reports",
-    "/help",
-    "/settings",
+    "/categories",
     "/",
-    "/signup",
+    "/brands",
     "/forgot-password",
     "/change-password",
+    "/payment-methods",
+    "/reports",
+    "/users",
   ],
 };
