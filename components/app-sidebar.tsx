@@ -49,7 +49,7 @@ const sidebarMenuItemsGeneral: SidebarMenuItem[] = [
     icon: RxDashboard,
     label: "Dashboard",
     link: "/dashboard",
-    rolesAllowed: ["Admin", "Manager", "Staff"],
+    rolesAllowed: ["Admin", "Manager"],
   },
   {
     id: 2,
@@ -63,7 +63,7 @@ const sidebarMenuItemsGeneral: SidebarMenuItem[] = [
     icon: LuShoppingCart,
     label: "Sales Orders",
     link: "/sales-orders",
-    rolesAllowed: ["Admin", "Manager"],
+    rolesAllowed: ["Admin", "Manager", "Staff"],
   },
   {
     id: 4,
@@ -112,7 +112,7 @@ const sidebarMenuItemsGeneral: SidebarMenuItem[] = [
     icon: AiOutlineStock,
     label: "Reports",
     link: "/reports",
-    rolesAllowed: ["Admin"],
+    rolesAllowed: ["Admin", "Manager"],
   },
   {
     id: 11,
