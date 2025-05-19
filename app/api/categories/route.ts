@@ -6,7 +6,7 @@ export async function GET(): Promise<NextResponse> {
   try {
     const categories = await prisma.category.findMany({
       orderBy: {
-        category_id: "desc", // Adjust this to the appropriate timestamp field (e.g., "updatedAt")
+        name: "asc", // Sort by name in ascending order (A-Z)
       },
     });
 

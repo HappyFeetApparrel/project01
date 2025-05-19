@@ -227,7 +227,7 @@ export function PlaceOrderDialog({
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Place New Order</DialogTitle>
+            <DialogTitle>Process New Order</DialogTitle>
             <DialogDescription>
               Search for products and add them to the order.
             </DialogDescription>
@@ -348,35 +348,6 @@ export function PlaceOrderDialog({
                       </FormItem>
                     )}
                   />
-                  {/* <FormField
-                    control={form.control}
-                    name="paymentMethod"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Payment Method *</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select payment method" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="credit_card">
-                              Credit Card
-                            </SelectItem>
-                            <SelectItem value="bank_transfer">
-                              Bank Transfer
-                            </SelectItem>
-                            <SelectItem value="cash">Cash</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  /> */}
                   <FormField
                     control={form.control}
                     name="amountGiven"
@@ -417,7 +388,7 @@ export function PlaceOrderDialog({
                         orderItems.length === 0 || change < 0 || isProcessing
                       }
                     >
-                      {isProcessing ? "Processing..." : "Place Order"}
+                      {isProcessing ? "Processing..." : "Process Order"}
                     </Button>
                   </div>
                 </form>

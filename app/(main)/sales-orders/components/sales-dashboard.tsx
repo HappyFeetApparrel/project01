@@ -133,7 +133,7 @@ export default function SalesDashboard() {
                 onClick={() => setOpen(true)}
               >
                 <Plus className="mr-2 h-4 w-4" />
-                Place Order
+                Process Order
               </Button>
             </div>
           </div>
@@ -172,13 +172,13 @@ export default function SalesDashboard() {
       )}
       {showSuccessPopup && (
         <SuccessPopup
-          message="Order placed successfully!"
+          message="Order processed successfully!"
           onClose={() => setShowSuccessPopup(false)}
         />
       )}
       {showFailPopup && (
         <FailPopup
-          message="Failed to place order. Please try again."
+          message="Failed to process order. Please try again."
           onClose={() => setShowFailPopup(false)}
         />
       )}
