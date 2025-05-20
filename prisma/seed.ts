@@ -119,14 +119,32 @@ async function main() {
 
   // // Seed Sales Orders
   for (let i = 0; i < 100; i++) {
+    const total_price = faker.number.float({
+      min: 100,
+      max: 1000,
+      fractionDigits: 2,
+    });
+    const discountPercentage = faker.number.int({ min: 0, max: 50 }); // e.g. 10%
+    const discountedTotal =
+      total_price - (total_price * discountPercentage) / 100;
+    const amount_given = faker.number.float({
+      min: discountedTotal,
+      max: discountedTotal + 500,
+      fractionDigits: 2,
+    });
+
+    const change = amount_given - discountedTotal;
+
     await prisma.salesOrder.create({
       data: {
         order_code: `ORD-${faker.string.uuid().slice(0, 8).toUpperCase()}`,
         user_id: faker.number.int({ min: 1, max: 100 }),
-        payment_method_id: faker.number.int({ min: 1, max: 100 }),
-        amount_given: faker.number.float({ min: 50, max: 500 }),
-        change: faker.number.float({ min: 0, max: 50 }),
-        total_price: faker.number.float({ min: 100, max: 1000 }),
+        payment_method_id: faker.number.int({ min: 1, max: 5 }), // or adjust to your actual method count
+        amount_given,
+        change,
+        total_price,
+        discountPercentage,
+        discountedTotal,
       },
     });
   }

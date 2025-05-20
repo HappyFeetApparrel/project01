@@ -62,6 +62,8 @@ export interface OrderData {
   change: number;
   orderDate: Date;
   name: String;
+  discountPercentage: number;
+  discountedTotal: number;
 }
 
 import ProductSearch from "./product-search";
@@ -77,6 +79,7 @@ export function PlaceOrderDialog({
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
   const [change, setChange] = useState(0);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [discountPercentage, setDiscountPercentage] = useState(0);
 
   const { user } = useLayout();
   // const [inventory, setInventory] = useState<Product[]>([]);
@@ -153,35 +156,38 @@ export function PlaceOrderDialog({
     }
   };
 
-  const VAT_RATE = 0.12;
   const calculateTotal = () => {
     const subtotal = orderItems.reduce((total, item) => {
       return total + item.product.unit_price * item.quantity_in_stock;
     }, 0);
 
-    const vatAmount = subtotal * VAT_RATE;
-    const totalWithVAT = subtotal + vatAmount;
+    const discountAmount = (subtotal * discountPercentage) / 100;
+    const totalAfterDiscount = subtotal - discountAmount;
 
-    return { subtotal, vatAmount, totalWithVAT };
+    return {
+      subtotal,
+      discountAmount,
+      totalAfterDiscount,
+    };
   };
 
   useEffect(() => {
-    const { totalWithVAT } = calculateTotal();
+    const { totalAfterDiscount } = calculateTotal();
     const amountGiven = form.getValues("amountGiven");
-    setChange(amountGiven - totalWithVAT);
+    setChange(amountGiven - totalAfterDiscount);
   }, [orderItems, form.watch("amountGiven")]);
 
   const { saveActivity } = useLayout();
 
-  const { subtotal, vatAmount, totalWithVAT } = calculateTotal();
+  const { subtotal, discountAmount, totalAfterDiscount } = calculateTotal();
   async function onSubmit(values: z.infer<typeof orderSchema>) {
     try {
       if (orderItems.length === 0) {
         throw new Error("No products in order");
       }
 
-      const { subtotal, vatAmount, totalWithVAT } = calculateTotal();
-      if (values.amountGiven < totalWithVAT) {
+      const { subtotal, discountAmount, totalAfterDiscount } = calculateTotal();
+      if (values.amountGiven < totalAfterDiscount) {
         throw new Error("Insufficient payment amount");
       }
 
@@ -192,9 +198,11 @@ export function PlaceOrderDialog({
         user_id: Number(user?.user.id ?? 0),
         name: user?.user.name ?? "",
         items: orderItems,
-        totalAmount: totalWithVAT,
-        change: values.amountGiven - totalWithVAT,
+        totalAmount: totalAfterDiscount,
+        change: values.amountGiven - totalAfterDiscount,
         orderDate: new Date(),
+        discountPercentage: discountPercentage,
+        discountedTotal: totalAfterDiscount,
       };
 
       const response = await api.post("/order-data", orderData);
@@ -313,13 +321,23 @@ export function PlaceOrderDialog({
                       <span>Subtotal:</span>
                       <span>₱{subtotal.toFixed(2)}</span>
                     </div>
+                    <div className="flex justify-between text-lg pt-2 border-t gap-x-8">
+                      <Input
+                        type="number"
+                        placeholder="Discount"
+                        value={discountPercentage}
+                        onChange={(e) =>
+                          setDiscountPercentage(Number(e.target.value))
+                        }
+                      />
+                    </div>
                     <div className="flex justify-between text-lg pt-2">
-                      <span>VAT (12%):</span>
-                      <span>₱{vatAmount.toFixed(2)}</span>
+                      <span>Discount ({`${discountPercentage}%`}):</span>
+                      <span>₱{discountAmount.toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between font-bold text-lg pt-2">
                       <span>Total:</span>
-                      <span>₱{totalWithVAT.toFixed(2)}</span>
+                      <span>₱{totalAfterDiscount.toFixed(2)}</span>
                     </div>
                   </div>
                 )}

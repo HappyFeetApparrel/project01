@@ -57,8 +57,6 @@ const getOrdersData = async (period: string) => {
     },
   });
 
-  // return orders;
-
   const formattedOrders = orders.flatMap((order) =>
     order.order_items.map((item) => ({
       id: item.order_id,
@@ -111,6 +109,8 @@ export async function POST(req: Request): Promise<NextResponse> {
         amount_given: data.amountGiven,
         change: data.change,
         total_price: data.totalAmount,
+        discountPercentage: data.discountPercentage,
+        discountedTotal: data.discountedTotal,
       },
     });
 

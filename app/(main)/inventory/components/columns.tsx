@@ -2,7 +2,7 @@ import { ColumnDef } from "@tanstack/react-table";
 
 import { Button } from "@/components/ui/button";
 import { ArrowUpDown } from "lucide-react";
-import Image from 'next/image';
+import Image from "next/image";
 
 // types
 import { Product } from "@/prisma/type";
@@ -25,7 +25,13 @@ export const columns: ColumnDef<Product>[] = [
       );
     },
     cell: ({ row }) => (
-      <Image src={row.getValue("product_image")} alt="Product" width={400} height={300} className="w-16 h-16 object-cover" />
+      <Image
+        src={row.getValue("product_image")}
+        alt="Product"
+        width={400}
+        height={300}
+        className="w-16 h-16 object-cover"
+      />
     ),
     minSize: 200,
     maxSize: 400,
@@ -82,8 +88,9 @@ export const columns: ColumnDef<Product>[] = [
     },
     cell: ({ row }) => {
       const value = row.getValue("unit_price");
-      const formattedValue = typeof value === "number" && !isNaN(value) ? value : 0;
-  
+      const formattedValue =
+        typeof value === "number" && !isNaN(value) ? value : 0;
+
       return (
         <div className="text-right">
           ₱
@@ -97,7 +104,27 @@ export const columns: ColumnDef<Product>[] = [
     minSize: 100,
     maxSize: 200,
     size: 150,
-  },  
+  },
+  {
+    accessorKey: "size",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Size
+          <ArrowUpDown />
+        </Button>
+      );
+    },
+    cell: ({ row }) => (
+      <div className="text-center">{row.getValue("size")}</div>
+    ),
+    minSize: 100,
+    maxSize: 200,
+    size: 150,
+  },
   {
     accessorKey: "status",
     header: ({ column }) => {

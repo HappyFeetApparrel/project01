@@ -65,6 +65,8 @@ export type SalesOrder = {
   amount_given: number;
   change: number;
   total_price: number;
+  discountPercentage?: number; // Promo: e.g., 10 for 10%
+  discountedTotal?: number; // Total after discount
   created_at: Date;
 
   // Relations

@@ -15,6 +15,7 @@ interface ProductReturnCustom extends Returns {
   type: string;
   quantity: number;
   reason: string;
+  supplier_name?: string;
 }
 
 interface ViewProductReturnModalProps {
@@ -52,6 +53,12 @@ export function ViewProductReturnModal({
               <dt className="font-semibold">Reason:</dt>
               <dd>{returns.reason || "N/A"}</dd>
             </div>
+            {returns.supplier_name && (
+              <div className="col-span-1 span-y-4">
+                <dt className="font-semibold">Supplier Name:</dt>
+                <dd>{returns.supplier_name || "N/A"}</dd>
+              </div>
+            )}
           </dl>
         </div>
         <DialogFooter>

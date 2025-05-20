@@ -6,26 +6,41 @@ export async function GET(req: Request): Promise<NextResponse> {
     const returns = await prisma.return.findMany({
       include: {
         product: {
-          select: { name: true },
+          select: {
+            name: true,
+            supplier: {
+              select: {
+                name: true, // Only needed for product returns
+              },
+            },
+          },
         },
         order: {
-          select: { order_code: true },
+          select: {
+            order_code: true,
+          },
         },
       },
       orderBy: {
-        created_at: "desc", // Sort by latest
+        created_at: "desc",
       },
     });
 
-    const formattedReturns = returns.map((ret) => ({
-      name: ret.order_id ? ret.order?.order_code : ret.product?.name, // Order code if order return, else product name
-      type: ret.order_id ? "order" : "product",
-      quantity: ret.quantity,
-      reason: ret.reason,
-      return_id: ret.return_id,
-      product_id: ret.product_id,
-      order_item_id: ret.order_id,
-    }));
+    const formattedReturns = returns.map((ret) => {
+      const isProductReturn = !ret.order_id;
+      return {
+        name: isProductReturn ? ret.product?.name : ret.order?.order_code,
+        type: isProductReturn ? "product" : "order",
+        quantity: ret.quantity,
+        reason: ret.reason,
+        return_id: ret.return_id,
+        product_id: ret.product_id,
+        order_item_id: ret.order_id,
+        supplier_name: isProductReturn
+          ? (ret.product?.supplier?.name ?? null)
+          : null,
+      };
+    });
 
     return NextResponse.json({ data: formattedReturns }, { status: 200 });
   } catch (error) {

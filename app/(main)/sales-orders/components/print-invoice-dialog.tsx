@@ -113,20 +113,26 @@ export function PrintInvoiceDialog({
   // const taxAmount = orderData?.totalAmount ? orderData.totalAmount - subtotal : 0
 
   const VAT_RATE = 0.12;
-  const calculateTotal = (): any => {
+  const calculateTotal = () => {
+    if (!orderData) {
+      return { subtotal: 0, discountAmount: 0, totalAfterDiscount: 0 };
+    }
+
     const subtotal = orderData?.items.reduce((total, item) => {
       return total + item.product.unit_price * item.quantity_in_stock;
     }, 0);
 
-    // @ts-ignore
-    const vatAmount = subtotal * VAT_RATE;
-    // @ts-ignore
-    const totalWithVAT = subtotal + vatAmount;
+    const discountAmount = (subtotal * orderData?.discountPercentage) / 100;
+    const totalAfterDiscount = subtotal - discountAmount;
 
-    return { subtotal, vatAmount, totalWithVAT };
+    return {
+      subtotal,
+      discountAmount,
+      totalAfterDiscount,
+    };
   };
 
-  const { subtotal, vatAmount, totalWithVAT } = calculateTotal();
+  const { subtotal, discountAmount, totalAfterDiscount } = calculateTotal();
 
   // Format date for receipt
   const formattedDate = orderData?.orderDate
@@ -222,14 +228,16 @@ export function PrintInvoiceDialog({
                 <p>Subtotal:</p>
                 <p>₱{subtotal.toFixed(2) || "0.00"}</p>
               </div>
-              <div className="flex justify-between">
-                <p>VAT: 12%</p>
-                <p>₱{vatAmount.toFixed(2) || "0.00"}</p>
-              </div>
+              {orderData && orderData?.discountPercentage > 0 && (
+                <div className="flex justify-between">
+                  <span>Discount ({`${orderData?.discountPercentage}%`}):</span>
+                  <p>₱{discountAmount.toFixed(2) || "0.00"}</p>
+                </div>
+              )}
               <div className="flex justify-between font-bold mt-2">
                 <p>TOTAL:</p>
                 {/* @ts-ignore */}
-                <p clas>₱{totalWithVAT.toFixed(2)}</p>
+                <p clas>₱{totalAfterDiscount.toFixed(2)}</p>
               </div>
               <div className="flex justify-between">
                 {/* @ts-ignore */}

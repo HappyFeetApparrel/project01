@@ -16,7 +16,11 @@ import InventoryReportPDF from "./InventoryReportPDF";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { api } from "@/lib/axios"; // Import the api from your axios configuration
 
-export default function StockReports() {
+interface StockReportsProps {
+  className?: string;
+}
+
+export default function StockReports({ className }: StockReportsProps) {
   // State to store the fetched stock report data
   const [stockData, setStockData] = useState([]);
 
@@ -35,22 +39,23 @@ export default function StockReports() {
   }, []);
 
   return (
-    <div className="py-8 px-4 md:px-8 space-y-8 ">
+    <div className={`py-8 px-4 md:px-8 space-y-8 ${className ?? ""}`}>
       <Card className="w-full ">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-7 flex-wrap">
           <CardTitle className="text-2xl font-bold">Stock Report</CardTitle>
           <div className="flex items-center gap-4">
-          <div className="flex items-center space-x-4">
-            <div className="flex items-center">
-              <div className="h-3 w-3 rounded-full bg-[#2196F3] mr-2" />
-              <span className="text-sm text-muted-foreground">Stock In</span>
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center">
+                <div className="h-3 w-3 rounded-full bg-[#2196F3] mr-2" />
+                <span className="text-sm text-muted-foreground">Stock In</span>
+              </div>
+              <div className="flex items-center">
+                <div className="h-3 w-3 rounded-full bg-[#9C27B0] mr-2" />
+                <span className="text-sm text-muted-foreground">Stock Out</span>
+              </div>
             </div>
-            <div className="flex items-center">
-              <div className="h-3 w-3 rounded-full bg-[#9C27B0] mr-2" />
-              <span className="text-sm text-muted-foreground">Stock Out</span>
-            </div>
-          </div><InventoryReportPDF /></div>
-          
+            <InventoryReportPDF />
+          </div>
         </CardHeader>
         <CardContent>
           <div className="h-[400px] w-full">

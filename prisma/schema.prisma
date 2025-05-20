@@ -82,6 +82,8 @@ model SalesOrder {
   amount_given  Float
   change        Float
   total_price   Float
+  discountPercentage Float?   // Promo: e.g., 10 for 10%
+  discountedTotal    Float?   // Total after discount
   created_at  DateTime @default(now())
   updated_at  DateTime? @default(dbgenerated()) // Fix
 
