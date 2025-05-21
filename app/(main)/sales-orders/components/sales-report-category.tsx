@@ -28,11 +28,12 @@ const SalesReportPDF = ({
       const { data } = await response.json();
 
       // Optional: filter only for selectedCategory if passed
-      const filteredData = selectedCategory
-        ? data.filter(
-            (item: { category: string }) => item.category === selectedCategory
-          )
-        : data;
+      const filteredData =
+        selectedCategory && selectedCategory !== "All"
+          ? data.filter(
+              (item: { category: string }) => item.category === selectedCategory
+            )
+          : data;
 
       if (filteredData.length === 0) {
         setSalesData([]);
@@ -93,7 +94,6 @@ const SalesReportPDF = ({
       }));
 
       setSalesData(finalData);
-      console.log(finalData);
     };
 
     fetchSalesData();
@@ -166,7 +166,6 @@ const SalesReportPDF = ({
 
     for (let i = 0; i < salesData.length; i++) {
       const { category, totalSales, totalOrders } = salesData[i];
-      console.log(salesData[i]);
 
       if (y < minY) {
         await addFooter(page, {
