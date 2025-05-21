@@ -6,17 +6,98 @@ import { Button } from "@/components/ui/button";
 import { format, subMonths } from "date-fns";
 import { addHeader, addFooter } from "../utils/inventory";
 
-const SalesReportPDF = () => {
-  const [salesData, setSalesData] = useState([]);
+interface SalesReportByCategoryPDFProps {
+  selectedCategory: string;
+}
+
+const SalesReportPDF = ({
+  selectedCategory,
+}: SalesReportByCategoryPDFProps) => {
+  const [salesData, setSalesData] = useState<
+    {
+      salesData: { month: string; totalSales: number }[];
+      category: string;
+      totalSales: number;
+      totalOrders: number;
+    }[]
+  >([]);
 
   useEffect(() => {
     const fetchSalesData = async () => {
       const response = await fetch("/api/category-report");
-      const data = await response.json();
-      setSalesData(data.data);
+      const { data } = await response.json();
+
+      // Optional: filter only for selectedCategory if passed
+      const filteredData = selectedCategory
+        ? data.filter(
+            (item: { category: string }) => item.category === selectedCategory
+          )
+        : data;
+
+      if (filteredData.length === 0) {
+        setSalesData([]);
+        return;
+      }
+
+      const summarized: {
+        [category: string]: {
+          category: string;
+          totalSales: number;
+          totalOrders: number;
+          salesData: Record<string, number>;
+        };
+      } = {};
+
+      filteredData.forEach(
+        ({
+          category,
+          totalSales,
+          totalOrders,
+          salesData,
+        }: {
+          category: string;
+          totalSales: number;
+          totalOrders: number;
+          salesData: { month: string; totalSales: number }[];
+        }) => {
+          if (!summarized[category]) {
+            summarized[category] = {
+              category,
+              totalSales: 0,
+              totalOrders: 0,
+              salesData: {},
+            };
+          }
+
+          summarized[category].totalSales += totalSales;
+          summarized[category].totalOrders += totalOrders;
+
+          salesData.forEach(({ month, totalSales }) => {
+            if (!summarized[category].salesData[month]) {
+              summarized[category].salesData[month] = 0;
+            }
+            summarized[category].salesData[month] += totalSales;
+          });
+        }
+      );
+
+      // Convert summarized object to array
+      const finalData = Object.values(summarized).map((category) => ({
+        ...category,
+        salesData: Object.entries(category.salesData).map(
+          ([month, totalSales]) => ({
+            month,
+            totalSales,
+          })
+        ),
+      }));
+
+      setSalesData(finalData);
+      console.log(finalData);
     };
+
     fetchSalesData();
-  }, []);
+  }, [selectedCategory]);
 
   const generatePDF = async () => {
     const pdfDoc = await PDFDocument.create();
@@ -85,10 +166,9 @@ const SalesReportPDF = () => {
 
     for (let i = 0; i < salesData.length; i++) {
       const { category, totalSales, totalOrders } = salesData[i];
+      console.log(salesData[i]);
 
       if (y < minY) {
-        console.log(y);
-        console.log(minY);
         await addFooter(page, {
           companyName: "Happy Feet and Apparel",
           website: "www.happyfeetandapparel.com",

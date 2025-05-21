@@ -10,7 +10,13 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { format, parse, eachMonthOfInterval, startOfYear, endOfYear } from "date-fns";
+import {
+  format,
+  parse,
+  eachMonthOfInterval,
+  startOfYear,
+  endOfYear,
+} from "date-fns";
 import SalesReportByCategoryPDF from "./sales-report-category";
 
 const SalesReport = () => {
@@ -38,7 +44,10 @@ const SalesReport = () => {
             const existingSale = item.salesData.find(
               // @ts-ignore
               (sale) =>
-                format(parse(`${sale.month}-01`, "yyyy-MM-dd", new Date()), "MMM yyyy") === month
+                format(
+                  parse(`${sale.month}-01`, "yyyy-MM-dd", new Date()),
+                  "MMM yyyy"
+                ) === month
             );
             return {
               monthFormatted: month,
@@ -74,13 +83,18 @@ const SalesReport = () => {
         // @ts-ignore
         category: item.category,
         // @ts-ignore
-        totalSales: item.salesData.reduce((sum, entry) => sum + entry.totalSales, 0),
+        totalSales: item.salesData.reduce(
+          (sum: number, entry: { totalSales: number }) =>
+            sum + entry.totalSales,
+          0
+        ),
       }));
   } else {
     // Show monthly sales data for the selected category
     chartData =
-    // @ts-ignore
-      salesData.find((item) => item.category === selectedCategory)?.salesData || [];
+      // @ts-ignore
+      salesData.find((item) => item.category === selectedCategory)?.salesData ||
+      [];
   }
 
   return (
@@ -95,13 +109,15 @@ const SalesReport = () => {
           >
             <option value="All">All Categories</option>
             {/* @ts-ignore */}
-            {[...new Set(salesData.map((item) => item.category))].map((category) => (
-              <option key={category} value={category}>
-                {category}
-              </option>
-            ))}
+            {[...new Set(salesData.map((item) => item.category))].map(
+              (category) => (
+                <option key={category} value={category}>
+                  {category}
+                </option>
+              )
+            )}
           </select>
-          <SalesReportByCategoryPDF />
+          <SalesReportByCategoryPDF selectedCategory={selectedCategory} />
         </div>
       </div>
 
@@ -117,7 +133,9 @@ const SalesReport = () => {
             <BarChart data={chartData} margin={{ bottom: 50 }}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} />
               <XAxis
-                dataKey={selectedCategory === "All" ? "category" : "monthFormatted"}
+                dataKey={
+                  selectedCategory === "All" ? "category" : "monthFormatted"
+                }
                 axisLine={false}
                 tickLine={false}
                 tick={{
@@ -137,7 +155,9 @@ const SalesReport = () => {
               />
               <Tooltip
                 labelFormatter={(label) =>
-                  selectedCategory === "All" ? `Category: ${label}` : `Month: ${label}`
+                  selectedCategory === "All"
+                    ? `Category: ${label}`
+                    : `Month: ${label}`
                 }
                 contentStyle={{
                   backgroundColor: "hsl(var(--background))",
@@ -145,7 +165,12 @@ const SalesReport = () => {
                   borderRadius: "6px",
                 }}
               />
-              <Bar dataKey="totalSales" fill="#00A3FF" barSize={40} radius={[4, 4, 0, 0]} />
+              <Bar
+                dataKey="totalSales"
+                fill="#00A3FF"
+                barSize={40}
+                radius={[4, 4, 0, 0]}
+              />
             </BarChart>
           </ResponsiveContainer>
         )}
