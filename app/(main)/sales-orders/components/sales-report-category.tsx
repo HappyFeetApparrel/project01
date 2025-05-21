@@ -22,82 +22,79 @@ const SalesReportPDF = ({
     }[]
   >([]);
 
+  const [formattedSalesData, setFormattedSalesData] = useState<
+    {
+      salesData: { month: string; totalSales: number }[];
+      category: string;
+      totalSales: number;
+      totalOrders: number;
+    }[]
+  >([]);
+
   useEffect(() => {
     const fetchSalesData = async () => {
       const response = await fetch("/api/category-report");
       const { data } = await response.json();
 
-      // Optional: filter only for selectedCategory if passed
-      const filteredData =
-        selectedCategory && selectedCategory !== "All"
-          ? data.filter(
-              (item: { category: string }) => item.category === selectedCategory
-            )
-          : data;
-
-      if (filteredData.length === 0) {
-        setSalesData([]);
-        return;
-      }
-
-      const summarized: {
-        [category: string]: {
-          category: string;
-          totalSales: number;
-          totalOrders: number;
-          salesData: Record<string, number>;
-        };
-      } = {};
-
-      filteredData.forEach(
-        ({
-          category,
-          totalSales,
-          totalOrders,
-          salesData,
-        }: {
-          category: string;
-          totalSales: number;
-          totalOrders: number;
-          salesData: { month: string; totalSales: number }[];
-        }) => {
-          if (!summarized[category]) {
-            summarized[category] = {
-              category,
-              totalSales: 0,
-              totalOrders: 0,
-              salesData: {},
-            };
-          }
-
-          summarized[category].totalSales += totalSales;
-          summarized[category].totalOrders += totalOrders;
-
-          salesData.forEach(({ month, totalSales }) => {
-            if (!summarized[category].salesData[month]) {
-              summarized[category].salesData[month] = 0;
-            }
-            summarized[category].salesData[month] += totalSales;
-          });
-        }
-      );
-
-      // Convert summarized object to array
-      const finalData = Object.values(summarized).map((category) => ({
-        ...category,
-        salesData: Object.entries(category.salesData).map(
-          ([month, totalSales]) => ({
-            month,
-            totalSales,
-          })
-        ),
-      }));
-
-      setSalesData(finalData);
+      setSalesData(data);
     };
 
     fetchSalesData();
-  }, [selectedCategory]);
+  }, []);
+
+  useEffect(() => {
+    const filteredData =
+      selectedCategory && selectedCategory !== "All"
+        ? salesData.filter((item) => item.category === selectedCategory)
+        : salesData;
+
+    if (filteredData.length === 0) {
+      setFormattedSalesData([]);
+      return;
+    }
+
+    // const summarized: {
+    //   [category: string]: {
+    //     category: string;
+    //     totalSales: number;
+    //     totalOrders: number;
+    //     salesData: Record<string, number>;
+    //   };
+    // } = {};
+
+    // filteredData.forEach(({ category, totalSales, totalOrders, salesData }) => {
+    //   if (!summarized[category]) {
+    //     summarized[category] = {
+    //       category,
+    //       totalSales: 0,
+    //       totalOrders: 0,
+    //       salesData: {},
+    //     };
+    //   }
+
+    //   summarized[category].totalSales += totalSales;
+    //   summarized[category].totalOrders += totalOrders;
+
+    //   salesData.forEach(({ month, totalSales: monthlySales }) => {
+    //     if (!summarized[category].salesData[month]) {
+    //       summarized[category].salesData[month] = 0;
+    //     }
+    //     summarized[category].salesData[month] += monthlySales;
+    //   });
+    // });
+
+    // const finalData = Object.values(summarized).map((category) => ({
+    //   ...category,
+    //   salesData: Object.entries(category.salesData).map(
+    //     ([month, totalSales]) => ({
+    //       month,
+    //       totalSales,
+    //     })
+    //   ),
+    // }));
+
+    setFormattedSalesData(filteredData);
+  }, [salesData, selectedCategory]);
 
   const generatePDF = async () => {
     const pdfDoc = await PDFDocument.create();
@@ -164,8 +161,8 @@ const SalesReportPDF = ({
     y -= 120;
     addTableHeader();
 
-    for (let i = 0; i < salesData.length; i++) {
-      const { category, totalSales, totalOrders } = salesData[i];
+    for (let i = 0; i < formattedSalesData.length; i++) {
+      const { category, totalSales, totalOrders } = formattedSalesData[i];
 
       if (y < minY) {
         await addFooter(page, {

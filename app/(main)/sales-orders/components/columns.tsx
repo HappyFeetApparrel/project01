@@ -138,7 +138,9 @@ export const columns: ColumnDef<FormattedOrder>[] = [
         </Button>
       );
     },
-    cell: ({ row }) => <div>{row.getValue("brand")}</div>,
+    cell: ({ row }) => (
+      <div className="capitalize">{row.getValue("brand")}</div>
+    ),
     minSize: 100,
     maxSize: 200,
     size: 150,

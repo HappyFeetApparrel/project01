@@ -88,6 +88,30 @@ export const columns: ColumnDef<ProductReturnCustom>[] = [
     size: 250,
   },
   {
+    accessorKey: "supplier_name",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Supplier Name
+          <ArrowUpDown />
+        </Button>
+      );
+    },
+    cell: ({ row }) => {
+      function toSentenceCase(str: string) {
+        if (!str) return "";
+        return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+      }
+      return <div>{toSentenceCase(row.getValue("supplier_name"))}</div>;
+    },
+    minSize: 200,
+    maxSize: 400,
+    size: 250,
+  },
+  {
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => <Options row={row.original} />,
